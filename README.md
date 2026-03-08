@@ -1,69 +1,94 @@
-# Novica
-# Novica – Plateforme e-commerce d’artisanat culturel
+Libertia
+Libertia – Plateforme intelligente de planification de voyages
+Présentation
 
-## Présentation
+Libertia est une plateforme numérique intelligente permettant de générer automatiquement des voyages personnalisés grâce à l’intelligence artificielle.
 
-**Novica** est une plateforme e-commerce dédiée à la vente de produits artisanaux provenant de différentes cultures à travers le monde.
-Elle met en relation directe des **artisans locaux** avec des **consommateurs internationaux** à travers une plateforme numérique moderne.
+L’utilisateur peut décrire son voyage idéal à l’aide d’un prompt texte ou d’une commande vocale, en précisant :
 
-L’objectif est de valoriser l’artisanat, le commerce équitable et les traditions culturelles en proposant des produits authentiques accompagnés de l’histoire et du savoir-faire de leurs créateurs.
+la destination
 
-Contrairement aux marketplaces traditionnelles, Novica combine :
+les dates
 
-* commerce en ligne
-* storytelling culturel
-* engagement communautaire
+le budget
 
-Les utilisateurs peuvent découvrir des produits artisanaux, soutenir les créateurs et partager leurs expériences avec la communauté.
+le type de voyage (culturel, aventure, détente, luxe…)
 
----
+La plateforme analyse ces informations et génère un itinéraire complet et personnalisé, adapté au profil de l’utilisateur.
 
-# Objectifs du projet
+Contrairement aux plateformes traditionnelles comme
+Booking.com,
+Airbnb ou
+Tripadvisor,
+Libertia combine trois dimensions principales :
 
-* Mettre en relation artisans et acheteurs
-* Promouvoir l’artisanat et le commerce équitable
-* Valoriser les cultures du monde
-* Créer une communauté autour de l’artisanat
+IA conversationnelle
 
----
+expérience utilisateur adaptative
 
-# Technologies utilisées (Stack MERN)
+dimension communautaire
 
-Le projet sera développé avec la stack **MERN**.
+Les utilisateurs peuvent également partager leurs voyages, découvrir ceux d’autres voyageurs et rejoindre des groupes de voyage, créant ainsi une communauté autour de l’exploration du monde.
 
-### Frontend
+Objectifs du projet
 
-* React.js
-* React Router
-* Axios
-* CSS / Tailwind / Bootstrap
+Simplifier la planification de voyage grâce à l’intelligence artificielle
 
-### Backend
+Générer des itinéraires personnalisés automatiquement
 
-* Node.js
-* Express.js
+Permettre aux utilisateurs de partager leurs expériences
 
-### Base de données
+Créer une communauté de voyageurs
 
-* MongoDB
+Offrir une expérience interactive et intelligente
 
-### Authentification
+Technologies utilisées (Stack MERN)
 
-* JWT (JSON Web Token)
-* bcrypt
+Le projet est développé avec la stack MERN.
 
-### Outils de développement
+Frontend
 
-* Git
-* GitHub
-* Postman
-* Visual Studio Code
+React.js
 
----
+React Router
 
-# Architecture du projet
+Axios
 
-```
+TailwindCSS / CSS
+
+Backend
+
+Node.js
+
+Express.js
+
+Base de données
+
+MongoDB
+
+Intelligence artificielle
+
+API IA pour génération d’itinéraires
+
+Analyse de prompts utilisateurs
+
+Authentification
+
+JWT (JSON Web Token)
+
+bcrypt
+
+Outils de développement
+
+Git
+
+GitHub
+
+Postman
+
+Visual Studio Code
+
+Architecture du projet
 Client (React)
        │
        │ HTTP / API REST
@@ -73,60 +98,70 @@ Backend (Node.js + Express)
        │
        ▼
 Base de données (MongoDB)
-```
+       │
+       ▼
+Service IA (génération d’itinéraires)
+Fonctionnalités principales
+Gestion des utilisateurs
 
----
+Création de compte
 
-# Fonctionnalités principales
+Connexion
 
-## Gestion des utilisateurs
+Gestion du profil
 
-* Création de compte
-* Connexion
-* Gestion du profil
-* Historique des commandes
+Préférences de voyage
 
-## Catalogue de produits
+Génération de voyages avec IA
 
-* Parcourir les catégories
-* Recherche de produits
-* Filtres (prix, pays, catégorie)
+Génération d’itinéraires via prompt
 
-## Produits artisanaux
+Génération de voyages via commande vocale
 
-* Fiche produit détaillée
-* Photos et description
-* Histoire de l’artisan
+Adaptation selon le budget
 
-## Gestion du panier
+Adaptation selon les dates
 
-* Ajouter au panier
-* Modifier les quantités
-* Supprimer un produit
+Adaptation selon le type de voyage
 
-## Commandes
+Itinéraires intelligents
 
-* Passer une commande
-* Paiement sécurisé
-* Suivi de commande
+Planning détaillé par jour
 
-## Communauté
+Suggestions d’activités
 
-* Ajouter aux favoris
-* Laisser un avis
-* Partager un produit
+Estimation du budget
 
-## Gestion des artisans
+Recommandations de lieux à visiter
 
-* Création de profil artisan
-* Ajout de produits
-* Tableau de bord des ventes
+Feed communautaire
 
----
+Partage de voyages
 
-# Structure du projet
+Publication de photos et d’expériences
 
-novica
+Découverte des voyages d’autres utilisateurs
+
+Likes et commentaires
+
+Voyage en groupe
+
+Création de groupes de voyage
+
+Rejoindre des voyageurs
+
+Organisation collaborative de voyages
+
+Découverte et recommandations
+
+Recherche de destinations
+
+Suggestions personnalisées
+
+Recommandations basées sur les préférences
+
+Structure du projet
+libertia
 │
 ├── client
 │   ├── public
@@ -136,14 +171,16 @@ novica
 │   ├── src
 │   │   ├── components
 │   │   │   ├── Navbar.jsx
-│   │   │   ├── ProductCard.jsx
+│   │   │   ├── TravelCard.jsx
+│   │   │   ├── Itinerary.jsx
 │   │   │   └── Footer.jsx
 │   │   │
 │   │   ├── pages
 │   │   │   ├── Home.jsx
 │   │   │   ├── Login.jsx
 │   │   │   ├── Register.jsx
-│   │   │   └── ProductDetails.jsx
+│   │   │   ├── Dashboard.jsx
+│   │   │   └── TravelGenerator.jsx
 │   │   │
 │   │   ├── services
 │   │   │   └── api.js
@@ -157,18 +194,18 @@ novica
 ├── server
 │   ├── controllers
 │   │   ├── userController.js
-│   │   ├── productController.js
-│   │   └── orderController.js
+│   │   ├── travelController.js
+│   │   └── communityController.js
 │   │
 │   ├── models
 │   │   ├── User.js
-│   │   ├── Product.js
-│   │   └── Order.js
+│   │   ├── Travel.js
+│   │   └── Post.js
 │   │
 │   ├── routes
 │   │   ├── userRoutes.js
-│   │   ├── productRoutes.js
-│   │   └── orderRoutes.js
+│   │   ├── travelRoutes.js
+│   │   └── communityRoutes.js
 │   │
 │   ├── middleware
 │   │   ├── authMiddleware.js
@@ -178,111 +215,60 @@ novica
 │
 ├── package.json
 └── README.md
----
-
-# Installation du projet
-
-## 1. Cloner le repository
-
-```bash
-git clone https://github.com/ton-username/novica.git
-```
-
----
-
-## 2. Installer les dépendances backend
-
-```bash
+Installation du projet
+1. Cloner le repository
+git clone https://github.com/ton-username/libertia.git
+2. Installer les dépendances backend
 cd server
 npm install
-```
-
----
-
-## 3. Installer les dépendances frontend
-
-```bash
+3. Installer les dépendances frontend
 cd client
 npm install
-```
-
----
-
-# Lancer le projet
-
-## Démarrer le backend
-
-```bash
+Lancer le projet
+Démarrer le backend
 cd server
 npm run dev
-```
-
-## Démarrer le frontend
-
-```bash
+Démarrer le frontend
 cd client
 npm start
-```
-
----
-
-# API REST (exemples)
-
-### Utilisateurs
-
-```
+API REST (exemples)
+Utilisateurs
 POST /api/users/register
 POST /api/users/login
 GET /api/users/profile
-```
+Voyages
+POST /api/travel/generate
+GET /api/travel/:id
+GET /api/travel/history
+Communauté
+POST /api/posts
+GET /api/posts
+POST /api/posts/:id/like
+POST /api/posts/:id/comment
+Méthodologie de développement
 
-### Produits
+Le projet est géré avec une approche Agile / Scrum.
 
-```
-GET /api/products
-GET /api/products/:id
-POST /api/products
-```
+Les outils utilisés :
 
-### Commandes
+User Stories
 
-```
-POST /api/orders
-GET /api/orders
-GET /api/orders/:id
-```
+Issues GitHub
 
----
+Milestones
 
-# Méthodologie de développement
+Backlog produit
 
-Le projet est géré avec :
+Chaque fonctionnalité est développée à partir d’une User Story avec critères d’acceptation.
 
-* User Stories
-* Issues GitHub
-* Milestones
-* Backlog produit
+Améliorations futures
 
-Chaque fonctionnalité est développée à partir d’une **User Story** définissant les critères d’acceptation.
+recommandations avancées avec IA
 
----
+intégration d’API de vols et d’hôtels
 
-# Améliorations futures
+système de chat entre voyageurs
 
-* système de recommandations avec IA
-* système de notation avancé
-* chat entre acheteurs et artisans
-* application mobile
+planification collaborative
 
----
-
-# Auteur
-
-Projet réalisé dans le cadre d’un projet académique utilisant la stack **MERN**.
-
----
-
-# Licence
-
-Ce projet est destiné à un usage éducatif.
-jdn
+application mobile
