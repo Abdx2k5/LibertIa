@@ -304,7 +304,108 @@ def scrape_google_flights(destination, date_depart, origine="CMN"):
 #  Confirmé par debug : a[href*="/tours/"] → 24
 #  IDs Viator incorrects → utiliser recherche texte
 # ─────────────────────────────────────────────
+def scrape_viator(destination):
+    print(f"  🎯 Viator → {destination}...")
+    p, browser, context = get_browser(headless=False)
+    page = context.new_page()
+    stealth.use_sync(page)
+    results = []
 
+    try:
+        url = f"https://www.viator.com/fr-FR/search?text={destination}"
+        page.goto(url, timeout=60000)
+        page.wait_for_timeout(6000)
+
+        for selector in ['button[id*="accept"]', 'button:has-text("Accepter")', 'button:has-text("Accept all")']:
+            try:
+                page.click(selector, timeout=2000)
+                page.wait_for_timeout(1000)
+                break
+            except:
+                pass
+
+        # Attendre chargement complet avant de scroller
+        try:
+            page.wait_for_load_state("networkidle", timeout=10000)
+        except:
+            pass
+
+        for _ in range(4):
+            try:
+                page.evaluate("window.scrollBy(0, 700)")
+                page.wait_for_timeout(1500)
+            except:
+                break
+
+        # Sélecteur confirmé
+        liens = page.query_selector_all('a[href*="/tours/"]')
+        print(f"     🔍 {len(liens)} liens activités détectés")
+
+        vus = set()
+        for lien in liens[:20]:
+            try:
+                href = lien.get_attribute("href") or ""
+                if not href or href in vus:
+                    continue
+                vus.add(href)
+
+                nom_el = lien.query_selector('h3') or lien.query_selector('h2')
+                nom_text = nom_el.inner_text().strip() if nom_el else lien.inner_text().split("\n")[0].strip()
+                if not nom_text or len(nom_text) < 5:
+                    continue
+
+                prix = "N/A"
+                for sel in ['span[class*="price"]', 'div[class*="Price"]', 'span[class*="Price"]']:
+                    el = lien.query_selector(sel)
+                    if el:
+                        prix = el.inner_text().strip()
+                        break
+
+                note = "N/A"
+                for sel in ['span[class*="rating"]', 'div[class*="Rating"]', 'span[aria-label]']:
+                    el = lien.query_selector(sel)
+                    if el:
+                        note = el.get_attribute("aria-label") or el.inner_text().strip()
+                        break
+
+                lien_href = href if href.startswith("http") else "https://www.viator.com" + href
+
+                activite = {
+                    "nom": nom_text, "destination": destination,
+                    "prix": prix, "note": note, "lien_viator": lien_href,
+                    "source": "viator", "type": "activite",
+                    "scraped_at": datetime.now(),
+                    "expire_at": datetime.now() + timedelta(hours=12)
+                }
+                activites_col.update_one(
+                    {"nom": activite["nom"], "destination": destination},
+                    {"$set": activite}, upsert=True
+                )
+                results.append(activite)
+            except:
+                continue
+
+        print(f"     ✅ {len(results)} activités")
+    except Exception as e:
+        print(f"     ❌ Erreur Viator: {e}")
+    finally:
+        browser.close()
+        p.stop()
+
+    return results
+
+
+# ─────────────────────────────────────────────
+#  TRIPADVISOR
+#  Confirmé par debug : a[href*="Restaurant_Review"] → 206
+# ─────────────────────────────────────────────
+TRIPADVISOR_IDS = {
+    "Marrakech": "304135", "Paris": "187147", "Istanbul": "297662",
+    "Dubai": "295424", "Rome": "187791", "Alger": "299553",
+    "Tunis": "299557", "Barcelone": "187497",
+    "Athènes":   "189400",
+    "Athens":    "189400",
+}
 
 def scrape_tripadvisor(destination):
     print(f"  ⭐ TripAdvisor → {destination}...")
@@ -402,8 +503,6 @@ def scrape_destination_complete(destination, checkin, checkout, origine="CMN"):
     time.sleep(2)
     vols      = scrape_google_flights(destination, checkin, origine)
     time.sleep(2)
-    activites = scrape_viator(destination)
-    time.sleep(2)
     restos    = scrape_tripadvisor(destination)
 
     duree = (datetime.now() - debut).seconds
@@ -412,7 +511,7 @@ def scrape_destination_complete(destination, checkin, checkout, origine="CMN"):
         "destination": destination, "checkin": checkin,
         "checkout": checkout, "origine": origine,
         "hotels_trouves": len(hotels), "airbnb_trouves": len(airbnb),
-        "vols_trouves": len(vols), "activites_trouvees": len(activites),
+        "vols_trouves": len(vols), "activites_trouvees": 0,
         "restos_trouves": len(restos), "duree_scraping_sec": duree,
         "date": datetime.now()
     })
@@ -421,12 +520,11 @@ def scrape_destination_complete(destination, checkin, checkout, origine="CMN"):
     print(f"   🏨 Hôtels    : {len(hotels)}")
     print(f"   🏠 Airbnb    : {len(airbnb)}")
     print(f"   ✈️  Vols      : {len(vols)}")
-    print(f"   🎯 Activités : {len(activites)}")
     print(f"   🍽️  Restos    : {len(restos)}")
 
     return {
         "hotels": hotels, "airbnb": airbnb, "vols": vols,
-        "activites": activites, "restos": restos
+        "activites": [], "restos": restos
     }
 
 
@@ -435,8 +533,8 @@ def scrape_destination_complete(destination, checkin, checkout, origine="CMN"):
 # ─────────────────────────────────────────────
 if __name__ == "__main__":
     scrape_destination_complete(
-        destination="Athènes",
+        destination="Marrakech",
         checkin="2026-04-10",
         checkout="2026-04-13",
-        origine="Alexandrie"
+        origine="CMN"
     )

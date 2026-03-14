@@ -1,5 +1,9 @@
 const axios = require('axios');
 const { spawn } = require('child_process');
+const path  = require('path');
+
+// Racine du projet (LibertIa/) — un niveau au-dessus de server/
+const ROOT = path.join(__dirname, '..', '..', '..');
 const User = require('../models/User');
 const Voyage = require('../models/Voyage');
 
@@ -48,7 +52,7 @@ function scraperDestination(destination, checkin, checkout, origine) {
 
         const python = spawn('python', ['-c', `
 import sys
-sys.path.insert(0, '.')
+sys.path.insert(0, r'${ROOT}')
 from ai.scraper import scrape_destination_complete
 import json
 
@@ -59,7 +63,6 @@ result = scrape_destination_complete(
     origine="${args[3]}"
 )
 
-# Sérialiser en JSON (retirer les champs non-sérialisables)
 def clean(obj):
     if isinstance(obj, list):
         return [clean(i) for i in obj]
@@ -68,11 +71,11 @@ def clean(obj):
     return str(obj) if hasattr(obj, 'isoformat') else obj
 
 print(json.dumps(clean(result)))
-`]);
+`], { cwd: ROOT, env: { ...process.env, PYTHONIOENCODING: 'utf-8' } });
 
         let output = '';
         python.stdout.on('data', (d) => output += d.toString());
-        python.stderr.on('data', (d) => process.stderr.write(d)); // Log scraping dans console serveur
+        python.stderr.on('data', (d) => process.stderr.write(d));
 
         python.on('close', (code) => {
             try {
@@ -93,13 +96,13 @@ function getRAGContexte(query, destination) {
     return new Promise((resolve) => {
         const python = spawn('python', ['-c', `
 import sys
-sys.path.insert(0, '.')
+sys.path.insert(0, r'${ROOT}')
 from ai.embeddings import rechercher
 import json
 
 contexte = rechercher("${query}", destination="${destination}", n_results=4)
 print(json.dumps({"contexte": contexte}))
-`]);
+`], { cwd: ROOT, env: { ...process.env, PYTHONIOENCODING: 'utf-8' } });
 
         let output = '';
         python.stdout.on('data', (d) => output += d.toString());
@@ -243,9 +246,10 @@ const genererVoyage = async (req, res) => {
         // ── ÉTAPE 2 : RAG — contexte local (parallèle avec scraping) ──
         // ── ÉTAPE 3 : Scraping temps réel ──
         console.log('🔄 RAG + Scraping en parallèle...');
+        const scrapingTimeout = new Promise(resolve => setTimeout(() => resolve(null), 120000));
         const [ragContexte, scraping] = await Promise.all([
             getRAGContexte(prompt, destination),
-            scraperDestination(destination, checkin, checkout, origine)
+            Promise.race([scraperDestination(destination, checkin, checkout, origine), scrapingTimeout])
         ]);
 
         const donneesScraping = formaterDonneesScraping(scraping);
@@ -314,7 +318,7 @@ Réponds UNIQUEMENT en JSON avec cette structure :
                 num_predict: 1500,
                 num_ctx: 4096
             }
-        });
+        }, { timeout: 120000 }); // 2 minutes
 
         // ── ÉTAPE 6 : Parser la réponse ──
         let itineraire;
