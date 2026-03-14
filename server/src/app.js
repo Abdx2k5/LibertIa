@@ -30,7 +30,7 @@ app.get('/', (req, res) => {
 // Démarrage serveur
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {
-    console.log(`🚀 Serveur Libertia démarré sur le port ${PORT}`);
+    console.log(` Serveur Libertia démarré sur le port ${PORT}`);
 });
 
 module.exports = app;
