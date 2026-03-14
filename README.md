@@ -1,274 +1,225 @@
-Libertia
-Libertia – Plateforme intelligente de planification de voyages
-Présentation
-
-Libertia est une plateforme numérique intelligente permettant de générer automatiquement des voyages personnalisés grâce à l’intelligence artificielle.
-
-L’utilisateur peut décrire son voyage idéal à l’aide d’un prompt texte ou d’une commande vocale, en précisant :
-
-la destination
-
-les dates
-
-le budget
-
-le type de voyage (culturel, aventure, détente, luxe…)
-
-La plateforme analyse ces informations et génère un itinéraire complet et personnalisé, adapté au profil de l’utilisateur.
-
-Contrairement aux plateformes traditionnelles comme
-Booking.com,
-Airbnb ou
-Tripadvisor,
-Libertia combine trois dimensions principales :
-
-IA conversationnelle
-
-expérience utilisateur adaptative
-
-dimension communautaire
-
-Les utilisateurs peuvent également partager leurs voyages, découvrir ceux d’autres voyageurs et rejoindre des groupes de voyage, créant ainsi une communauté autour de l’exploration du monde.
-
-Objectifs du projet
-
-Simplifier la planification de voyage grâce à l’intelligence artificielle
-
-Générer des itinéraires personnalisés automatiquement
-
-Permettre aux utilisateurs de partager leurs expériences
-
-Créer une communauté de voyageurs
-
-Offrir une expérience interactive et intelligente
-
-Technologies utilisées (Stack MERN)
-
-Le projet est développé avec la stack MERN.
-
-Frontend
-
-React.js
-
-React Router
-
-Axios
-
-TailwindCSS / CSS
-
-Backend
-
-Node.js
-
-Express.js
-
-Base de données
-
-MongoDB
-
-Intelligence artificielle
-
-API IA pour génération d’itinéraires
-
-Analyse de prompts utilisateurs
-
-Authentification
-
-JWT (JSON Web Token)
-
-bcrypt
-
-Outils de développement
-
-Git
-
-GitHub
-
-Postman
-
-Visual Studio Code
-
-Architecture du projet
-Client (React)
-       │
-       │ HTTP / API REST
-       ▼
-Backend (Node.js + Express)
-       │
-       │
-       ▼
-Base de données (MongoDB)
-       │
-       ▼
-Service IA (génération d’itinéraires)
-Fonctionnalités principales
-Gestion des utilisateurs
-
-Création de compte
-
-Connexion
-
-Gestion du profil
-
-Préférences de voyage
-
-Génération de voyages avec IA
-
-Génération d’itinéraires via prompt
-
-Génération de voyages via commande vocale
-
-Adaptation selon le budget
-
-Adaptation selon les dates
-
-Adaptation selon le type de voyage
-
-Itinéraires intelligents
-
-Planning détaillé par jour
-
-Suggestions d’activités
-
-Estimation du budget
-
-Recommandations de lieux à visiter
-
-Feed communautaire
-
-Partage de voyages
-
-Publication de photos et d’expériences
-
-Découverte des voyages d’autres utilisateurs
-
-Likes et commentaires
-
-Voyage en groupe
-
-Création de groupes de voyage
-
-Rejoindre des voyageurs
-
-Organisation collaborative de voyages
-
-Découverte et recommandations
-
-Recherche de destinations
-
-Suggestions personnalisées
-
-Recommandations basées sur les préférences
-
-Structure du projet
-libertia
-│
-├── client
-│   ├── public
-│   │   ├── index.html
-│   │   └── favicon.ico
-│
-│   ├── src
-│   │   ├── components
-│   │   │   ├── Navbar.jsx
-│   │   │   ├── TravelCard.jsx
-│   │   │   ├── Itinerary.jsx
-│   │   │   └── Footer.jsx
-│   │   │
-│   │   ├── pages
-│   │   │   ├── Home.jsx
-│   │   │   ├── Login.jsx
-│   │   │   ├── Register.jsx
-│   │   │   ├── Dashboard.jsx
-│   │   │   └── TravelGenerator.jsx
-│   │   │
-│   │   ├── services
-│   │   │   └── api.js
-│   │   │
-│   │   ├── context
-│   │   │   └── AuthContext.jsx
-│   │   │
-│   │   ├── App.jsx
-│   │   └── index.js
-│
-├── server
-│   ├── controllers
-│   │   ├── userController.js
-│   │   ├── travelController.js
-│   │   └── communityController.js
-│   │
-│   ├── models
-│   │   ├── User.js
-│   │   ├── Travel.js
-│   │   └── Post.js
-│   │
-│   ├── routes
-│   │   ├── userRoutes.js
-│   │   ├── travelRoutes.js
-│   │   └── communityRoutes.js
-│   │
-│   ├── middleware
-│   │   ├── authMiddleware.js
-│   │   └── errorMiddleware.js
-│   │
-│   └── server.js
-│
-├── package.json
+# 🐦 LibertIA
+
+> **Voyagez intelligemment avec Libertia**  
+> Une plateforme de planification de voyage propulsée par l'IA, combinée à une communauté de voyageurs passionnés.
+
+---
+
+## 📖 Description
+
+LibertIA est une application web qui permet à l'utilisateur de décrire son voyage en langage naturel (texte ou voix), et génère automatiquement un itinéraire complet et personnalisé incluant vols, hôtels, activités et restaurants — le tout enrichi par les données de la communauté.
+
+---
+
+## ✨ Fonctionnalités
+
+### 🤖 Intelligence Artificielle
+- Génération d'itinéraires personnalisés via **Mistral 7B** (100% local)
+- Pipeline **RAG** (Retrieval-Augmented Generation) avec ChromaDB
+- Données réelles : OpenStreetMap, Hotels-API, Booking.com
+- Système freemium : 10 prompts gratuits puis abonnement
+
+### 👥 Communauté
+- Forum thématique (étudiants, voyage entre filles, voyage de noce, omra)
+- Partage d'itinéraires et carnets de voyage
+- Avis et recommandations validés par la communauté
+- Organisation de voyages en groupe
+
+### 🔒 Sécurité
+- Authentification JWT + bcrypt
+- 2FA (Two-Factor Authentication)
+- Rate limiting & protection CORS
+- Audit logs & monitoring
+
+### 💰 Monétisation
+- Freemium (10 prompts/mois gratuits)
+- Affiliation Travelpayouts (Booking.com, Skyscanner, Viator)
+- Commission sur réservations
+- Data B2B pour agences partenaires
+
+---
+
+## 🛠️ Stack Technique
+
+| Composant | Technologie |
+|-----------|-------------|
+| Frontend | React.js |
+| Backend | Node.js + Express |
+| Base de données | MongoDB |
+| IA | Mistral 7B (via Ollama) |
+| Embeddings | nomic-embed-text |
+| Base vectorielle | ChromaDB |
+| Données | OpenStreetMap + Hotels-API |
+| Authentification | JWT + bcrypt |
+
+---
+
+## 📁 Structure du Projet
+
+```
+LibertIA/
+├── client/                     # Frontend React
+│   └── src/
+│       ├── pages/              # Landing, Login, Register, Dashboard
+│       ├── components/         # Composants réutilisables
+│       └── services/           # Appels API
+├── server/                     # Backend Node.js
+│   └── src/
+│       ├── config/
+│       │   └── db.js           # Connexion MongoDB
+│       ├── controllers/
+│       │   ├── authController.js
+│       │   └── voyageController.js
+│       ├── models/
+│       │   ├── User.js
+│       │   └── Voyage.js
+│       ├── routes/
+│       │   ├── authRoutes.js
+│       │   └── voyageRoutes.js
+│       ├── middlewares/
+│       │   └── authMiddleware.js
+│       └── app.js
+├── ai/                         # Scripts IA & RAG
+│   ├── import_data.py          # Import données OpenStreetMap + Hotels-API
+│   ├── embeddings.py           # Vectorisation ChromaDB
+│   └── requirements.txt
+├── data/                       # Données brutes
+├── docs/                       # Documentation
 └── README.md
-Installation du projet
-1. Cloner le repository
-git clone https://github.com/ton-username/libertia.git
-2. Installer les dépendances backend
+```
+
+---
+
+## 🚀 Installation
+
+### Prérequis
+- Node.js 18+
+- Python 3.14+
+- MongoDB (local)
+- Ollama
+
+### 1. Cloner le projet
+```bash
+git clone https://github.com/Abdx2k5/LibertIa.git
+cd LibertIa
+```
+
+### 2. Backend
+```bash
 cd server
 npm install
-3. Installer les dépendances frontend
+```
+
+Créer le fichier `.env` :
+```env
+PORT=5000
+MONGO_URI=mongodb://localhost:27017/libertia
+JWT_SECRET=libertia_secret_key_2026
+```
+
+Lancer le serveur :
+```bash
+node src/app.js
+```
+
+### 3. IA (Ollama + Mistral)
+```bash
+# Installer Ollama sur https://ollama.com
+ollama pull mistral
+ollama pull nomic-embed-text
+ollama run mistral
+```
+
+### 4. Import des données
+```bash
+cd ai
+pip install -r requirements.txt
+python import_data.py
+```
+
+### 5. Frontend
+```bash
 cd client
 npm install
-Lancer le projet
-Démarrer le backend
-cd server
-npm run dev
-Démarrer le frontend
-cd client
 npm start
-API REST (exemples)
-Utilisateurs
-POST /api/users/register
-POST /api/users/login
-GET /api/users/profile
-Voyages
-POST /api/travel/generate
-GET /api/travel/:id
-GET /api/travel/history
-Communauté
-POST /api/posts
-GET /api/posts
-POST /api/posts/:id/like
-POST /api/posts/:id/comment
-Méthodologie de développement
+```
 
-Le projet est géré avec une approche Agile / Scrum.
+---
 
-Les outils utilisés :
+## 🔌 API Endpoints
 
-User Stories
+### Authentification
+| Méthode | Route | Description |
+|---------|-------|-------------|
+| POST | `/api/auth/register` | Créer un compte |
+| POST | `/api/auth/login` | Se connecter |
+| GET | `/api/auth/me` | Profil utilisateur (protégé) |
 
-Issues GitHub
+### Voyages
+| Méthode | Route | Description |
+|---------|-------|-------------|
+| POST | `/api/voyages/generer` | Générer un itinéraire IA |
+| GET | `/api/voyages/mes-voyages` | Historique des voyages |
+| GET | `/api/voyages/:id` | Détail d'un voyage |
 
-Milestones
+---
 
-Backlog produit
+## 🗺️ Roadmap
 
-Chaque fonctionnalité est développée à partir d’une User Story avec critères d’acceptation.
+### ✅ Mois 1 — IA + Auth + Frontend
+- [x] Authentification JWT
+- [x] Pipeline Mistral 7B
+- [x] Import données OSM + Hotels-API
+- [ ] RAG avec ChromaDB
+- [ ] Frontend React (Landing, Login, Dashboard)
 
-Améliorations futures
+### 🔜 Mois 2 — Communauté + Sécurité
+- [ ] Forum thématique
+- [ ] Partage d'itinéraires
+- [ ] 2FA + OAuth
+- [ ] Rate limiting & audit logs
 
-recommandations avancées avec IA
+### ⏳ Mois 3 — Finalisation
+- [ ] Affiliation Travelpayouts
+- [ ] Data warehouse
+- [ ] Tests end-to-end
+- [ ] Export PDF itinéraires
 
-intégration d’API de vols et d’hôtels
+---
 
-système de chat entre voyageurs
+## 👥 Équipe — Groupe Colibri
 
-planification collaborative
+| Membre | Rôle |
+|--------|------|
+| Abdelwahab | Backend + IA + RAG + Sécurité |
+| Équipière 1 | Frontend React + Backend affilié |
+| Équipière 2 | Sécurité + User Stories |
 
-application mobile
+---
+
+## 🌿 Branches Git
+
+| Branche | Description |
+|---------|-------------|
+| `main` | Production — code stable livrable |
+| `develop` | Intégration — toutes les features |
+| `feature/auth` | ✅ Authentification |
+| `feature/ai` | ✅ Pipeline IA Mistral |
+| `feature/rag` | 🔜 RAG + ChromaDB |
+| `feature/client` | 🔜 Frontend React |
+| `feature/forum` | ⏳ Communauté |
+| `feature/security` | ⏳ Sécurité |
+
+---
+
+## 📄 Licence
+
+Projet académique — ESISA 2026 — Groupe Colibri  
+Usage privé uniquement.
+
+---
+
+<div align="center">
+  <strong>🐦 LibertIA — Voyagez intelligemment</strong><br/>
+  Groupe Colibri • ESISA • 2026
+</div>
