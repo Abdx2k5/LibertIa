@@ -1,14 +1,18 @@
 import "./styles/Banner.css";
 
-export default function Banner({ userName }) {
+export default function Banner() {
   return (
-    <div className="flex flex-col items-center gap-2 pt-6 pb-2 w-full">
-      <h1 className="text-[#e6f0ff] text-[32px] font-bold text-center">
-        Bonjour {userName} ! Prêt pour l'aventure ?
+    <section className="banner">
+
+      <h1>
+        Où votre imagination vous porte-t-elle aujourd'hui ?
       </h1>
-      <p className="text-[#97b6c8] text-[15px] text-center">
-        Dites-moi où vous voulez aller, je m'occupe des vols d'abord, puis des hébergements.
+
+      <p>
+        Je suis votre assistant de voyage personnel.
+        Je trouve vols, hôtels et activités selon vos envies et votre budget.
       </p>
-    </div>
+
+    </section>
   );
 }

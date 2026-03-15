@@ -1,0 +1,63 @@
+.flightsection-container {
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 16px;
+  padding: 22px;
+  box-shadow: 0 14px 32px rgba(0, 0, 0, 0.35);
+}
+
+.flightsection-header {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.flightsection-step-num {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  color: #0ff;
+  background: rgba(0,255,255,0.08);
+  border: 1px solid rgba(0,255,255,0.2);
+  border-radius: 4px;
+  padding: 2px 8px;
+}
+
+.flightsection-step-icon {
+  width: 16px;
+  height: 16px;
+  color: #0ff;
+}
+
+.flightsection-title {
+  color: #e6f0ff;
+  font-size: 20px;
+  font-weight: 700;
+  margin: 0;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.flightsection-track {
+  background: rgba(255, 255, 255, 0.08);
+  height: 5px;
+  border-radius: 999px;
+  overflow: hidden;
+}
+
+.flightsection-bar {
+  height: 100%;
+  background: linear-gradient(90deg, #0ff, #a78bfa);
+  border-radius: 999px;
+  box-shadow: 0 0 10px rgba(0,255,255,0.5);
+}
+
+.flightsection-summary {
+  color: #97b6c8;
+  font-size: 14px;
+  margin: 0;
+}

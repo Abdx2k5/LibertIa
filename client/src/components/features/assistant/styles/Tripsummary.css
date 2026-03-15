@@ -1,0 +1,228 @@
+/* Tripsummary.css */
+.tripsummary-container {
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 16px;
+  padding: 32px;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
+}
+
+.tripsummary-budgetbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 28px;
+  padding: 18px;
+  border-radius: 14px;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.07);
+}
+
+.tripsummary-budget-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 16px;
+  flex: 1;
+}
+
+.tripsummary-budget-block {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.tripsummary-budget-label {
+  font-size: 12px;
+  color: #97b6c8;
+}
+
+.tripsummary-budget-value {
+  color: #e6f0ff;
+  font-size: 22px;
+  font-weight: 800;
+}
+
+.tripsummary-budget-cyan {
+  color: #0ff;
+}
+
+.tripsummary-budget-btn {
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 10px;
+  padding: 12px 16px;
+  color: #e6f0ff;
+  cursor: pointer;
+}
+
+.tripsummary-title {
+  color: #e6f0ff;
+  font-size: 24px;
+  font-weight: bold;
+  text-align: center;
+  margin: 0 0 8px 0;
+}
+
+.tripsummary-subtitle {
+  color: #97b6c8;
+  font-size: 16px;
+  text-align: center;
+  margin: 0 0 32px 0;
+}
+
+.tripsummary-details {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  margin-bottom: 32px;
+}
+
+.tripsummary-item {
+  background: rgba(0, 0, 0, 0.2);
+  border-radius: 8px;
+  padding: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.tripsummary-item-left {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.tripsummary-item-icon {
+  width: 20px;
+  height: 20px;
+  color: #0ff;
+}
+
+.tripsummary-item-title {
+  color: #e6f0ff;
+  font-size: 14px;
+  font-weight: 500;
+  margin: 0 0 4px 0;
+}
+
+.tripsummary-item-subtitle {
+  color: #97b6c8;
+  font-size: 12px;
+  margin: 0;
+}
+
+.tripsummary-item-price {
+  color: #0ff;
+  font-size: 18px;
+  font-weight: bold;
+  margin: 0;
+}
+
+.tripsummary-total {
+  background: rgba(0, 255, 255, 0.05);
+  border: 1px solid #0ff;
+  border-radius: 8px;
+  padding: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.tripsummary-total-left {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.tripsummary-total-icon {
+  width: 24px;
+  height: 24px;
+  color: #0ff;
+}
+
+.tripsummary-total-label {
+  color: #e6f0ff;
+  font-size: 16px;
+  font-weight: bold;
+  margin: 0;
+}
+
+.tripsummary-total-price {
+  color: #0ff;
+  font-size: 24px;
+  font-weight: bold;
+  margin: 0;
+}
+
+.tripsummary-budget-remaining {
+  color: #97b6c8;
+  font-size: 13px;
+  text-align: center;
+  margin: 8px 0 0 0;
+}
+
+.tripsummary-budget-highlight {
+  color: #0ff;
+}
+
+.tripsummary-actions {
+  display: flex;
+  gap: 16px;
+  align-items: center;
+  justify-content: flex-start;
+  flex-wrap: wrap;
+}
+
+.tripsummary-btn-secondary {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 8px;
+  padding: 12px 24px;
+  color: #e6f0ff;
+  font-size: 14px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.tripsummary-btn-secondary:hover {
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.tripsummary-btn-confirm {
+  background: #0ff;
+  border: none;
+  border-radius: 8px;
+  padding: 12px 32px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: #001217;
+  font-size: 16px;
+  font-weight: bold;
+  box-shadow: 0px 4px 15px 0px rgba(0, 255, 255, 0.2);
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.tripsummary-btn-confirm:hover {
+  background: #00e6e6;
+}
+
+.tripsummary-btn-icon {
+  width: 20px;
+  height: 20px;
+}
+
+@media (max-width: 900px) {
+  .tripsummary-budgetbar {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .tripsummary-budget-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
