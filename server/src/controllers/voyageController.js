@@ -1,38 +1,18 @@
 const axios = require('axios');
+const { spawn } = require('child_process');
+const path  = require('path');
+
+// Racine du projet (LibertIa/) — un niveau au-dessus de server/
+const ROOT = path.join(__dirname, '..', '..', '..');
 const User = require('../models/User');
 const Voyage = require('../models/Voyage');
-// URL du service Ollama (à externaliser dans .env)
-const OLLAMA_URL = process.env.OLLAMA_URL || 'http://localhost:11434/api/generate';
-/*
-* NOUVEAU :
- * - Validation des entrées
- * - Gestion des erreurs de connexion à l'IA (timeout, refus)
- * - Parsing JSON robuste (extraction même si l'IA ajoute du texte)
- * - Utilisation des champs existants (abonnement, promptsUtilises)
- *  MODIFICATIONS :
- * - Correction de la condition de quota (utilisation de user.peutGenerer())
- * - Gestion des erreurs Axios (timeout, refus de connexion)
- * - Parsing robuste avec fallback
- * - Utilisation des méthodes du modèle User (peutGenerer, promptsRestants)
- * - Mise à jour du compteur avec user.save() plutôt que findByIdAndUpdate
- * - Suppression des doublons dans la réponse JSON
-*/
+
 // @POST /api/voyages/generer
 const genererVoyage = async (req, res) => {
     try {
         const { prompt } = req.body;
         const userId = req.user._id;
-        
-        // 1. Validation des inputs 
-        // Protège contre les requêtes vides ou trop courtes
-        if (!prompt || prompt.trim().length < 5) {
-            return res.status(400).json({ 
-                success: false,
-                message: 'Le prompt doit contenir au moins 5 caractères' 
-            });
-        }  
 
-        //Récupération utilisateur et vérification quota 
         const user = await User.findById(userId);
         if (!user) {
             return res.status(404).json({ 
@@ -50,9 +30,7 @@ const genererVoyage = async (req, res) => {
             });
         }
 
-        let response;
-        try {
-            response = await axios.post(OLLAMA_URL, {
+        const response = await axios.post('http://localhost:11434/api/generate', {
             model: 'mistral',
             prompt: `Tu es un expert en voyage. Génère un itinéraire détaillé en JSON pour: ${prompt}. 
             Réponds UNIQUEMENT en JSON avec cette structure:
@@ -79,92 +57,38 @@ const genererVoyage = async (req, res) => {
             stream: false,
             options: {
                 temperature: 0.7,
-                num_predict: 800,
-                num_ctx: 2048
+                num_predict: 1500,
+                num_ctx: 4096
             }
         });
-        }  catch (error) {
-            console.error('Erreur appel Ollama:', error.message);
-            if (error.code === 'ECONNREFUSED') {
-                return res.status(503).json({
-                    success: false,
-                    message: 'Service IA indisponible - Veuillez réessayer plus tard'
-                });
-            }
-            if (error.code === 'ETIMEDOUT') {
-                return res.status(504).json({
-                    success: false,
-                    message: 'Délai de génération dépassé - Veuillez réessayer'
-                });
-            }
-            return res.status(500).json({
-                success: false,
-                message: 'Erreur lors de la communication avec l\'IA'
-            });
-        }
 
-        let itinerairData;
+        let itineraire;
         try {
             const text = response.data.response;
             const jsonMatch = text.match(/\{[\s\S]*\}/);
-            itineraireData = JSON.parse(jsonMatch[0]);
-            // Validation minimale (présence de destination et jours)
-            if (!itineraireData.destination || !itineraireData.jours) {
-                throw new Error('Structure JSON incomplète');
-            }
-        } catch (parseError) {
-            console.error('Erreur parsing JSON:', parseError.message);
-            // Fallback : on garde le prompt comme titre et on crée un itinéraire minimal
-            itineraireData = {
-                destination: prompt.split(' ').slice(0, 2).join(' ') || 'Destination inconnue',
-                duree_jours: 3,
-                budget_estime: 'À définir',
-                jours: [
-                    {
-                        jour: 1,
-                        matin: { activite: 'Exploration libre', lieu: 'Centre-ville', duree: '3h' },
-                        apres_midi: { activite: 'Visites', lieu: 'À découvrir', duree: '3h' },
-                        soir: { activite: 'Dîner', lieu: 'Restaurant local', duree: '2h' }
-                    }
-                ],
-                conseils: ['Vérifiez les conditions locales', 'Réservez à l\'avance'],
-                budget_detail: {
-                    hotel: 'À définir',
-                    transport: 'À définir',
-                    repas: 'À définir',
-                    activites: 'À définir'
-                }
-            };
+            itineraire = JSON.parse(jsonMatch[0]);
+        } catch {
+            return res.status(500).json({ message: 'Erreur parsing réponse IA' });
         }
-        // Mise à jour du compteur de prompts utilisés
-        user.promptsUtilises += 1;
-        await user.save();
-        // Création du voyage avec les champs du modèle Voyage
+
+        await User.findByIdAndUpdate(userId, {
+            $inc: { promptsUtilises: 1 }
+        });
+
         const voyage = await Voyage.create({
             user: userId,
             prompt,
-            itineraire: itineraireData,
-            titre: `Voyage à ${itineraireData.destination}`,
-            destination: itineraireData.destination,
-            dates: {
-                start: new Date(),
-                end: new Date(Date.now() + (itineraireData.duree_jours || 3) * 24 * 60 * 60 * 1000)
-            },
-            budget: { total: parseFloat(itineraireData.budget_estime) || 0, currency: 'EUR' }
+            itineraire
         });
         //Réponse
         res.json({
-            success: true,
-            message: 'Voyage généré avec succès',
-            data: {
-                voyageId: voyage._id,
-                itineraire: itineraireData,
-                promptsRestants: user.abonnement === 'free' ? 10 - user.promptsUtilises : 'Illimité'
-            }
+            succes: true,
+            promptsRestants: 10 - (user.promptsUtilises + 1),
+            voyageId: voyage._id,
+            itineraire
         });
 
     } catch (err) {
-        console.error('Erreur génération voyage:', err);
         res.status(500).json({ message: err.message });
     }
 };
