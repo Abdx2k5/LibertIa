@@ -98,7 +98,6 @@ userSchema.pre('save', async function () {
     if (!this.isModified('motDePasse')) return;
     this.motDePasse = await bcrypt.hash(this.motDePasse, 10);
 });
-
 // Comparer mot de passe
 userSchema.methods.comparerMotDePasse = async function (motDePasseSaisi) {
     return await bcrypt.compare(motDePasseSaisi, this.motDePasse);
@@ -131,10 +130,8 @@ userSchema.methods.estExpire = function() {
     if (!this.dateFinAbonnement) return false;
     return new Date() > this.dateFinAbonnement;
 };
-// Index pour recherche rapide par email
-userSchema.index({ email: 1 });
+
 // Index textuel pour recherche par nom
 userSchema.index({ nom: 'text' });
-
 
 module.exports = mongoose.model('User', userSchema);
