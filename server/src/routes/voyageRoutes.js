@@ -1,14 +1,20 @@
 const express = require('express');
 const router = express.Router();
-const { genererVoyage, getMesVoyages, getVoyage , supprimerVoyage ,togglePartage , ajouterLike , retirerLike } = require('../controllers/voyageController');
+const {
+    genererVoyage,
+    genererVoyageStream,
+    getMesVoyages,
+    getVoyage
+} = require('../controllers/voyageController');
 const { proteger } = require('../middlewares/authMiddleware');
 
-router.post('/generer', proteger, genererVoyage);
-router.get('/mes-voyages', proteger, getMesVoyages);
-router.get('/:id', proteger, getVoyage);
-router.delete('/:id', proteger, supprimerVoyage);
-router.patch('/:id/partage', proteger, togglePartage);
-router.post('/:id/like', proteger, ajouterLike);
-router.delete('/:id/like', proteger, retirerLike);
+// Version normale
+router.post('/generer',        proteger, genererVoyage);
+
+// T24 — Version streaming SSE
+router.post('/generer/stream', proteger, genererVoyageStream);
+
+router.get('/mes-voyages',     proteger, getMesVoyages);
+router.get('/:id',             proteger, getVoyage);
 
 module.exports = router;

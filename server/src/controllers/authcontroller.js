@@ -1,57 +1,50 @@
 const User = require('../models/User');
+const Voyage = require('../models/Voyage');
 const jwt = require('jsonwebtoken');
+const crypto = require('crypto');
+const nodemailer = require('nodemailer');
 
-// Générer un token JWT
+// ─────────────────────────────────────────────
+//  HELPERS
+// ─────────────────────────────────────────────
 const genererToken = (id) => {
-    return jwt.sign({ id }, process.env.JWT_SECRET, {
-        expiresIn: '7d'
-    });
+    return jwt.sign({ id }, process.env.JWT_SECRET, { expiresIn: '7d' });
 };
 
-// @route   POST /api/auth/register
-// @desc    Inscription d'un nouvel utilisateur
-// @access  Public
+const transporter = nodemailer.createTransport({
+    service: 'gmail',
+    auth: {
+        user: process.env.EMAIL_USER,
+        pass: process.env.EMAIL_PASS
+    }
+});
+
+// ─────────────────────────────────────────────
+//  AUTH
+// ─────────────────────────────────────────────
+
+// @POST /api/auth/register
 const register = async (req, res) => {
     try {
         const { nom, email, motDePasse, age } = req.body;
-        // Validation basique
-        if (!nom || !email || !motDePasse) {
-            return res.status(400).json({ 
-                success: false,
-                message: 'Veuillez fournir nom, email et mot de passe' 
-            });
-        }if (motDePasse.length < 6) {
-            return res.status(400).json({ 
-                success: false,
-                message: 'Le mot de passe doit contenir au moins 6 caractères' 
-            });
-        }
-        // Vérifier si l'utilisateur existe déjà
+
         const userExiste = await User.findOne({ email });
         if (userExiste) {
             return res.status(400).json({ message: 'Email déjà utilisé' });
         }
 
-        // Créer l'utilisateur(les valeurs par défaut sont gérées par le modèle)
         const user = await User.create({ nom, email, motDePasse, age });
-        // Générer le token
-        const token = genererToken(user._id);
+
         res.status(201).json({
             _id: user._id,
             nom: user.nom,
             email: user.email,
             abonnement: user.abonnement,
-            profilePhoto: user.profilePhoto,
-            promptsRestants: user.promptsRestants(),
-            token
+            token: genererToken(user._id)
         });
 
     } catch (err) {
-        console.error('Erreur register:', err);
-        res.status(500).json({ 
-            success: false,
-            message: 'Erreur lors de l\'inscription' 
-        });
+        res.status(500).json({ message: err.message });
     }
 };
 
@@ -60,137 +53,243 @@ const login = async (req, res) => {
     try {
         const { email, motDePasse } = req.body;
 
-        if (!email || !motDePasse) {
-            return res.status(400).json({ 
-                success: false,
-                message: 'Veuillez fournir email et mot de passe' 
-            });
-        }
-        // Trouver l'utilisateur
         const user = await User.findOne({ email });
         if (!user) {
             return res.status(401).json({ message: 'Email ou mot de passe incorrect' });
         }
-        // Vérifier si le compte est actif
-        if (user.isActive === false) {
-            return res.status(403).json({ 
-                success: false,
-                message: 'Ce compte a été désactivé' 
-            });
-        }
-        // Vérifier le mot de passe
+
         const motDePasseValide = await user.comparerMotDePasse(motDePasse);
         if (!motDePasseValide) {
             return res.status(401).json({ message: 'Email ou mot de passe incorrect' });
         }
-        // Mettre à jour la dernière connexion
-        user.lastLogin = Date.now();
-        await user.save();
 
-        // Générer le token
-        const token = genererToken(user._id);
         res.json({
             _id: user._id,
             nom: user.nom,
             email: user.email,
             abonnement: user.abonnement,
-            profilePhoto: user.profilePhoto,
-            promptsRestants: user.promptsRestants(),
-            token
+            token: genererToken(user._id)
         });
 
     } catch (err) {
-        console.error('Erreur login:', err);
-        res.status(500).json({ 
-            success: false,
-            message: 'Erreur lors de la connexion' 
-        });
+        res.status(500).json({ message: err.message });
     }
 };
 
-
-// @route   GET /api/auth/me
-// @desc    Obtenir le profil de l'utilisateur connecté
-// @access  Private
+// @GET /api/auth/me
 const getMe = async (req, res) => {
-try {
-        // req.user est déjà chargé par le middleware proteger
-        const user = await User.findById(req.user._id)
-            .select('-motDePasse')
-            .populate('followers', 'nom profilePhoto')
-            .populate('following', 'nom profilePhoto');
-
-        res.json(req.user);
-    } catch (err) {
-        console.error('Erreur getMe:', err);
-        res.status(500).json({ 
-            success: false,
-            message: 'Erreur lors de la récupération du profil' 
-        });
-    }
+    res.json(req.user);
 };
 
-// @route   POST /api/auth/logout
-// @desc    Déconnexion (côté client, on peut juste renvoyer un succès)
-// @access  Private
-const logout = async (req, res) => {
+// ─────────────────────────────────────────────
+//  T6 — @POST /api/auth/forgot-password
+// ─────────────────────────────────────────────
+const forgotPassword = async (req, res) => {
     try {
-        // Avec JWT, la déconnexion est gérée côté client en supprimant le token
-        res.json({
-            success: true,
-            message: 'Déconnexion réussie'
+        const { email } = req.body;
+
+        const user = await User.findOne({ email });
+        if (!user) {
+            return res.json({ message: 'Si cet email existe, un lien de réinitialisation a été envoyé.' });
+        }
+
+        const resetToken = crypto.randomBytes(32).toString('hex');
+        const resetTokenHashe = crypto.createHash('sha256').update(resetToken).digest('hex');
+
+        user.resetPasswordToken = resetTokenHashe;
+        user.resetPasswordExpire = Date.now() + 15 * 60 * 1000;
+        await user.save();
+
+        const resetUrl = `${process.env.FRONTEND_URL || 'http://localhost:3000'}/reset-password/${resetToken}`;
+
+        await transporter.sendMail({
+            from: `"LibertIa" <${process.env.EMAIL_USER}>`,
+            to: user.email,
+            subject: 'Réinitialisation de votre mot de passe — LibertIa',
+            html: `
+                <div style="font-family: Arial, sans-serif; max-width: 600px; margin: auto;">
+                    <h2 style="color: #1B4F72;">LibertIa 🌍</h2>
+                    <p>Bonjour <strong>${user.nom}</strong>,</p>
+                    <p>Vous avez demandé une réinitialisation de votre mot de passe.</p>
+                    <p>Cliquez sur le bouton ci-dessous pour choisir un nouveau mot de passe :</p>
+                    <a href="${resetUrl}" 
+                       style="display:inline-block; background:#1B4F72; color:white; padding:12px 24px; 
+                              border-radius:6px; text-decoration:none; margin:16px 0;">
+                        Réinitialiser mon mot de passe
+                    </a>
+                    <p style="color:#888; font-size:12px;">Ce lien expire dans <strong>15 minutes</strong>.</p>
+                    <p style="color:#888; font-size:12px;">Si vous n'avez pas demandé cette réinitialisation, ignorez cet email.</p>
+                </div>
+            `
         });
+
+        res.json({ message: 'Si cet email existe, un lien de réinitialisation a été envoyé.' });
+
     } catch (err) {
-        res.status(500).json({ 
-            success: false,
-            message: err.message 
-        });
+        res.status(500).json({ message: err.message });
     }
 };
 
-// @route   PUT /api/auth/profile
-// @desc    Mettre à jour le profil de l'utilisateur
-// @access  Private
+// ─────────────────────────────────────────────
+//  T8 — @POST /api/auth/reset-password/:token
+// ─────────────────────────────────────────────
+const resetPassword = async (req, res) => {
+    try {
+        const { token } = req.params;
+        const { motDePasse } = req.body;
+
+        const resetTokenHashe = crypto.createHash('sha256').update(token).digest('hex');
+
+        const user = await User.findOne({
+            resetPasswordToken: resetTokenHashe,
+            resetPasswordExpire: { $gt: Date.now() }
+        });
+
+        if (!user) {
+            return res.status(400).json({ message: 'Token invalide ou expiré.' });
+        }
+
+        user.motDePasse = motDePasse;
+        user.resetPasswordToken = undefined;
+        user.resetPasswordExpire = undefined;
+        await user.save();
+
+        res.json({ message: 'Mot de passe mis à jour avec succès.' });
+
+    } catch (err) {
+        res.status(500).json({ message: err.message });
+    }
+};
+
+// ─────────────────────────────────────────────
+//  T12 — @PUT /api/auth/update-profile
+// ─────────────────────────────────────────────
 const updateProfile = async (req, res) => {
     try {
-        const { nom, age, bio, preferences } = req.body;
         const userId = req.user._id;
+        const { nom, age, preferences, bio } = req.body;
+
+        const champsAutorises = {};
+        if (nom)         champsAutorises.nom         = nom;
+        if (age)         champsAutorises.age         = age;
+        if (preferences) champsAutorises.preferences = preferences;
+        if (bio)         champsAutorises.bio         = bio;
+
+        const user = await User.findByIdAndUpdate(
+            userId,
+            { $set: champsAutorises },
+            { new: true, runValidators: true }
+        ).select('-motDePasse -resetPasswordToken -resetPasswordExpire');
+
+        if (!user) {
+            return res.status(404).json({ message: 'Utilisateur non trouvé.' });
+        }
+
+        res.json({ message: 'Profil mis à jour avec succès.', user });
+
+    } catch (err) {
+        res.status(500).json({ message: err.message });
+    }
+};
+
+// ─────────────────────────────────────────────
+//  T16 — @DELETE /api/auth/supprimer-compte
+//  Suppression RGPD — anonymisation + purge
+// ─────────────────────────────────────────────
+const supprimerCompte = async (req, res) => {
+    try {
+        const userId = req.user._id;
+        const { motDePasse } = req.body;
+
+        // 1. Vérifier le mot de passe (confirmation obligatoire)
+        if (!motDePasse) {
+            return res.status(400).json({ message: 'Mot de passe requis pour confirmer la suppression.' });
+        }
 
         const user = await User.findById(userId);
         if (!user) {
-            return res.status(404).json({ 
-                success: false,
-                message: 'Utilisateur non trouvé' 
-            });
+            return res.status(404).json({ message: 'Utilisateur non trouvé.' });
         }
 
-        // Mise à jour des champs autorisés
-        if (nom) user.nom = nom;
-        if (age) user.age = age;
-        if (bio) user.bio = bio;
-        if (preferences) user.preferences = preferences;
+        const motDePasseValide = await user.comparerMotDePasse(motDePasse);
+        if (!motDePasseValide) {
+            return res.status(401).json({ message: 'Mot de passe incorrect.' });
+        }
 
-        await user.save();
+        // 2. Anonymisation des données (RGPD)
+        //    On ne supprime pas physiquement pour garder l'intégrité des données
+        //    mais on efface toutes les données personnelles identifiables
+        const emailHashe = crypto
+            .createHash('sha256')
+            .update(user.email + Date.now().toString())
+            .digest('hex');
 
-        res.json({
-            success: true,
-            data: {
-                _id: user._id,
-                nom: user.nom,
-                email: user.email,
-                age: user.age,
-                bio: user.bio,
-                profilePhoto: user.profilePhoto,
-                preferences: user.preferences,
-                promptsRestants: user.promptsRestants()
+        await User.findByIdAndUpdate(userId, {
+            $set: {
+                nom:            'Utilisateur supprimé',
+                email:          `supprime_${emailHashe.substring(0, 16)}@libertia.deleted`,
+                bio:            '',
+                profilePhoto:   'default-avatar.png',
+                preferences:    [],
+                followers:      [],
+                following:      [],
+                isActive:       false,
+                abonnement:     'free',
+                // Effacer les tokens de sécurité
+                resetPasswordToken:   undefined,
+                resetPasswordExpire:  undefined,
+            },
+            // Effacer l'historique des paiements
+            $unset: {
+                historiquePaiements: '',
+                dateDebutAbonnement: '',
+                dateFinAbonnement:   '',
+                lastLogin:           '',
+                age:                 '',
             }
         });
-    } catch (err) {
-        console.error('Erreur updateProfile:', err);
-        res.status(500).json({ 
-            success: false,
-            message: 'Erreur lors de la mise à jour du profil' 
+
+        // 3. Supprimer les voyages de l'utilisateur
+        const voyagesSupprimés = await Voyage.deleteMany({ user: userId });
+
+        // 4. Envoyer email de confirmation de suppression
+        try {
+            await transporter.sendMail({
+                from: `"LibertIa" <${process.env.EMAIL_USER}>`,
+                to: user.email, // Envoyer à l'ancien email avant anonymisation
+                subject: 'Confirmation de suppression de compte — LibertIa',
+                html: `
+                    <div style="font-family: Arial, sans-serif; max-width: 600px; margin: auto;">
+                        <h2 style="color: #1B4F72;">LibertIa 🌍</h2>
+                        <p>Bonjour,</p>
+                        <p>Votre compte LibertIa a bien été supprimé conformément au RGPD.</p>
+                        <p>Toutes vos données personnelles ont été anonymisées et vos voyages supprimés.</p>
+                        <p style="color:#888; font-size:12px;">
+                            Si vous n'avez pas demandé cette suppression, contactez-nous immédiatement.
+                        </p>
+                    </div>
+                `
+            });
+        } catch {
+            // Ne pas bloquer si l'email échoue
+        }
+
+        res.json({
+            message: 'Compte supprimé avec succès. Vos données ont été anonymisées conformément au RGPD.',
+            voyages_supprimes: voyagesSupprimés.deletedCount
         });
+
+    } catch (err) {
+        res.status(500).json({ message: err.message });
     }
 };
-module.exports = { register, login, getMe, logout, updateProfile};
+
+module.exports = {
+    register,
+    login,
+    getMe,
+    forgotPassword,
+    resetPassword,
+    updateProfile,
+    supprimerCompte  // T16
+};
