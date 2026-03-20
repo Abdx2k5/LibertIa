@@ -2,54 +2,15 @@ const axios = require('axios');
 const { spawn } = require('child_process');
 const path  = require('path');
 
-// Racine du projet (LibertIa/) — un niveau au-dessus de server/
 const ROOT = path.join(__dirname, '..', '..', '..');
 const User = require('../models/User');
 const Voyage = require('../models/Voyage');
 
 // ─────────────────────────────────────────────
-//  HELPER — Appel Python (scraping + RAG)
+//  HELPERS PYTHON
 // ─────────────────────────────────────────────
-
-/**
- * Lance un script Python et retourne le résultat JSON
- */
-function runPython(script, args = []) {
-    return new Promise((resolve, reject) => {
-        const python = spawn('python', [script, ...args]);
-        let output = '';
-        let error  = '';
-
-        python.stdout.on('data', (data) => output += data.toString());
-        python.stderr.on('data', (data) => error  += data.toString());
-
-        python.on('close', (code) => {
-            if (code !== 0) {
-                console.error(`⚠️  Python error (${script}):`, error);
-                resolve(null); // Ne pas bloquer si scraping échoue
-            } else {
-                try {
-                    resolve(JSON.parse(output));
-                } catch {
-                    resolve(null);
-                }
-            }
-        });
-    });
-}
-
-/**
- * Lance le scraping pour une destination
- */
 function scraperDestination(destination, checkin, checkout, origine) {
     return new Promise((resolve) => {
-        const args = [
-            destination,
-            checkin    || getDateIn(7),   // défaut : dans 7 jours
-            checkout   || getDateIn(10),  // défaut : 3 nuits
-            origine    || 'CMN'
-        ];
-
         const python = spawn('python', ['-c', `
 import sys
 sys.path.insert(0, r'${ROOT}')
@@ -57,10 +18,10 @@ from ai.scraper import scrape_destination_complete
 import json
 
 result = scrape_destination_complete(
-    destination="${args[0]}",
-    checkin="${args[1]}",
-    checkout="${args[2]}",
-    origine="${args[3]}"
+    destination="${destination}",
+    checkin="${checkin}",
+    checkout="${checkout}",
+    origine="${origine}"
 )
 
 def clean(obj):
@@ -76,22 +37,15 @@ print(json.dumps(clean(result)))
         let output = '';
         python.stdout.on('data', (d) => output += d.toString());
         python.stderr.on('data', (d) => process.stderr.write(d));
-
-        python.on('close', (code) => {
+        python.on('close', () => {
             try {
                 const lines = output.trim().split('\n');
-                const jsonLine = lines[lines.length - 1]; // Dernière ligne = JSON
-                resolve(JSON.parse(jsonLine));
-            } catch {
-                resolve(null);
-            }
+                resolve(JSON.parse(lines[lines.length - 1]));
+            } catch { resolve(null); }
         });
     });
 }
 
-/**
- * Récupère le contexte RAG pour une destination
- */
 function getRAGContexte(query, destination) {
     return new Promise((resolve) => {
         const python = spawn('python', ['-c', `
@@ -107,32 +61,22 @@ print(json.dumps({"contexte": contexte}))
         let output = '';
         python.stdout.on('data', (d) => output += d.toString());
         python.stderr.on('data', () => {});
-
         python.on('close', () => {
             try {
                 const lines = output.trim().split('\n');
-                const jsonLine = lines[lines.length - 1];
-                const parsed = JSON.parse(jsonLine);
+                const parsed = JSON.parse(lines[lines.length - 1]);
                 resolve(parsed.contexte || '');
-            } catch {
-                resolve('');
-            }
+            } catch { resolve(''); }
         });
     });
 }
 
-// ─────────────────────────────────────────────
-//  HELPER — Dates
-// ─────────────────────────────────────────────
 function getDateIn(jours) {
     const d = new Date();
     d.setDate(d.getDate() + jours);
     return d.toISOString().split('T')[0];
 }
 
-// ─────────────────────────────────────────────
-//  HELPER — Extraire infos du prompt via Mistral
-// ─────────────────────────────────────────────
 async function extraireInfosPrompt(prompt) {
     try {
         const response = await axios.post('http://localhost:11434/api/generate', {
@@ -154,108 +98,49 @@ JSON attendu :
 Réponds UNIQUEMENT avec le JSON, sans texte avant ou après.`,
             stream: false,
             options: { temperature: 0.1, num_predict: 300 }
-        });
+        }, { timeout: 30000 });
 
-        const text = response.data.response;
-        const jsonMatch = text.match(/\{[\s\S]*\}/);
+        const jsonMatch = response.data.response.match(/\{[\s\S]*\}/);
         if (jsonMatch) return JSON.parse(jsonMatch[0]);
     } catch {}
 
-    // Fallback par défaut
     return {
-        destination: null,
-        checkin: getDateIn(7),
-        checkout: getDateIn(10),
-        origine: 'CMN',
-        budget: 'medium',
-        duree_jours: 3,
-        preferences: []
+        destination: null, checkin: getDateIn(7), checkout: getDateIn(10),
+        origine: 'CMN', budget: 'medium', duree_jours: 3, preferences: []
     };
 }
 
-// ─────────────────────────────────────────────
-//  HELPER — Formater les données scraping
-//  pour les injecter dans le prompt Mistral
-// ─────────────────────────────────────────────
 function formaterDonneesScraping(scraping) {
     if (!scraping) return '';
-
     let texte = '\n=== DONNÉES TEMPS RÉEL ===\n\n';
-
-    // Hôtels (Booking + Airbnb)
     const hebergements = [...(scraping.hotels || []), ...(scraping.airbnb || [])];
     if (hebergements.length > 0) {
-        texte += '🏨 HÉBERGEMENTS DISPONIBLES (prix réels) :\n';
+        texte += 'HÉBERGEMENTS DISPONIBLES (prix réels) :\n';
         hebergements.slice(0, 5).forEach(h => {
             texte += `- ${h.nom} | ${h.prix_nuit} | Note: ${h.note} | ${h.source}\n`;
-            if (h.lien_booking) texte += `  → Réserver: ${h.lien_booking}\n`;
+            if (h.lien_booking) texte += `  Réserver: ${h.lien_booking}\n`;
         });
         texte += '\n';
     }
-
-    // Vols
-    if (scraping.vols && scraping.vols.length > 0) {
-        texte += '✈️  VOLS DISPONIBLES (prix réels) :\n';
+    if (scraping.vols?.length > 0) {
+        texte += 'VOLS DISPONIBLES (prix réels) :\n';
         scraping.vols.slice(0, 3).forEach(v => {
-            texte += `- ${v.compagnie} | ${v.prix} | Durée: ${v.duree} | ${v.horaires}\n`;
+            texte += `- ${v.compagnie} | ${v.prix} | Durée: ${v.duree}\n`;
         });
         texte += '\n';
     }
-
-    // Restaurants
-    if (scraping.restos && scraping.restos.length > 0) {
-        texte += '🍽️  RESTAURANTS :\n';
+    if (scraping.restos?.length > 0) {
+        texte += 'RESTAURANTS :\n';
         scraping.restos.slice(0, 5).forEach(r => {
             texte += `- ${r.nom} | Note: ${r.note} | ${r.cuisine}\n`;
-            if (r.lien) texte += `  → Voir: ${r.lien}\n`;
         });
         texte += '\n';
     }
-
     return texte;
 }
 
-// ─────────────────────────────────────────────
-//  CONTROLLER PRINCIPAL
-// ─────────────────────────────────────────────
-
-// @POST /api/voyages/generer
-const genererVoyage = async (req, res) => {
-    try {
-        const { prompt } = req.body;
-        const userId = req.user._id;
-
-        // Vérification freemium
-        const user = await User.findById(userId);
-        if (user.abonnement === 'free' && user.promptsUtilises >= 10) {
-            return res.status(403).json({
-                message: 'Limite atteinte - passez en premium pour continuer'
-            });
-        }
-
-        // ── ÉTAPE 1 : Extraire destination + dates du prompt ──
-        console.log('🔍 Extraction infos prompt...');
-        const infos = await extraireInfosPrompt(prompt);
-        const destination = infos.destination || 'Paris';
-        const checkin     = infos.checkin     || getDateIn(7);
-        const checkout    = infos.checkout    || getDateIn(10);
-        const origine     = infos.origine     || 'CMN';
-
-        console.log(`📍 Destination: ${destination} | ${checkin} → ${checkout}`);
-
-        // ── ÉTAPE 2 : RAG — contexte local (parallèle avec scraping) ──
-        // ── ÉTAPE 3 : Scraping temps réel ──
-        console.log('🔄 RAG + Scraping en parallèle...');
-        const scrapingTimeout = new Promise(resolve => setTimeout(() => resolve(null), 120000));
-        const [ragContexte, scraping] = await Promise.all([
-            getRAGContexte(prompt, destination),
-            Promise.race([scraperDestination(destination, checkin, checkout, origine), scrapingTimeout])
-        ]);
-
-        const donneesScraping = formaterDonneesScraping(scraping);
-
-        // ── ÉTAPE 4 : Construire le prompt enrichi pour Mistral ──
-        const promptEnrichi = `Tu es LibertIa, un expert en voyage personnalisé.
+function buildPromptEnrichi(prompt, infos, destination, checkin, checkout, ragContexte, donneesScraping) {
+    return `Tu es LibertIa, un expert en voyage personnalisé.
 
 DEMANDE DE L'UTILISATEUR :
 "${prompt}"
@@ -269,9 +154,8 @@ INFORMATIONS EXTRAITES :
 ${ragContexte}
 ${donneesScraping}
 
-En utilisant les données ci-dessus, génère un itinéraire complet et personnalisé.
-Intègre les vrais hôtels, vols et restaurants fournis avec leurs prix réels.
-Réponds UNIQUEMENT en JSON avec cette structure :
+Génère un itinéraire complet et personnalisé avec les vraies données fournies.
+Réponds UNIQUEMENT en JSON :
 {
   "destination": "",
   "duree_jours": 0,
@@ -286,63 +170,210 @@ Réponds UNIQUEMENT en JSON avec cette structure :
       "soir":       {"activite": "", "lieu": "", "duree": ""}
     }
   ],
-  "hebergement_recommande": {
-    "nom": "",
-    "prix_nuit": "",
-    "lien": ""
-  },
-  "vol_recommande": {
-    "compagnie": "",
-    "prix": "",
-    "duree": ""
-  },
+  "hebergement_recommande": {"nom": "", "prix_nuit": "", "lien": ""},
+  "vol_recommande": {"compagnie": "", "prix": "", "duree": ""},
   "restaurants_recommandes": [],
   "conseils": [],
-  "budget_detail": {
-    "hotel": "",
-    "transport": "",
-    "repas": "",
-    "activites": "",
-    "total": ""
-  }
+  "budget_detail": {"hotel": "", "transport": "", "repas": "", "activites": "", "total": ""}
 }`;
+}
 
-        // ── ÉTAPE 5 : Génération Mistral ──
-        console.log('🤖 Génération Mistral...');
-        const response = await axios.post('http://localhost:11434/api/generate', {
-            model: 'mistral',
-            prompt: promptEnrichi,
-            stream: false,
-            options: {
-                temperature: 0.7,
-                num_predict: 1500,
-                num_ctx: 4096
-            }
-        }, { timeout: 120000 }); // 2 minutes
+// ─────────────────────────────────────────────
+//  T36 — WRAPPER MISTRAL avec retry + timeout
+// ─────────────────────────────────────────────
+async function appelMistral(promptEnrichi, streamMode = false) {
+    const MAX_RETRIES = 2;
+    const TIMEOUT = 120000;
 
-        // ── ÉTAPE 6 : Parser la réponse ──
-        let itineraire;
+    for (let tentative = 1; tentative <= MAX_RETRIES; tentative++) {
         try {
-            const text = response.data.response;
-            const jsonMatch = text.match(/\{[\s\S]*\}/);
-            itineraire = JSON.parse(jsonMatch[0]);
-        } catch {
-            return res.status(500).json({ message: 'Erreur parsing réponse IA' });
+            const response = await axios.post('http://localhost:11434/api/generate', {
+                model: 'mistral',
+                prompt: promptEnrichi,
+                stream: streamMode,
+                options: { temperature: 0.7, num_predict: 1500, num_ctx: 4096 }
+            }, {
+                timeout: TIMEOUT,
+                responseType: streamMode ? 'stream' : 'json'
+            });
+            return response;
+
+        } catch (err) {
+            console.error(`❌ Mistral tentative ${tentative}/${MAX_RETRIES}:`, err.message);
+
+            if (tentative === MAX_RETRIES) {
+                if (err.code === 'ECONNREFUSED') {
+                    throw new Error("Ollama non disponible — lancez 'ollama serve' d'abord");
+                } else if (err.code === 'ECONNABORTED' || err.message.includes('timeout')) {
+                    throw new Error('Timeout IA — la génération a pris trop de temps, réessayez');
+                } else {
+                    throw new Error(`Erreur IA: ${err.message}`);
+                }
+            }
+            // Attendre avant retry
+            await new Promise(r => setTimeout(r, 2000 * tentative));
+        }
+    }
+}
+
+// ─────────────────────────────────────────────
+//  T24 — @POST /api/voyages/generer/stream
+//  Génération avec Server-Sent Events (SSE)
+// ─────────────────────────────────────────────
+const genererVoyageStream = async (req, res) => {
+    try {
+        const { prompt } = req.body;
+        const userId = req.user._id;
+
+        const user = await User.findById(userId);
+        if (user.abonnement === 'free' && user.promptsUtilises >= 10) {
+            return res.status(403).json({ message: 'Limite atteinte - passez en premium pour continuer' });
         }
 
-        // ── ÉTAPE 7 : Sauvegarder ──
-        await User.findByIdAndUpdate(userId, {
-            $inc: { promptsUtilises: 1 }
+        // Headers SSE
+        res.setHeader('Content-Type', 'text/event-stream');
+        res.setHeader('Cache-Control', 'no-cache');
+        res.setHeader('Connection', 'keep-alive');
+        res.setHeader('Access-Control-Allow-Origin', '*');
+        res.flushHeaders();
+
+        const sendEvent = (event, data) => {
+            res.write(`event: ${event}\ndata: ${JSON.stringify(data)}\n\n`);
+        };
+
+        // Étape 1 — Extraction
+        sendEvent('status', { step: 1, message: 'Analyse de votre demande...' });
+        const infos = await extraireInfosPrompt(prompt);
+        const destination = infos.destination || 'Paris';
+        const checkin     = infos.checkin     || getDateIn(7);
+        const checkout    = infos.checkout    || getDateIn(10);
+        const origine     = infos.origine     || 'CMN';
+        sendEvent('infos', { destination, checkin, checkout });
+
+        // Étape 2 — RAG + Scraping
+        sendEvent('status', { step: 2, message: 'Recherche des données...' });
+        const scrapingTimeout = new Promise(resolve => setTimeout(() => resolve(null), 120000));
+        const [ragContexte, scraping] = await Promise.all([
+            getRAGContexte(prompt, destination),
+            Promise.race([scraperDestination(destination, checkin, checkout, origine), scrapingTimeout])
+        ]);
+        sendEvent('status', { step: 3, message: 'Données récupérées — génération en cours...' });
+
+        // Étape 3 — Streaming Mistral
+        const promptEnrichi = buildPromptEnrichi(prompt, infos, destination, checkin, checkout, ragContexte, formaterDonneesScraping(scraping));
+        const streamResponse = await appelMistral(promptEnrichi, true);
+
+        let texteComplet = '';
+        await new Promise((resolve, reject) => {
+            streamResponse.data.on('data', (chunk) => {
+                try {
+                    const lines = chunk.toString().split('\n').filter(l => l.trim());
+                    for (const line of lines) {
+                        const parsed = JSON.parse(line);
+                        if (parsed.response) {
+                            texteComplet += parsed.response;
+                            sendEvent('token', { token: parsed.response });
+                        }
+                        if (parsed.done) resolve();
+                    }
+                } catch {}
+            });
+            streamResponse.data.on('error', reject);
+            streamResponse.data.on('end', resolve);
         });
 
+        // Étape 4 — Parser + sauvegarder
+        let itineraire;
+        try {
+            const jsonMatch = texteComplet.match(/\{[\s\S]*\}/);
+            itineraire = JSON.parse(jsonMatch[0]);
+        } catch {
+            sendEvent('error', { message: 'Erreur parsing réponse IA — réessayez' });
+            return res.end();
+        }
+
+        await User.findByIdAndUpdate(userId, { $inc: { promptsUtilises: 1 } });
         const voyage = await Voyage.create({
-            user: userId,
-            prompt,
+            user: userId, prompt, itineraire,
+            destination, checkin, checkout, scraping_utilise: !!scraping
+        });
+
+        sendEvent('done', {
+            succes: true,
+            promptsRestants: 10 - (user.promptsUtilises + 1),
+            voyageId: voyage._id,
             itineraire,
-            destination,
-            checkin,
-            checkout,
-            scraping_utilise: !!scraping
+            meta: {
+                destination, checkin, checkout,
+                rag_utilise: !!ragContexte,
+                scraping_utilise: !!scraping,
+                hotels_trouves: scraping?.hotels?.length || 0,
+                vols_trouves: scraping?.vols?.length || 0,
+                restos_trouves: scraping?.restos?.length || 0,
+            }
+        });
+
+        res.end();
+
+    } catch (err) {
+        console.error('❌ Erreur streaming:', err);
+        if (!res.headersSent) {
+            res.status(500).json({ message: err.message });
+        } else {
+            res.write(`event: error\ndata: ${JSON.stringify({ message: err.message })}\n\n`);
+            res.end();
+        }
+    }
+};
+
+// ─────────────────────────────────────────────
+//  @POST /api/voyages/generer (version normale)
+// ─────────────────────────────────────────────
+const genererVoyage = async (req, res) => {
+    try {
+        const { prompt } = req.body;
+        const userId = req.user._id;
+
+        const user = await User.findById(userId);
+        if (user.abonnement === 'free' && user.promptsUtilises >= 10) {
+            return res.status(403).json({ message: 'Limite atteinte - passez en premium pour continuer' });
+        }
+
+        console.log('🔍 Extraction infos prompt...');
+        const infos = await extraireInfosPrompt(prompt);
+        const destination = infos.destination || 'Paris';
+        const checkin     = infos.checkin     || getDateIn(7);
+        const checkout    = infos.checkout    || getDateIn(10);
+        const origine     = infos.origine     || 'CMN';
+        console.log(`📍 Destination: ${destination} | ${checkin} → ${checkout}`);
+
+        console.log('🔄 RAG + Scraping en parallèle...');
+        const scrapingTimeout = new Promise(resolve => setTimeout(() => resolve(null), 120000));
+        const [ragContexte, scraping] = await Promise.all([
+            getRAGContexte(prompt, destination),
+            Promise.race([scraperDestination(destination, checkin, checkout, origine), scrapingTimeout])
+        ]);
+
+        const promptEnrichi = buildPromptEnrichi(
+            prompt, infos, destination, checkin, checkout,
+            ragContexte, formaterDonneesScraping(scraping)
+        );
+
+        console.log('🤖 Génération Mistral...');
+        const response = await appelMistral(promptEnrichi); // T36 — retry + timeout
+
+        let itineraire;
+        try {
+            const jsonMatch = response.data.response.match(/\{[\s\S]*\}/);
+            itineraire = JSON.parse(jsonMatch[0]);
+        } catch {
+            return res.status(500).json({ message: 'Erreur parsing réponse IA — réessayez' });
+        }
+
+        await User.findByIdAndUpdate(userId, { $inc: { promptsUtilises: 1 } });
+        const voyage = await Voyage.create({
+            user: userId, prompt, itineraire,
+            destination, checkin, checkout, scraping_utilise: !!scraping
         });
 
         res.json({
@@ -351,28 +382,25 @@ Réponds UNIQUEMENT en JSON avec cette structure :
             voyageId: voyage._id,
             itineraire,
             meta: {
-                destination,
-                checkin,
-                checkout,
-                rag_utilise:      !!ragContexte,
+                destination, checkin, checkout,
+                rag_utilise: !!ragContexte,
                 scraping_utilise: !!scraping,
-                hotels_trouves:   scraping?.hotels?.length || 0,
-                vols_trouves:     scraping?.vols?.length   || 0,
-                restos_trouves:   scraping?.restos?.length || 0,
+                hotels_trouves: scraping?.hotels?.length || 0,
+                vols_trouves: scraping?.vols?.length || 0,
+                restos_trouves: scraping?.restos?.length || 0,
             }
         });
 
     } catch (err) {
         console.error('❌ Erreur genererVoyage:', err);
-        res.status(500).json({ message: err.message });
+        res.status(500).json({ message: err.message }); // T36 — message clair
     }
 };
 
 // @GET /api/voyages/mes-voyages
 const getMesVoyages = async (req, res) => {
     try {
-        const voyages = await Voyage.find({ user: req.user._id })
-            .sort({ createdAt: -1 });
+        const voyages = await Voyage.find({ user: req.user._id }).sort({ createdAt: -1 });
         res.json(voyages);
     } catch (err) {
         res.status(500).json({ message: err.message });
@@ -383,13 +411,11 @@ const getMesVoyages = async (req, res) => {
 const getVoyage = async (req, res) => {
     try {
         const voyage = await Voyage.findById(req.params.id);
-        if (!voyage) {
-            return res.status(404).json({ message: 'Voyage non trouvé' });
-        }
+        if (!voyage) return res.status(404).json({ message: 'Voyage non trouvé' });
         res.json(voyage);
     } catch (err) {
         res.status(500).json({ message: err.message });
     }
 };
 
-module.exports = { genererVoyage, getMesVoyages, getVoyage };
+module.exports = { genererVoyage, genererVoyageStream, getMesVoyages, getVoyage };

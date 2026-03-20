@@ -1,4 +1,5 @@
 const User = require('../models/User');
+const Voyage = require('../models/Voyage');
 const jwt = require('jsonwebtoken');
 const crypto = require('crypto');
 const nodemailer = require('nodemailer');
@@ -6,14 +7,10 @@ const nodemailer = require('nodemailer');
 // ─────────────────────────────────────────────
 //  HELPERS
 // ─────────────────────────────────────────────
-
 const genererToken = (id) => {
-    return jwt.sign({ id }, process.env.JWT_SECRET, {
-        expiresIn: '7d'
-    });
+    return jwt.sign({ id }, process.env.JWT_SECRET, { expiresIn: '7d' });
 };
 
-// Transporter Gmail
 const transporter = nodemailer.createTransport({
     service: 'gmail',
     auth: {
@@ -86,7 +83,6 @@ const getMe = async (req, res) => {
 
 // ─────────────────────────────────────────────
 //  T6 — @POST /api/auth/forgot-password
-//  Génère un token de reset et envoie l'email
 // ─────────────────────────────────────────────
 const forgotPassword = async (req, res) => {
     try {
@@ -94,28 +90,18 @@ const forgotPassword = async (req, res) => {
 
         const user = await User.findOne({ email });
         if (!user) {
-            // Sécurité : ne pas révéler si l'email existe ou non
             return res.json({ message: 'Si cet email existe, un lien de réinitialisation a été envoyé.' });
         }
 
-        // Générer un token aléatoire
         const resetToken = crypto.randomBytes(32).toString('hex');
+        const resetTokenHashe = crypto.createHash('sha256').update(resetToken).digest('hex');
 
-        // Hasher le token avant de le stocker en base
-        const resetTokenHashe = crypto
-            .createHash('sha256')
-            .update(resetToken)
-            .digest('hex');
-
-        // Stocker dans le user (expire dans 15 minutes)
         user.resetPasswordToken = resetTokenHashe;
-        user.resetPasswordExpire = Date.now() + 15 * 60 * 1000; // 15 min
+        user.resetPasswordExpire = Date.now() + 15 * 60 * 1000;
         await user.save();
 
-        // Construire le lien de reset
         const resetUrl = `${process.env.FRONTEND_URL || 'http://localhost:3000'}/reset-password/${resetToken}`;
 
-        // Envoyer l'email
         await transporter.sendMail({
             from: `"LibertIa" <${process.env.EMAIL_USER}>`,
             to: user.email,
@@ -146,20 +132,14 @@ const forgotPassword = async (req, res) => {
 
 // ─────────────────────────────────────────────
 //  T8 — @POST /api/auth/reset-password/:token
-//  Valide le token et met à jour le mot de passe
 // ─────────────────────────────────────────────
 const resetPassword = async (req, res) => {
     try {
         const { token } = req.params;
         const { motDePasse } = req.body;
 
-        // Hasher le token reçu pour comparer avec celui en base
-        const resetTokenHashe = crypto
-            .createHash('sha256')
-            .update(token)
-            .digest('hex');
+        const resetTokenHashe = crypto.createHash('sha256').update(token).digest('hex');
 
-        // Trouver l'utilisateur avec ce token non expiré
         const user = await User.findOne({
             resetPasswordToken: resetTokenHashe,
             resetPasswordExpire: { $gt: Date.now() }
@@ -169,7 +149,6 @@ const resetPassword = async (req, res) => {
             return res.status(400).json({ message: 'Token invalide ou expiré.' });
         }
 
-        // Mettre à jour le mot de passe
         user.motDePasse = motDePasse;
         user.resetPasswordToken = undefined;
         user.resetPasswordExpire = undefined;
@@ -184,14 +163,12 @@ const resetPassword = async (req, res) => {
 
 // ─────────────────────────────────────────────
 //  T12 — @PUT /api/auth/update-profile
-//  Modification du profil utilisateur
 // ─────────────────────────────────────────────
 const updateProfile = async (req, res) => {
     try {
         const userId = req.user._id;
         const { nom, age, preferences, bio } = req.body;
 
-        // Champs modifiables
         const champsAutorises = {};
         if (nom)         champsAutorises.nom         = nom;
         if (age)         champsAutorises.age         = age;
@@ -208,9 +185,98 @@ const updateProfile = async (req, res) => {
             return res.status(404).json({ message: 'Utilisateur non trouvé.' });
         }
 
+        res.json({ message: 'Profil mis à jour avec succès.', user });
+
+    } catch (err) {
+        res.status(500).json({ message: err.message });
+    }
+};
+
+// ─────────────────────────────────────────────
+//  T16 — @DELETE /api/auth/supprimer-compte
+//  Suppression RGPD — anonymisation + purge
+// ─────────────────────────────────────────────
+const supprimerCompte = async (req, res) => {
+    try {
+        const userId = req.user._id;
+        const { motDePasse } = req.body;
+
+        // 1. Vérifier le mot de passe (confirmation obligatoire)
+        if (!motDePasse) {
+            return res.status(400).json({ message: 'Mot de passe requis pour confirmer la suppression.' });
+        }
+
+        const user = await User.findById(userId);
+        if (!user) {
+            return res.status(404).json({ message: 'Utilisateur non trouvé.' });
+        }
+
+        const motDePasseValide = await user.comparerMotDePasse(motDePasse);
+        if (!motDePasseValide) {
+            return res.status(401).json({ message: 'Mot de passe incorrect.' });
+        }
+
+        // 2. Anonymisation des données (RGPD)
+        //    On ne supprime pas physiquement pour garder l'intégrité des données
+        //    mais on efface toutes les données personnelles identifiables
+        const emailHashe = crypto
+            .createHash('sha256')
+            .update(user.email + Date.now().toString())
+            .digest('hex');
+
+        await User.findByIdAndUpdate(userId, {
+            $set: {
+                nom:            'Utilisateur supprimé',
+                email:          `supprime_${emailHashe.substring(0, 16)}@libertia.deleted`,
+                bio:            '',
+                profilePhoto:   'default-avatar.png',
+                preferences:    [],
+                followers:      [],
+                following:      [],
+                isActive:       false,
+                abonnement:     'free',
+                // Effacer les tokens de sécurité
+                resetPasswordToken:   undefined,
+                resetPasswordExpire:  undefined,
+            },
+            // Effacer l'historique des paiements
+            $unset: {
+                historiquePaiements: '',
+                dateDebutAbonnement: '',
+                dateFinAbonnement:   '',
+                lastLogin:           '',
+                age:                 '',
+            }
+        });
+
+        // 3. Supprimer les voyages de l'utilisateur
+        const voyagesSupprimés = await Voyage.deleteMany({ user: userId });
+
+        // 4. Envoyer email de confirmation de suppression
+        try {
+            await transporter.sendMail({
+                from: `"LibertIa" <${process.env.EMAIL_USER}>`,
+                to: user.email, // Envoyer à l'ancien email avant anonymisation
+                subject: 'Confirmation de suppression de compte — LibertIa',
+                html: `
+                    <div style="font-family: Arial, sans-serif; max-width: 600px; margin: auto;">
+                        <h2 style="color: #1B4F72;">LibertIa 🌍</h2>
+                        <p>Bonjour,</p>
+                        <p>Votre compte LibertIa a bien été supprimé conformément au RGPD.</p>
+                        <p>Toutes vos données personnelles ont été anonymisées et vos voyages supprimés.</p>
+                        <p style="color:#888; font-size:12px;">
+                            Si vous n'avez pas demandé cette suppression, contactez-nous immédiatement.
+                        </p>
+                    </div>
+                `
+            });
+        } catch {
+            // Ne pas bloquer si l'email échoue
+        }
+
         res.json({
-            message: 'Profil mis à jour avec succès.',
-            user
+            message: 'Compte supprimé avec succès. Vos données ont été anonymisées conformément au RGPD.',
+            voyages_supprimes: voyagesSupprimés.deletedCount
         });
 
     } catch (err) {
@@ -218,4 +284,12 @@ const updateProfile = async (req, res) => {
     }
 };
 
-module.exports = { register, login, getMe, forgotPassword, resetPassword, updateProfile };
+module.exports = {
+    register,
+    login,
+    getMe,
+    forgotPassword,
+    resetPassword,
+    updateProfile,
+    supprimerCompte  // T16
+};
