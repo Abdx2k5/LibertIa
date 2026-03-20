@@ -1,0 +1,36 @@
+/* ============================================================
+   NotFound.module.css — Page 404
+   ============================================================ */
+
+.page {
+  min-height: 100vh;
+  background: linear-gradient(135deg, #09090b 0%, #171123 100%);
+  font-family: 'Inter', sans-serif;
+  display: flex; align-items: center; justify-content: center;
+  color: #fff;
+}
+
+.content {
+  display: flex; flex-direction: column;
+  align-items: center; text-align: center; gap: 24px;
+  max-width: 480px; padding: 40px;
+}
+
+.code {
+  font-size: 120px; font-weight: 800; line-height: 1;
+  background: linear-gradient(135deg, #00ffff, #8b5cf6);
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+  background-clip: text; margin: 0;
+}
+
+.title    { font-size: 28px; font-weight: 700; color: #e7f0ff; margin: 0; }
+.subtitle { font-size: 16px; color: #94a3b8; line-height: 1.6; margin: 0; }
+
+.btn {
+  background: linear-gradient(135deg, #06b6d4, #8b5cf6);
+  border: none; border-radius: 8px;
+  padding: 13px 32px; font-size: 15px; font-weight: 700;
+  color: #061826; cursor: pointer; text-decoration: none;
+  font-family: 'Inter', sans-serif; transition: opacity 0.2s;
+}
+.btn:hover { opacity: 0.9; }

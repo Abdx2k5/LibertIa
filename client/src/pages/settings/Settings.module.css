@@ -1,0 +1,107 @@
+/* ============================================================
+   Settings.module.css — Page paramètres
+   ============================================================ */
+
+.page {
+  min-height: 100vh;
+  background: linear-gradient(135deg, #0b1026 0%, #1a1a2e 100%);
+  font-family: 'Inter', sans-serif; color: #fff;
+}
+
+.main { max-width: 800px; margin: 0 auto; padding: 40px 24px; }
+
+.pageTitle { font-size: 28px; font-weight: 700; color: #fff; margin: 0 0 8px; }
+.pageSub   { font-size: 15px; color: #a1a1aa; margin: 0 0 32px; }
+
+/* ── Tabs ── */
+.tabs { display: flex; gap: 4px; border-bottom: 1px solid rgba(255,255,255,0.06); margin-bottom: 28px; }
+
+.tab {
+  padding: 10px 20px; font-size: 14px; font-weight: 500;
+  color: #71717a; background: none; border: none;
+  cursor: pointer; border-bottom: 2px solid transparent;
+  font-family: 'Inter', sans-serif; transition: all 0.15s;
+  margin-bottom: -1px;
+}
+.tab:hover   { color: #fff; }
+.tabActive   { color: #a78bfa; border-bottom-color: #a78bfa; }
+
+/* ── Section card ── */
+.section {
+  backdrop-filter: blur(6px);
+  background-color: rgba(255,255,255,0.03);
+  border: 1px solid rgba(255,255,255,0.08);
+  border-radius: 16px; padding: 28px; margin-bottom: 16px;
+}
+
+.sectionTitle { font-size: 16px; font-weight: 600; color: #fff; margin: 0 0 20px; }
+
+/* ── Toggle row ── */
+.toggleRow {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 14px 0; border-bottom: 1px solid rgba(255,255,255,0.05);
+}
+.toggleRow:last-child { border-bottom: none; padding-bottom: 0; }
+
+.toggleInfo  { display: flex; flex-direction: column; gap: 4px; }
+.toggleLabel { font-size: 14px; font-weight: 500; color: #e7f0ff; }
+.toggleDesc  { font-size: 13px; color: #71717a; }
+
+.toggleBtn {
+  width: 44px; height: 24px; border-radius: 12px;
+  border: none; cursor: pointer; position: relative;
+  transition: background 0.2s; flex-shrink: 0;
+}
+.toggleBtnOn  { background-color: #8b5cf6; }
+.toggleBtnOff { background-color: rgba(255,255,255,0.15); }
+
+.toggleDot {
+  width: 18px; height: 18px; border-radius: 9px;
+  background-color: #fff; position: absolute; top: 3px;
+  transition: left 0.2s;
+}
+.toggleDotOn  { left: 23px; }
+.toggleDotOff { left: 3px; }
+
+/* ── Field ── */
+.fieldGroup { display: flex; flex-direction: column; gap: 8px; margin-bottom: 16px; }
+.label { font-size: 14px; font-weight: 500; color: #e7f0ff; }
+
+.select {
+  width: 100%; background-color: #0f1724;
+  border: 1px solid rgba(255,255,255,0.08);
+  border-radius: 6px; padding: 13px 17px;
+  font-size: 15px; color: #e7f0ff; outline: none;
+  font-family: 'Inter', sans-serif; cursor: pointer;
+}
+
+/* ── Danger zone ── */
+.dangerZone {
+  backdrop-filter: blur(6px);
+  background-color: rgba(239,68,68,0.05);
+  border: 1px solid rgba(239,68,68,0.2);
+  border-radius: 16px; padding: 28px;
+}
+.dangerTitle { font-size: 16px; font-weight: 600; color: #f87171; margin: 0 0 8px; }
+.dangerText  { font-size: 14px; color: #94a3b8; margin: 0 0 20px; }
+
+.btnDanger {
+  background: rgba(239,68,68,0.1);
+  border: 1px solid rgba(239,68,68,0.3);
+  border-radius: 6px; padding: 11px 24px;
+  font-size: 14px; color: #f87171; cursor: pointer;
+  font-family: 'Inter', sans-serif; transition: all 0.2s;
+}
+.btnDanger:hover { background: rgba(239,68,68,0.2); }
+
+/* ── Save button ── */
+.saveWrap { display: flex; justify-content: flex-end; margin-top: 8px; }
+
+.btnSave {
+  background: linear-gradient(135deg, #06b6d4, #8b5cf6);
+  border: none; border-radius: 6px;
+  padding: 11px 32px; font-size: 14px; font-weight: 700;
+  color: #061826; cursor: pointer;
+  font-family: 'Inter', sans-serif; transition: opacity 0.2s;
+}
+.btnSave:hover { opacity: 0.9; }
