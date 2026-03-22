@@ -3,10 +3,10 @@ import { Link, useNavigate } from "react-router-dom";
 import styles from "./Login.module.css";
 import { useAuthStore } from "../../store/authStore";
 import authService from "../../services/Auth.service";
-
+import imgIllustration from "../../assets/TravelerIllustration.png";
 // ── Assets Figma ──────────────────────────────────────────────
 const imgLogo      = "https://www.figma.com/api/mcp/asset/d93104aa-ce16-42fe-b9cd-8bbe43f0929d";
-const imgHero      = "https://www.figma.com/api/mcp/asset/2d1d879d-a4d2-4bc2-98bf-7842a9327598";
+//const imgHero      = "https://www.figma.com/api/mcp/asset/2d1d879d-a4d2-4bc2-98bf-7842a9327598";
 const imgSpaceBg   = "https://www.figma.com/api/mcp/asset/d42b2bd3-40e7-4c81-9e00-2f6037d84ee4";
 const imgGlobe     = "https://www.figma.com/api/mcp/asset/ce67d7c1-e338-4383-8ae7-5ea7ae0b31e4";
 const imgGoogle    = "https://www.figma.com/api/mcp/asset/94a3da07-8c28-40f0-bd59-a220992a155e";
@@ -72,7 +72,7 @@ export default function Login() {
 
           {/* Formulaire */}
           <div className={styles.card}>
-            <h1 className={styles.title}>Bon retour ! 👋</h1>
+            <h1 className={styles.title}>Bon retour ! </h1>
             <p className={styles.subtitle}>
               Connectez-vous pour accéder à votre assistant de voyage personnel.
             </p>
@@ -187,9 +187,10 @@ export default function Login() {
 
           {/* Illustration */}
           <div className={styles.illustration}>
-            <img src={imgHero} alt="Voyage" className={styles.illustrationImg} />
+          < img src={imgIllustration} alt="Voyage" className={styles.illustrationImg} />
+        
           </div>
-
+          
         </div>
       </div>
     </div>

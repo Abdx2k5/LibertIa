@@ -38,9 +38,9 @@ const DESTINATIONS = [
 ];
 
 const AI_EXAMPLES = [
-  "Je veux 5 jours à Tokyo avec un budget de 1500€",
-  "Voyage romantique à Paris pour 2 personnes",
-  "Aventure au Maroc, 7 jours, budget serré",
+  "Je veux 5 jours à Tokyo, budget 1500€",
+  "Voyage romantique à Paris pour 2",
+  "Aventure au Maroc, 7 jours",
 ];
 
 const navItems = ["Accueil", "Vols", "Hébergements", "Activités", "Communauté"];
@@ -57,12 +57,18 @@ const whyCards = [
   { icon: imgIconCommunity, title: "Communauté",        text: "Des voyageurs bienveillants prêts à partager leurs astuces." },
   { icon: imgIconAll,       title: "Tout-en-un",        text: "Vols, hôtels, et activités combinés en un seul panier flexible." },
   { icon: imgIconDark,      title: "Dark & Light Mode", text: "Profitez de notre ambiance nocturne ou basculez en mode jour." },
-  { icon: imgIconTranslate, title: "Traduction Auto",   text: "Parcourez les avis et interagissez dans la langue de votre choix." },
+  { icon: imgIconTranslate, title: "Traduction Auto",   text: "Parcourez les avis et interagissez dans votre langue." },
 ];
 
 const communityPosts = [
-  { img: imgTrip,  name: "Sarah M.", location: "à Kyoto, Japon",     text: "L'itinéraire IA était parfait. Le temple d'or au lever du soleil, sans la foule ! 🌸", likes: 124, comments: 12 },
-  { img: imgTrip1, name: "Marc T.",  location: "à Marrakech, Maroc", text: "Super recommandation pour le Riad. Merci la communauté Libertia pour les conseils. 🐪", likes: 89,  comments: 5  },
+  { img: imgTrip,  name: "Sarah M.", location: "à Kyoto, Japon",     text: "L'itinéraire IA était parfait. Le temple d'or au lever du soleil ! 🌸", likes: 124, comments: 12 },
+  { img: imgTrip1, name: "Marc T.",  location: "à Marrakech, Maroc", text: "Super recommandation pour le Riad. Merci la communauté Libertia ! 🐪",  likes: 89,  comments: 5  },
+];
+
+const footerCols = [
+  { title: "Explorer",    links: ["Destinations", "Communauté", "Vols & Hôtels"] },
+  { title: "Légal",       links: ["Conditions d'utilisation", "Confidentialité", "Cookies"] },
+  { title: "Suivez-nous", links: ["Instagram", "Twitter", "TikTok"] },
 ];
 
 // ── Composant ──────────────────────────────────────────────────────
@@ -70,13 +76,15 @@ export default function Landing() {
   const navigate = useNavigate();
   const isAuthenticated = !!localStorage.getItem("libertia_token");
 
+  // State
   const [isAiMode, setIsAiMode]       = useState(false);
   const [query, setQuery]             = useState("");
   const [panelOpen, setPanelOpen]     = useState(false);
   const [isListening, setIsListening] = useState(false);
   const [micError, setMicError]       = useState(null);
+  const [menuOpen, setMenuOpen]       = useState(false); // ← menu hamburger
 
-  // Destinations filtrées selon la saisie
+  // Filtrage destinations
   const filtered = query.trim().length >= 1
     ? DESTINATIONS.filter((d) =>
         d.name.toLowerCase().includes(query.toLowerCase()) ||
@@ -85,7 +93,7 @@ export default function Landing() {
       )
     : DESTINATIONS;
 
-  // Soumission
+  // Submit
   const handleSubmit = (e) => {
     e.preventDefault();
     if (!query.trim()) return;
@@ -97,13 +105,13 @@ export default function Landing() {
     }
   };
 
-  // Clic sur une destination
+  // Clic destination
   const handleDestClick = (dest) => {
     sessionStorage.setItem("libertia_prompt", `Je veux visiter ${dest.name}, ${dest.country}`);
     navigate(isAuthenticated ? "/dashboard" : "/register");
   };
 
-  // Switch de mode
+  // Switch mode
   const handleModeSwitch = (aiMode) => {
     setIsAiMode(aiMode);
     setQuery("");
@@ -138,14 +146,18 @@ export default function Landing() {
             <img src={imgLogoGroup} alt="Libertia" className={styles.navLogoImg} />
             <span className={styles.navLogoText}>Libertia</span>
           </Link>
+
+          {/* Links desktop */}
           <div className={styles.navLinks}>
             {navItems.map((item) => (
               <button key={item} className={styles.navLink}>{item}</button>
             ))}
           </div>
+
+          {/* Actions desktop */}
           <div className={styles.navActions}>
             <button className={styles.langBtn}>
-              <img src={imgGlobe} alt="" style={{ width: 20, height: 20 }} />
+              <img src={imgGlobe} alt="" style={{ width: 18, height: 18 }} />
               FR
             </button>
             <Link to="/login">
@@ -155,7 +167,35 @@ export default function Landing() {
               <button className={styles.btnPurple}>S'inscrire</button>
             </Link>
           </div>
+
+          {/* Bouton hamburger (mobile) */}
+          <button
+            className={`${styles.hamburger} ${menuOpen ? styles.hamburgerOpen : ""}`}
+            onClick={() => setMenuOpen(!menuOpen)}
+            aria-label="Menu"
+          >
+            <span className={styles.hamburgerLine} />
+            <span className={styles.hamburgerLine} />
+            <span className={styles.hamburgerLine} />
+          </button>
         </nav>
+
+        {/* ── MENU MOBILE ── */}
+        <div className={`${styles.mobileMenu} ${menuOpen ? styles.mobileMenuOpen : ""}`}>
+          {navItems.map((item) => (
+            <button key={item} className={styles.mobileNavLink} onClick={() => setMenuOpen(false)}>
+              {item}
+            </button>
+          ))}
+          <div className={styles.mobileActions}>
+            <Link to="/login" style={{ textDecoration: "none" }} onClick={() => setMenuOpen(false)}>
+              <button className={styles.mobileBtnOutline}>Se connecter</button>
+            </Link>
+            <Link to="/register" style={{ textDecoration: "none" }} onClick={() => setMenuOpen(false)}>
+              <button className={styles.mobileBtnPurple}>S'inscrire</button>
+            </Link>
+          </div>
+        </div>
 
         {/* ── HERO ── */}
         <section className={styles.hero}>
@@ -191,14 +231,13 @@ export default function Landing() {
             {/* Barre de recherche */}
             <form onSubmit={handleSubmit} className={styles.searchForm}>
               <div className={`${styles.searchBox} ${isListening ? styles.searchBoxListening : ""}`}>
-
-                {/* Icône gauche SVG inline */}
+                {/* Icône gauche SVG */}
                 {isAiMode ? (
-                  <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#a78bfa" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ flexShrink: 0 }}>
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#a78bfa" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ flexShrink: 0 }}>
                     <path d="M12 2l2.4 7.4H22l-6.2 4.5 2.4 7.4L12 17l-6.2 4.3 2.4-7.4L2 9.4h7.6z"/>
                   </svg>
                 ) : (
-                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#a1a1aa" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ flexShrink: 0 }}>
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#a1a1aa" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ flexShrink: 0 }}>
                     <circle cx="11" cy="11" r="8"/>
                     <line x1="21" y1="21" x2="16.65" y2="16.65"/>
                   </svg>
@@ -215,7 +254,7 @@ export default function Landing() {
                   onChange={(e) => setQuery(e.target.value)}
                 />
 
-                {/* Bouton micro — mode IA uniquement */}
+                {/* Bouton mic — mode IA uniquement */}
                 {isAiMode && (
                   <button
                     type="button"
@@ -223,7 +262,7 @@ export default function Landing() {
                     className={`${styles.micBtn} ${isListening ? styles.micBtnActive : ""}`}
                     title={isListening ? "Écoute en cours..." : "Activer le microphone"}
                   >
-                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none"
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none"
                       stroke={isListening ? "#8b5cf6" : "#a1a1aa"}
                       strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"
                     >
@@ -234,9 +273,9 @@ export default function Landing() {
                   </button>
                 )}
 
-                {/* Bouton envoi — flèche SVG */}
+                {/* Bouton envoi */}
                 <button type="submit" className={styles.searchSubmitBtn}>
-                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
                     <line x1="5" y1="12" x2="19" y2="12"/>
                     <polyline points="13 6 19 12 13 18"/>
                   </svg>
@@ -258,7 +297,7 @@ export default function Landing() {
             <p className={styles.searchHint}>
               {isAiMode
                 ? isAuthenticated
-                  ? "Appuyez sur Entrée pour générer votre itinéraire IA 🚀"
+                  ? "Appuyez sur Entrée pour générer votre itinéraire 🚀"
                   : "Vous serez invité à vous inscrire pour utiliser l'assistant IA"
                 : "Tapez une destination pour voir les suggestions"}
             </p>
@@ -304,7 +343,7 @@ export default function Landing() {
                 <div className={styles.commAvatarMore}>+2k</div>
               </div>
               <Link to="/register">
-                <button className={styles.btnPurple} style={{ fontSize: 16, padding: "13px 24px" }}>
+                <button className={styles.btnPurple} style={{ fontSize: 15, padding: "12px 22px" }}>
                   Rejoindre la communauté
                 </button>
               </Link>
@@ -336,7 +375,7 @@ export default function Landing() {
           </div>
         </section>
 
-        {/* ── DESTINATIONS POPULAIRES ── */}
+        {/* ── DESTINATIONS ── */}
         <section className={styles.sectionWrap}>
           <div className={styles.sectionInner}>
             <div className={styles.sectionHead}>
@@ -401,11 +440,7 @@ export default function Landing() {
                   et validé par une communauté d'explorateurs passionnés.
                 </p>
               </div>
-              {[
-                { title: "Explorer",    links: ["Destinations", "Communauté", "Vols & Hôtels"] },
-                { title: "Légal",       links: ["Conditions d'utilisation", "Confidentialité", "Cookies"] },
-                { title: "Suivez-nous", links: ["Instagram", "Twitter", "TikTok"] },
-              ].map((col) => (
+              {footerCols.map((col) => (
                 <div key={col.title} className={styles.footerCol}>
                   <p className={styles.footerColTitle}>{col.title}</p>
                   <div className={styles.footerColLinks}>
@@ -428,7 +463,7 @@ export default function Landing() {
 
       </div>
 
-      {/* ── PANNEAU LATÉRAL ── */}
+      {/* ── PANNEAU LATÉRAL (Recherche) ── */}
       {panelOpen && !isAiMode && (
         <div className={styles.panelOverlay}>
           <div className={styles.panelBackdrop} onClick={() => setPanelOpen(false)} />
@@ -463,7 +498,7 @@ export default function Landing() {
                 className={styles.panelAiBtn}
                 onClick={() => { setIsAiMode(true); setPanelOpen(false); setQuery(`Je veux visiter ${query}`); }}
               >
-                 Générer un itinéraire IA pour "{query}"
+                🤖 Générer un itinéraire IA pour "{query}"
               </button>
             </div>
           </div>
