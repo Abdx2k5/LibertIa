@@ -1,13 +1,13 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuthStore } from "../store/authStore.js";
-import authService from "../services/Auth.service";
+import authService from "../services/auth.service";
 import { ROUTES } from "../utils/constants";
 
 export function useAuth() {
   const { login, logout, user, role, isAuthenticated, loading } = useAuthStore();
   const navigate = useNavigate();
-  const [error, setError]     = useState(null);
+  const [error, setError] = useState(null);
   const [pending, setPending] = useState(false);
 
   // ── Connexion ─────────────────────────────────────────────────

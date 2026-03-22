@@ -1,0 +1,100 @@
+# ─────────────────────────────────────────────
+#  LibertIa — Docker Compose
+#  Lance tout le projet en une commande :
+#  docker compose up
+# ─────────────────────────────────────────────
+
+version: '3.9'
+
+services:
+
+  # ── MongoDB ──────────────────────────────
+  mongodb:
+    image: mongo:7
+    container_name: libertia_mongodb
+    restart: unless-stopped
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongodb_data:/data/db
+    environment:
+      MONGO_INITDB_DATABASE: libertia
+    networks:
+      - libertia_network
+
+  # ── Ollama (Mistral + nomic-embed-text) ──
+  ollama:
+    image: ollama/ollama:latest
+    container_name: libertia_ollama
+    restart: unless-stopped
+    ports:
+      - "11434:11434"
+    volumes:
+      - ollama_data:/root/.ollama
+    networks:
+      - libertia_network
+    # GPU support (optionnel — commenter si pas de GPU)
+    # deploy:
+    #   resources:
+    #     reservations:
+    #       devices:
+    #         - driver: nvidia
+    #           count: 1
+    #           capabilities: [gpu]
+
+  # ── Backend Node.js ───────────────────────
+  backend:
+    build:
+      context: ./server
+      dockerfile: Dockerfile
+    container_name: libertia_backend
+    restart: unless-stopped
+    ports:
+      - "5000:5000"
+    environment:
+      NODE_ENV: production
+      PORT: 5000
+      MONGO_URI: mongodb://mongodb:27017/libertia
+      JWT_SECRET: ${JWT_SECRET}
+      EMAIL_USER: ${EMAIL_USER}
+      EMAIL_PASS: ${EMAIL_PASS}
+      FRONTEND_URL: ${FRONTEND_URL:-http://localhost:3000}
+      OLLAMA_URL: http://ollama:11434/api/generate
+    depends_on:
+      - mongodb
+      - ollama
+    volumes:
+      - ./ai:/app/ai          # Monter le dossier AI pour les scripts Python
+      - chroma_data:/app/ai/chroma_db
+    networks:
+      - libertia_network
+
+  # ── Module AI Python ─────────────────────
+  ai:
+    build:
+      context: ./ai
+      dockerfile: Dockerfile
+    container_name: libertia_ai
+    restart: unless-stopped
+    environment:
+      PYTHONIOENCODING: utf-8
+      MONGO_URI: mongodb://mongodb:27017/libertia
+    depends_on:
+      - mongodb
+      - ollama
+    volumes:
+      - ./ai:/app
+      - chroma_data:/app/chroma_db
+    networks:
+      - libertia_network
+
+# ── Volumes persistants ───────────────────
+volumes:
+  mongodb_data:
+  ollama_data:
+  chroma_data:
+
+# ── Réseau interne ────────────────────────
+networks:
+  libertia_network:
+    driver: bridge
