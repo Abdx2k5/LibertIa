@@ -1,0 +1,144 @@
+/* ============================================================
+   Register.module.css
+   ============================================================ */
+
+.page {
+  min-height: 100vh;
+  background: linear-gradient(135deg, #09090b 0%, #171123 100%);
+  font-family: 'Inter', sans-serif;
+  position: relative; overflow: hidden;
+}
+
+.cosmicBg    { position: absolute; inset: 0; opacity: 0.15; overflow: hidden; pointer-events: none; }
+.cosmicBgImg { width: 109%; height: 100%; position: absolute; left: -4.69%; top: 0; object-fit: cover; }
+
+.container { max-width: 1200px; margin: 0 auto; padding: 0 24px; position: relative; z-index: 1; }
+
+/* ── Header ── */
+.header       { display: flex; align-items: center; justify-content: space-between; padding: 24px 0; }
+.logoWrap     { display: flex; align-items: center; gap: 12px; text-decoration: none; }
+.logoImg      { width: 32px; height: 32px; }
+.logoText     { font-size: 24px; font-weight: 800; color: #e7f0ff; letter-spacing: -0.5px; }
+.headerRight  { display: flex; align-items: center; gap: 16px; }
+.headerLink   { font-size: 14px; color: #94a3b8; padding-right: 16px; }
+.headerLinkAccent { color: #6ee7f3; font-weight: 500; text-decoration: none; }
+.headerLinkAccent:hover { text-decoration: underline; }
+
+.iconBtn {
+  background: none; border: none; cursor: pointer;
+  padding: 8px; display: flex; align-items: center;
+  gap: 6px; color: #e7f0ff; font-size: 14px; font-family: 'Inter', sans-serif;
+}
+.iconBtnImg { width: 20px; height: 20px; }
+
+/* ── Body ── */
+.body { display: flex; justify-content: center; padding: 24px 0 44px; }
+
+/* ── Card ── */
+.card {
+  width: 540px;
+  backdrop-filter: blur(8px);
+  background-color: rgba(255,255,255,0.03);
+  border: 1px solid rgba(255,255,255,0.08);
+  border-radius: 8px; padding: 40px;
+  box-shadow: 0px 25px 50px -12px rgba(0,0,0,0.5);
+}
+
+.title    { font-size: 32px; font-weight: 700; color: #e7f0ff; margin: 0 0 8px; line-height: 1.2; }
+.subtitle { font-size: 15px; color: #94a3b8; line-height: 1.5; margin: 0 0 21px; }
+
+/* ── Grid ── */
+.grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 16px; }
+
+/* ── Fields ── */
+.fieldGroup  { display: flex; flex-direction: column; gap: 8px; margin-bottom: 16px; }
+.label       { font-size: 14px; font-weight: 500; color: #e7f0ff; }
+.inputWrap   { position: relative; display: flex; align-items: center; }
+
+.input {
+  width: 100%;
+  background-color: #0f1724;
+  border: 1px solid rgba(255,255,255,0.08);
+  border-radius: 6px; padding: 13px 17px 13px 49px;
+  font-size: 15px; color: #e7f0ff; outline: none;
+  box-sizing: border-box; font-family: 'Inter', sans-serif;
+  transition: border-color 0.2s;
+}
+.input::placeholder { color: #94a3b8; }
+.input:focus        { border-color: rgba(110,231,243,0.4); }
+.inputError         { border-color: rgba(248,113,113,0.5) !important; }
+
+.inputIcon  { position: absolute; left: 16px; width: 18px; height: 18px; pointer-events: none; }
+.fieldError { font-size: 12px; color: #f87171; margin-top: 4px; }
+
+/* ── Preferences ── */
+.prefsLabel { font-size: 14px; font-weight: 500; color: #e7f0ff; margin-bottom: 8px; }
+.prefsRow   { display: flex; gap: 12px; flex-wrap: wrap; margin-bottom: 16px; }
+
+.pillOn {
+  background-color: rgba(139,92,246,0.2);
+  border: 1px solid #6ee7f3; border-radius: 12px;
+  padding: 9px 17px; font-size: 14px; color: #e7f0ff;
+  cursor: pointer; font-family: 'Inter', sans-serif; transition: all 0.15s;
+}
+.pillOff {
+  background-color: #0f1724;
+  border: 1px solid rgba(255,255,255,0.08); border-radius: 12px;
+  padding: 9px 17px; font-size: 14px; color: #94a3b8;
+  cursor: pointer; font-family: 'Inter', sans-serif; transition: all 0.15s;
+}
+.pillOff:hover { border-color: rgba(255,255,255,0.2); }
+
+/* ── Checkboxes ── */
+.checkSection { display: flex; flex-direction: column; gap: 12px; margin-bottom: 16px; }
+.checkRow     { display: flex; align-items: center; gap: 8px; cursor: pointer; }
+
+.checkBoxOn {
+  width: 18px; height: 18px; border-radius: 4px;
+  border: 1px solid #6ee7f3; background-color: #6ee7f3;
+  display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+}
+.checkBoxOff {
+  width: 18px; height: 18px; border-radius: 4px;
+  border: 1px solid rgba(255,255,255,0.2);
+  background-color: #0f1724; flex-shrink: 0;
+}
+.checkIcon     { width: 14px; height: 14px; }
+.checkLabel    { font-size: 13px; color: #94a3b8; }
+.checkLabelErr { color: #f87171; }
+
+/* ── Error ── */
+.errorMsg {
+  font-size: 13px; color: #f87171;
+  background-color: rgba(248,113,113,0.1);
+  border: 1px solid rgba(248,113,113,0.3);
+  border-radius: 6px; padding: 10px 14px; margin-bottom: 8px;
+}
+
+/* ── Submit ── */
+.submitBtn {
+  width: 100%;
+  background: linear-gradient(135deg, #06b6d4 0%, #8b5cf6 100%);
+  border: none; border-radius: 6px;
+  padding: 12px 24px; font-size: 15px; font-weight: 700;
+  color: #061826; cursor: pointer;
+  font-family: 'Inter', sans-serif; transition: opacity 0.2s;
+}
+.submitBtn:hover   { opacity: 0.9; }
+.submitBtnDisabled { opacity: 0.6; cursor: not-allowed; }
+
+/* ── Divider + OAuth ── */
+.dividerRow  { display: flex; align-items: center; gap: 16px; padding: 21px 0; }
+.dividerLine { flex: 1; height: 1px; background-color: rgba(255,255,255,0.08); }
+.dividerText { font-size: 13px; color: #94a3b8; white-space: nowrap; }
+
+.oauthRow { display: grid; grid-template-columns: repeat(3,1fr); gap: 12px; }
+.oauthBtn {
+  background-color: #0f1724;
+  border: 1px solid rgba(255,255,255,0.08);
+  border-radius: 6px; padding: 11px;
+  display: flex; align-items: center; justify-content: center;
+  cursor: pointer; transition: border-color 0.2s;
+}
+.oauthBtn:hover { border-color: rgba(255,255,255,0.2); }
+.oauthIcon { width: 20px; height: 20px; }

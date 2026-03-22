@@ -1,0 +1,134 @@
+/* ============================================================
+   Profile.module.css — Page profil utilisateur (T9)
+   ============================================================ */
+
+.page {
+  min-height: 100vh;
+  background: linear-gradient(135deg, #0b1026 0%, #1a1a2e 100%);
+  font-family: 'Inter', sans-serif; color: #fff;
+}
+
+.main { max-width: 900px; margin: 0 auto; padding: 40px 24px; }
+
+/* ── Hero profil ── */
+.hero {
+  display: flex; gap: 32px; align-items: center;
+  backdrop-filter: blur(6px);
+  background-color: rgba(255,255,255,0.03);
+  border: 1px solid rgba(255,255,255,0.08);
+  border-radius: 16px; padding: 32px; margin-bottom: 24px;
+}
+
+.avatarWrap { position: relative; flex-shrink: 0; }
+.avatar {
+  width: 100px; height: 100px; border-radius: 50%;
+  border: 3px solid rgba(139,92,246,0.4); overflow: hidden;
+}
+.avatarImg  { width: 100%; height: 100%; object-fit: cover; }
+
+.avatarEditBtn {
+  position: absolute; bottom: 0; right: 0;
+  width: 28px; height: 28px; border-radius: 14px;
+  background-color: #8b5cf6; border: 2px solid #0b1026;
+  display: flex; align-items: center; justify-content: center;
+  cursor: pointer; font-size: 13px;
+}
+
+.heroInfo { flex: 1; display: flex; flex-direction: column; gap: 6px; }
+.heroName  { font-size: 24px; font-weight: 700; color: #fff; margin: 0; }
+.heroEmail { font-size: 14px; color: #94a3b8; }
+
+.heroBadge {
+  display: inline-flex; align-items: center; gap: 6px;
+  background-color: rgba(139,92,246,0.15);
+  border: 1px solid rgba(139,92,246,0.3);
+  border-radius: 20px; padding: 5px 12px;
+  font-size: 12px; color: #a78bfa; width: fit-content;
+}
+
+/* ── Stats bar ── */
+.statsBar {
+  display: grid; grid-template-columns: repeat(3,1fr);
+  gap: 16px; margin-bottom: 24px;
+}
+
+.statCard {
+  backdrop-filter: blur(6px);
+  background-color: rgba(255,255,255,0.03);
+  border: 1px solid rgba(255,255,255,0.08);
+  border-radius: 12px; padding: 20px;
+  display: flex; flex-direction: column; gap: 4px; align-items: center;
+}
+.statNum   { font-size: 28px; font-weight: 700; color: #00ffff; }
+.statLabel { font-size: 13px; color: #a1a1aa; }
+
+/* ── Section ── */
+.section {
+  backdrop-filter: blur(6px);
+  background-color: rgba(255,255,255,0.03);
+  border: 1px solid rgba(255,255,255,0.08);
+  border-radius: 16px; padding: 28px; margin-bottom: 24px;
+}
+
+.sectionTitle { font-size: 18px; font-weight: 600; color: #fff; margin: 0 0 20px; }
+
+/* ── Form fields ── */
+.fieldGrid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+.fieldGroup{ display: flex; flex-direction: column; gap: 8px; }
+.fieldFull { grid-column: 1 / -1; }
+.label     { font-size: 14px; font-weight: 500; color: #e7f0ff; }
+
+.input {
+  width: 100%; background-color: #0f1724;
+  border: 1px solid rgba(255,255,255,0.08);
+  border-radius: 6px; padding: 13px 17px;
+  font-size: 15px; color: #e7f0ff; outline: none;
+  box-sizing: border-box; font-family: 'Inter', sans-serif;
+  transition: border-color 0.2s;
+}
+.input::placeholder { color: #94a3b8; }
+.input:focus        { border-color: rgba(110,231,243,0.4); }
+.inputDisabled      { opacity: 0.5; cursor: not-allowed; }
+
+/* ── Prompt counter ── */
+.promptWrap {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 16px;
+  background-color: rgba(0,255,255,0.05);
+  border: 1px solid rgba(0,255,255,0.1);
+  border-radius: 12px;
+}
+.promptInfo { display: flex; flex-direction: column; gap: 4px; }
+.promptTitle{ font-size: 14px; font-weight: 500; color: #fff; }
+.promptSub  { font-size: 12px; color: #a1a1aa; }
+.promptNum  { font-size: 24px; font-weight: 700; color: #00ffff; }
+
+/* ── Actions ── */
+.actions { display: flex; gap: 12px; justify-content: flex-end; margin-top: 8px; }
+
+.btnSave {
+  background: linear-gradient(135deg, #06b6d4, #8b5cf6);
+  border: none; border-radius: 6px;
+  padding: 11px 24px; font-size: 14px; font-weight: 700;
+  color: #061826; cursor: pointer;
+  font-family: 'Inter', sans-serif; transition: opacity 0.2s;
+}
+.btnSave:hover { opacity: 0.9; }
+
+.btnCancel {
+  background: none;
+  border: 1px solid rgba(255,255,255,0.15);
+  border-radius: 6px; padding: 11px 24px;
+  font-size: 14px; color: #94a3b8; cursor: pointer;
+  font-family: 'Inter', sans-serif; transition: border-color 0.2s;
+}
+.btnCancel:hover { border-color: rgba(255,255,255,0.3); }
+
+.btnDanger {
+  background: rgba(239,68,68,0.1);
+  border: 1px solid rgba(239,68,68,0.3);
+  border-radius: 6px; padding: 11px 24px;
+  font-size: 14px; color: #f87171; cursor: pointer;
+  font-family: 'Inter', sans-serif; transition: all 0.2s;
+}
+.btnDanger:hover { background: rgba(239,68,68,0.2); }

@@ -1,0 +1,46 @@
+/* ============================================================
+   Footer.module.css — Layout component
+   ============================================================ */
+
+.footer {
+  border-top: 1px solid rgba(255,255,255,0.05);
+  padding: 65px 120px 32px;
+  margin-top: 40px;
+  font-family: 'Inter', sans-serif;
+}
+
+.inner {
+  max-width: 1200px; margin: 0 auto; padding: 0 24px;
+  display: flex; flex-direction: column; gap: 48px;
+}
+
+.top { display: flex; gap: 48px; align-items: flex-start; }
+
+.brand { display: flex; flex-direction: column; gap: 12px; flex: 0 0 400px; }
+.brandLogo { display: flex; align-items: center; gap: 12px; }
+.brandLogoImg { width: 24px; height: 24px; }
+.brandName { font-size: 20px; font-weight: 700; color: #fff; margin: 0; }
+.brandText { font-size: 14px; color: #a1a1aa; line-height: 1.6; margin: 0; }
+
+.col { display: flex; flex-direction: column; gap: 20px; flex: 1; }
+.colTitle { font-size: 16px; font-weight: 600; color: #fff; margin: 0; }
+.colLinks { display: flex; flex-direction: column; gap: 12px; }
+
+.colLink {
+  font-size: 16px; color: #fafafa; text-decoration: none;
+  cursor: pointer; background: none; border: none;
+  text-align: left; padding: 0;
+  font-family: 'Inter', sans-serif; transition: color 0.2s;
+}
+.colLink:hover { color: #a78bfa; }
+
+.bottom {
+  border-top: 1px solid rgba(255,255,255,0.05);
+  padding-top: 25px;
+  display: flex; justify-content: space-between; align-items: center;
+}
+
+.copy { font-size: 13px; color: #71717a; }
+.lang { display: flex; gap: 8px; align-items: center; }
+.langIcon { width: 16px; height: 16px; }
+.langText { font-size: 13px; color: #71717a; }
