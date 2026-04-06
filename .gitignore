@@ -1,3 +1,5 @@
 node_modules/
 reset_kanban.js
+.envnode_modules/
+reset_kanban.js
 .env
