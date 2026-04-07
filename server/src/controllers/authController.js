@@ -3,12 +3,18 @@ const Voyage = require('../models/Voyage');
 const jwt = require('jsonwebtoken');
 const crypto = require('crypto');
 const nodemailer = require('nodemailer');
+const { encrypt } = require('../utils/encryption');   // SA2
+const { auditLog } = require('../utils/auditLogger'); // SA4
 
 // ─────────────────────────────────────────────
-//  HELPERS
+//  HELPERS — SA1 : Access token 15min / Refresh 7j
 // ─────────────────────────────────────────────
-const genererToken = (id) => {
-    return jwt.sign({ id }, process.env.JWT_SECRET, { expiresIn: '7d' });
+const genererTokenAcces = (id) => {
+    return jwt.sign({ id }, process.env.JWT_SECRET, { expiresIn: '15m' });
+};
+
+const genererTokenRafraichissement = (id) => {
+    return jwt.sign({ id }, process.env.JWT_REFRESH_SECRET || process.env.JWT_SECRET + '_refresh', { expiresIn: '7d' });
 };
 
 const transporter = nodemailer.createTransport({
@@ -30,17 +36,28 @@ const register = async (req, res) => {
 
         const userExiste = await User.findOne({ email });
         if (userExiste) {
+            await auditLog({ action: 'register', req, success: false, details: { email, raison: 'Email déjà utilisé' } });
             return res.status(400).json({ message: 'Email déjà utilisé' });
         }
 
         const user = await User.create({ nom, email, motDePasse, age });
+
+        // SA1 — générer et stocker le refresh token
+        const accessToken  = genererTokenAcces(user._id);
+        const refreshToken = genererTokenRafraichissement(user._id);
+        user.refreshToken = refreshToken;
+        await user.save({ validateModifiedOnly: true });
+
+        // SA4
+        await auditLog({ userId: user._id, action: 'register', req, success: true });
 
         res.status(201).json({
             _id: user._id,
             nom: user.nom,
             email: user.email,
             abonnement: user.abonnement,
-            token: genererToken(user._id)
+            token: accessToken,
+            refreshToken
         });
 
     } catch (err) {
@@ -55,20 +72,33 @@ const login = async (req, res) => {
 
         const user = await User.findOne({ email });
         if (!user) {
+            await auditLog({ action: 'login', req, success: false, details: { email, raison: 'Email introuvable' } });
             return res.status(401).json({ message: 'Email ou mot de passe incorrect' });
         }
 
         const motDePasseValide = await user.comparerMotDePasse(motDePasse);
         if (!motDePasseValide) {
+            await auditLog({ userId: user._id, action: 'login', req, success: false, details: { raison: 'Mot de passe incorrect' } });
             return res.status(401).json({ message: 'Email ou mot de passe incorrect' });
         }
+
+        // SA1 — générer et stocker le refresh token
+        const accessToken  = genererTokenAcces(user._id);
+        const refreshToken = genererTokenRafraichissement(user._id);
+        user.refreshToken  = refreshToken;
+        user.lastLogin     = new Date();
+        await user.save({ validateModifiedOnly: true });
+
+        // SA4
+        await auditLog({ userId: user._id, action: 'login', req, success: true });
 
         res.json({
             _id: user._id,
             nom: user.nom,
             email: user.email,
             abonnement: user.abonnement,
-            token: genererToken(user._id)
+            token: accessToken,
+            refreshToken
         });
 
     } catch (err) {
@@ -172,8 +202,9 @@ const updateProfile = async (req, res) => {
         const champsAutorises = {};
         if (nom)         champsAutorises.nom         = nom;
         if (age)         champsAutorises.age         = age;
-        if (preferences) champsAutorises.preferences = preferences;
-        if (bio)         champsAutorises.bio         = bio;
+        // SA2 — chiffrer les données sensibles avant stockage
+        if (preferences) champsAutorises.preferences = encrypt(JSON.stringify(preferences));
+        if (bio)         champsAutorises.bio         = encrypt(bio);
 
         const user = await User.findByIdAndUpdate(
             userId,
@@ -184,6 +215,9 @@ const updateProfile = async (req, res) => {
         if (!user) {
             return res.status(404).json({ message: 'Utilisateur non trouvé.' });
         }
+
+        // SA4
+        await auditLog({ userId, action: 'update_profile', req, success: true, details: { champs: Object.keys(champsAutorises) } });
 
         res.json({ message: 'Profil mis à jour avec succès.', user });
 
@@ -216,6 +250,16 @@ const supprimerCompte = async (req, res) => {
             return res.status(401).json({ message: 'Mot de passe incorrect.' });
         }
 
+        // SA5 — blacklister l'access token courant
+        if (req.token) {
+            const BlacklistedToken = require('../models/BlacklistedToken');
+            const decoded = jwt.decode(req.token);
+            const expireAt = decoded?.exp
+                ? new Date(decoded.exp * 1000)
+                : new Date(Date.now() + 15 * 60 * 1000);
+            await BlacklistedToken.create({ token: req.token, expireAt }).catch(() => {});
+        }
+
         // 2. Anonymisation des données (RGPD)
         //    On ne supprime pas physiquement pour garder l'intégrité des données
         //    mais on efface toutes les données personnelles identifiables
@@ -228,9 +272,9 @@ const supprimerCompte = async (req, res) => {
             $set: {
                 nom:            'Utilisateur supprimé',
                 email:          `supprime_${emailHashe.substring(0, 16)}@libertia.deleted`,
-                bio:            '',
+                bio:            null,
                 profilePhoto:   'default-avatar.png',
-                preferences:    [],
+                preferences:    null, // SA2 — null car champ String chiffré
                 followers:      [],
                 following:      [],
                 isActive:       false,
@@ -274,10 +318,88 @@ const supprimerCompte = async (req, res) => {
             // Ne pas bloquer si l'email échoue
         }
 
+        // SA4
+        await auditLog({ userId, action: 'delete_account', req, success: true, details: { voyages_supprimes: voyagesSupprimés.deletedCount } });
+
         res.json({
             message: 'Compte supprimé avec succès. Vos données ont été anonymisées conformément au RGPD.',
             voyages_supprimes: voyagesSupprimés.deletedCount
         });
+
+    } catch (err) {
+        res.status(500).json({ message: err.message });
+    }
+};
+
+// ─────────────────────────────────────────────
+//  SA1 — @POST /api/auth/refresh-token
+// ─────────────────────────────────────────────
+const refreshTokenHandler = async (req, res) => {
+    try {
+        const { refreshToken } = req.body;
+
+        if (!refreshToken) {
+            return res.status(401).json({ message: 'Refresh token manquant.' });
+        }
+
+        // Vérifier la signature du refresh token
+        let decoded;
+        try {
+            decoded = jwt.verify(
+                refreshToken,
+                process.env.JWT_REFRESH_SECRET || process.env.JWT_SECRET + '_refresh'
+            );
+        } catch {
+            return res.status(401).json({ message: 'Refresh token invalide ou expiré.' });
+        }
+
+        // Vérifier que le refresh token correspond bien à celui stocké en base
+        const user = await User.findById(decoded.id).select('refreshToken isActive');
+        if (!user || !user.isActive) {
+            return res.status(401).json({ message: 'Utilisateur non trouvé ou désactivé.' });
+        }
+        if (user.refreshToken !== refreshToken) {
+            return res.status(401).json({ message: 'Refresh token révoqué.' });
+        }
+
+        // Émettre un nouvel access token (rotation : nouveau refresh token aussi)
+        const newAccessToken  = genererTokenAcces(user._id);
+        const newRefreshToken = genererTokenRafraichissement(user._id);
+        user.refreshToken = newRefreshToken;
+        await user.save({ validateModifiedOnly: true });
+
+        // SA4
+        await auditLog({ userId: user._id, action: 'refresh_token', req, success: true });
+
+        res.json({ token: newAccessToken, refreshToken: newRefreshToken });
+
+    } catch (err) {
+        res.status(500).json({ message: err.message });
+    }
+};
+
+// ─────────────────────────────────────────────
+//  SA1 + SA5 — @POST /api/auth/logout
+// ─────────────────────────────────────────────
+const logout = async (req, res) => {
+    try {
+        // SA5 — blacklister l'access token courant (injecté par authMiddleware)
+        if (req.token) {
+            const BlacklistedToken = require('../models/BlacklistedToken');
+            const decoded = jwt.decode(req.token);
+            const expireAt = decoded?.exp
+                ? new Date(decoded.exp * 1000)
+                : new Date(Date.now() + 15 * 60 * 1000);
+            await BlacklistedToken.create({ token: req.token, expireAt }).catch(() => {});
+        }
+
+        // Révoquer le refresh token en base
+        await User.findByIdAndUpdate(req.user._id, { refreshToken: null });
+
+        // SA4
+        await auditLog({ userId: req.user._id, action: 'logout', req, success: true });
+
+        res.json({ message: 'Déconnexion réussie.' });
 
     } catch (err) {
         res.status(500).json({ message: err.message });
@@ -291,5 +413,7 @@ module.exports = {
     forgotPassword,
     resetPassword,
     updateProfile,
-    supprimerCompte  // T16
+    supprimerCompte,   // T16
+    refreshTokenHandler, // SA1
+    logout             // SA1 + SA5
 };

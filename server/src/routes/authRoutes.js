@@ -7,7 +7,9 @@ const {
     forgotPassword,
     resetPassword,
     updateProfile,
-    supprimerCompte
+    supprimerCompte,
+    refreshTokenHandler,
+    logout
 } = require('../controllers/authController');
 const { proteger } = require('../middlewares/authMiddleware');
 
@@ -26,5 +28,9 @@ router.put('/update-profile',         proteger, updateProfile);
 
 // T16 — Suppression compte RGPD
 router.delete('/supprimer-compte',    proteger, supprimerCompte);
+
+// SA1 — Refresh token / Logout
+router.post('/refresh-token',         refreshTokenHandler);
+router.post('/logout',                proteger, logout);
 
 module.exports = router;

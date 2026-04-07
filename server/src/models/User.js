@@ -1,5 +1,6 @@
 const mongoose = require('mongoose');
 const bcrypt = require('bcryptjs');
+const { decrypt } = require('../utils/encryption'); // SA2
 
 const userSchema = new mongoose.Schema({
     nom: {
@@ -20,9 +21,10 @@ const userSchema = new mongoose.Schema({
     age: {
         type: Number
     },
+    // SA2 — stocké en base comme JSON chiffré (AES-256-CBC)
     preferences: {
-        type: [String],
-        default: []
+        type: String,
+        default: null
     },
     // GESTION ABONNEMENT FREE/PREMIUM 
     abonnement: {
@@ -65,10 +67,9 @@ const userSchema = new mongoose.Schema({
         type: String,
         default: 'default-avatar.png'
     },
-    // Bio de l'utilisateur
+    // SA2 — bio chiffrée AES-256-CBC (maxlength retiré : données chiffrées plus longues)
     bio: {
-        type: String,
-        maxlength: 500
+        type: String
     },
     // Liste des followers (pour fonctionnalité sociale)
     followers: [{
@@ -84,6 +85,11 @@ const userSchema = new mongoose.Schema({
     resetPasswordToken: String,
     // Date d'expiration du token
     resetPasswordExpire: Date,
+    // Refresh token (SA1)
+    refreshToken: {
+        type: String,
+        default: null
+    },
     // Dernière connexion
     lastLogin: Date,
     // État du compte (actif/désactivé)
@@ -130,6 +136,32 @@ userSchema.methods.estExpire = function() {
     if (!this.dateFinAbonnement) return false;
     return new Date() > this.dateFinAbonnement;
 };
+
+// SA2 — Déchiffrement automatique des champs sensibles dans les réponses JSON
+userSchema.set('toJSON', {
+    transform(doc, ret) {
+        // Déchiffrer bio
+        if (ret.bio) {
+            ret.bio = decrypt(ret.bio);
+        }
+        // Déchiffrer preferences (stocké comme JSON chiffré → retourner tableau)
+        if (ret.preferences) {
+            try {
+                ret.preferences = JSON.parse(decrypt(ret.preferences));
+            } catch {
+                ret.preferences = [];
+            }
+        } else {
+            ret.preferences = [];
+        }
+        // Supprimer les champs sensibles des réponses
+        delete ret.motDePasse;
+        delete ret.resetPasswordToken;
+        delete ret.resetPasswordExpire;
+        delete ret.refreshToken;
+        return ret;
+    }
+});
 
 // Index textuel pour recherche par nom
 userSchema.index({ nom: 'text' });
