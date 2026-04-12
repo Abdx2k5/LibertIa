@@ -4,7 +4,6 @@ import styles from "./Register.module.css";
 import { useAuthStore } from "../../store/authStore";
 import authService from "../../services/Auth.service";
 
-// ── Assets Figma ──────────────────────────────────────────────
 const imgLogo     = "https://www.figma.com/api/mcp/asset/d93104aa-ce16-42fe-b9cd-8bbe43f0929d";
 const imgSpaceBg  = "https://www.figma.com/api/mcp/asset/d42b2bd3-40e7-4c81-9e00-2f6037d84ee4";
 const imgGlobe    = "https://www.figma.com/api/mcp/asset/ce67d7c1-e338-4383-8ae7-5ea7ae0b31e4";
@@ -18,13 +17,15 @@ export default function Register() {
   const navigate = useNavigate();
   const { login } = useAuthStore();
 
+  // ── Le backend n'a pas de champ prenom
+  // On garde les 2 champs pour l'UX et on concatène avant l'envoi
   const [form, setForm] = useState({ nom: "", prenom: "", email: "", motDePasse: "" });
-  const [prefs, setPrefs]         = useState([]);
-  const [cgu, setCgu]             = useState(false);
-  const [newsletter, setNewsletter] = useState(false);
-  const [loading, setLoading]     = useState(false);
-  const [error, setError]         = useState(null);
-  const [errors, setErrors]       = useState({});
+  const [prefs, setPrefs]             = useState([]);
+  const [cgu, setCgu]                 = useState(false);
+  const [newsletter, setNewsletter]   = useState(false);
+  const [loading, setLoading]         = useState(false);
+  const [error, setError]             = useState(null);
+  const [errors, setErrors]           = useState({});
 
   const update = (field) => (e) => setForm({ ...form, [field]: e.target.value });
 
@@ -33,11 +34,11 @@ export default function Register() {
 
   const validate = () => {
     const e = {};
-    if (!form.nom.trim())      e.nom      = "Nom requis";
-    if (!form.prenom.trim())   e.prenom   = "Prénom requis";
-    if (!form.email.trim())    e.email    = "Email requis";
-    if (form.motDePasse.length < 8) e.motDePasse = "8 caractères minimum";
-    if (!cgu)                  e.cgu      = "Vous devez accepter les CGU";
+    if (!form.nom.trim())           e.nom        = "Nom requis";
+    if (!form.prenom.trim())        e.prenom     = "Prénom requis";
+    if (!form.email.trim())         e.email      = "Email requis";
+    if (form.motDePasse.length < 6) e.motDePasse = "6 caractères minimum";
+    if (!cgu)                       e.cgu        = "Vous devez accepter les CGU";
     setErrors(e);
     return Object.keys(e).length === 0;
   };
@@ -48,10 +49,33 @@ export default function Register() {
     setLoading(true);
     setError(null);
     try {
-      const data = await authService.register({ ...form, preferences: prefs });
-      login(data.user, data.token);
-      // Si un prompt IA était stocké → redirige vers dashboard
+      // ── Appel API 
+      // POST /api/auth/register
+      // → Le backend attend : { nom, email, motDePasse }
+      // → On concatène prenom + nom pour le champ nom du backend
+      const data = await authService.register({
+        nom:         `${form.prenom} ${form.nom}`.trim(), // ← concaténation
+        email:       form.email,
+        motDePasse:  form.motDePasse,
+        preferences: prefs,
+      });
+
+      // ── Réponse à PLAT : { _id, nom, email, abonnement, profilePhoto, promptsRestants, token }
+      login(
+        {
+          _id:             data._id,
+          nom:             data.nom,
+          email:           data.email,
+          abonnement:      data.abonnement,
+          profilePhoto:    data.profilePhoto,
+          promptsRestants: data.promptsRestants,
+        },
+        data.token
+      );
+
+      // Si un prompt IA était en attente → va au dashboard directement
       navigate(sessionStorage.getItem("libertia_prompt") ? "/dashboard" : "/dashboard");
+
     } catch (err) {
       setError(err.response?.data?.message || "Une erreur est survenue.");
     } finally {
@@ -66,8 +90,6 @@ export default function Register() {
       </div>
 
       <div className={styles.container}>
-
-        {/* ── Header ── */}
         <header className={styles.header}>
           <Link to="/" className={styles.logoWrap}>
             <img src={imgLogo} alt="Libertia" className={styles.logoImg} />
@@ -85,7 +107,6 @@ export default function Register() {
           </div>
         </header>
 
-        {/* ── Body ── */}
         <div className={styles.body}>
           <div className={styles.card}>
             <h1 className={styles.title}>Créez votre compte ✈️</h1>
@@ -95,25 +116,8 @@ export default function Register() {
 
             <form onSubmit={handleSubmit}>
 
-              {/* Nom + Prénom */}
+              {/* Nom + Prénom — 2 champs pour l'UX, concaténés avant envoi */}
               <div className={styles.grid2}>
-                <div className={styles.fieldGroup}>
-                  <label className={styles.label}>Nom</label>
-                  <div className={styles.inputWrap}>
-                    <svg className={styles.inputIcon} viewBox="0 0 24 24" fill="none" stroke="#94a3b8" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                      <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
-                      <circle cx="12" cy="7" r="4"/>
-                    </svg>
-                    <input
-                      className={`${styles.input} ${errors.nom ? styles.inputError : ""}`}
-                      placeholder="Dupont"
-                      value={form.nom}
-                      onChange={update("nom")}
-                    />
-                  </div>
-                  {errors.nom && <span className={styles.fieldError}>{errors.nom}</span>}
-                </div>
-
                 <div className={styles.fieldGroup}>
                   <label className={styles.label}>Prénom</label>
                   <div className={styles.inputWrap}>
@@ -129,6 +133,23 @@ export default function Register() {
                     />
                   </div>
                   {errors.prenom && <span className={styles.fieldError}>{errors.prenom}</span>}
+                </div>
+
+                <div className={styles.fieldGroup}>
+                  <label className={styles.label}>Nom</label>
+                  <div className={styles.inputWrap}>
+                    <svg className={styles.inputIcon} viewBox="0 0 24 24" fill="none" stroke="#94a3b8" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                      <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
+                      <circle cx="12" cy="7" r="4"/>
+                    </svg>
+                    <input
+                      className={`${styles.input} ${errors.nom ? styles.inputError : ""}`}
+                      placeholder="Dupont"
+                      value={form.nom}
+                      onChange={update("nom")}
+                    />
+                  </div>
+                  {errors.nom && <span className={styles.fieldError}>{errors.nom}</span>}
                 </div>
               </div>
 
@@ -163,7 +184,7 @@ export default function Register() {
                   <input
                     className={`${styles.input} ${errors.motDePasse ? styles.inputError : ""}`}
                     type="password"
-                    placeholder="8 caractères minimum"
+                    placeholder="6 caractères minimum"
                     value={form.motDePasse}
                     onChange={update("motDePasse")}
                     autoComplete="new-password"

@@ -30,8 +30,23 @@ export default function Login() {
     setLoading(true);
     setError(null);
     try {
+            // ── Appel API ──────────────────────────────────────────────
+      // POST /api/auth/login → { _id, nom, email, abonnement, profilePhoto, promptsRestants, token }
       const data = await authService.login({ email, motDePasse: password });
-      login(data.user, data.token);
+      // ── Stocke l'user ET le token dans le store ────────────────
+      // La réponse est à PLAT (pas data.user) — on reconstruit l'objet user
+      login(
+        {
+          _id:          data._id,
+          nom:          data.nom,
+          email:        data.email,
+          abonnement:   data.abonnement,
+          profilePhoto: data.profilePhoto,
+          promptsRestants: data.promptsRestants,
+        },
+        data.token
+      );
+ 
       navigate("/dashboard");
     } catch (err) {
       setError(err.response?.data?.message || "Email ou mot de passe incorrect.");
