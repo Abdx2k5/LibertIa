@@ -4,6 +4,7 @@ export const ROUTES = {
   REGISTER:  "/register",
   DASHBOARD: "/dashboard",
   PROFILE:   "/profile",
+  FORGOT_PASSWORD:  "/forgot-password",
   SETTINGS:  "/settings",
   ADMIN:     "/admin",
   NOT_FOUND: "*",
