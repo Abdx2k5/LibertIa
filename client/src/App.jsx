@@ -15,6 +15,7 @@ import Landing  from "./pages/landing/Landing";
 import Login    from "./pages/auth/Login";
 import Register from "./pages/auth/Register";
 import ForgotPassword from "./pages/auth/ForgotPassword";
+import ResetPassword from "./pages/auth/ResetPassword";
 
 // Pages privées (à créer)
 import Dashboard  from "./pages/dashboard/Dashboard";
@@ -38,6 +39,7 @@ export default function App() {
               <Route path={ROUTES.LOGIN}    element={<Login />} />
               <Route path={ROUTES.REGISTER} element={<Register />} />
               <Route path={ROUTES.FORGOT_PASSWORD}  element={<ForgotPassword />} />
+              <Route path={ROUTES.RESET_PASSWORD} element={<ResetPassword />} />
             </Route>
 
             {/* ── Pages privées (user connecté) ──────────── */}
