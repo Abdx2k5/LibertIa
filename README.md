@@ -187,16 +187,6 @@ npm start
 
 ---
 
-## 👥 Équipe — Groupe Colibri
-
-| Membre | Rôle |
-|--------|------|
-| Abdelwahab | Backend + IA + RAG + Sécurité |
-| Équipière 1 | Frontend React + Backend affilié |
-| Équipière 2 | Sécurité + User Stories |
-
----
-
 ## 🌿 Branches Git
 
 | Branche | Description |
