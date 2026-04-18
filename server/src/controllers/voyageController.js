@@ -6,24 +6,6 @@ const path  = require('path');
 const ROOT = path.join(__dirname, '..', '..', '..');
 const User = require('../models/User');
 const Voyage = require('../models/Voyage');
-<<<<<<< HEAD
-// URL du service Ollama (à externaliser dans .env)
-const OLLAMA_URL = process.env.OLLAMA_URL || 'http://localhost:11434/api/generate';
-/*
-* NOUVEAU :
- * - Validation des entrées
- * - Gestion des erreurs de connexion à l'IA (timeout, refus)
- * - Parsing JSON robuste (extraction même si l'IA ajoute du texte)
- * - Utilisation des champs existants (abonnement, promptsUtilises)
- *  MODIFICATIONS :
- * - Correction de la condition de quota (utilisation de user.peutGenerer())
- * - Gestion des erreurs Axios (timeout, refus de connexion)
- * - Parsing robuste avec fallback
- * - Utilisation des méthodes du modèle User (peutGenerer, promptsRestants)
- * - Mise à jour du compteur avec user.save() plutôt que findByIdAndUpdate
- * - Suppression des doublons dans la réponse JSON
-*/
-=======
 
 // ─────────────────────────────────────────────
 //  HELPER — Appel Python (scraping + RAG)
@@ -237,7 +219,6 @@ function formaterDonneesScraping(scraping) {
 //  CONTROLLER PRINCIPAL
 // ─────────────────────────────────────────────
 
->>>>>>> 99df27b1481503a4319172145f5d7e7703abdd39
 // @POST /api/voyages/generer
 const genererVoyage = async (req, res) => {
     try {
@@ -253,11 +234,7 @@ const genererVoyage = async (req, res) => {
             });
         }  
 
-<<<<<<< HEAD
-        //Récupération utilisateur et vérification quota 
-=======
         // Vérification freemium
->>>>>>> 99df27b1481503a4319172145f5d7e7703abdd39
         const user = await User.findById(userId);
         if (!user) {
             return res.status(404).json({ 
@@ -275,11 +252,6 @@ const genererVoyage = async (req, res) => {
             });
         }
 
-<<<<<<< HEAD
-        let response;
-        try {
-            response = await axios.post(OLLAMA_URL, {
-=======
         // ── ÉTAPE 1 : Extraire destination + dates du prompt ──
         console.log('🔍 Extraction infos prompt...');
         const infos = await extraireInfosPrompt(prompt);
@@ -357,7 +329,6 @@ Réponds UNIQUEMENT en JSON avec cette structure :
         // ── ÉTAPE 5 : Génération Mistral ──
         console.log('🤖 Génération Mistral...');
         const response = await axios.post('http://localhost:11434/api/generate', {
->>>>>>> 99df27b1481503a4319172145f5d7e7703abdd39
             model: 'mistral',
             prompt: promptEnrichi,
             stream: false,
@@ -366,35 +337,10 @@ Réponds UNIQUEMENT en JSON avec cette structure :
                 num_predict: 1500,
                 num_ctx: 4096
             }
-<<<<<<< HEAD
-        });
-        }  catch (error) {
-            console.error('Erreur appel Ollama:', error.message);
-            if (error.code === 'ECONNREFUSED') {
-                return res.status(503).json({
-                    success: false,
-                    message: 'Service IA indisponible - Veuillez réessayer plus tard'
-                });
-            }
-            if (error.code === 'ETIMEDOUT') {
-                return res.status(504).json({
-                    success: false,
-                    message: 'Délai de génération dépassé - Veuillez réessayer'
-                });
-            }
-            return res.status(500).json({
-                success: false,
-                message: 'Erreur lors de la communication avec l\'IA'
-            });
-        }
-
-        let itinerairData;
-=======
         }, { timeout: 120000 }); // 2 minutes
 
         // ── ÉTAPE 6 : Parser la réponse ──
         let itineraire;
->>>>>>> 99df27b1481503a4319172145f5d7e7703abdd39
         try {
             const text = response.data.response;
             const jsonMatch = text.match(/\{[\s\S]*\}/);
@@ -427,23 +373,6 @@ Réponds UNIQUEMENT en JSON avec cette structure :
                 }
             };
         }
-<<<<<<< HEAD
-        // Mise à jour du compteur de prompts utilisés
-        user.promptsUtilises += 1;
-        await user.save();
-        // Création du voyage avec les champs du modèle Voyage
-        const voyage = await Voyage.create({
-            user: userId,
-            prompt,
-            itineraire: itineraireData,
-            titre: `Voyage à ${itineraireData.destination}`,
-            destination: itineraireData.destination,
-            dates: {
-                start: new Date(),
-                end: new Date(Date.now() + (itineraireData.duree_jours || 3) * 24 * 60 * 60 * 1000)
-            },
-            budget: { total: parseFloat(itineraireData.budget_estime) || 0, currency: 'EUR' }
-=======
 
         // ── ÉTAPE 7 : Sauvegarder ──
         await User.findByIdAndUpdate(userId, {
@@ -458,18 +387,9 @@ Réponds UNIQUEMENT en JSON avec cette structure :
             checkin,
             checkout,
             scraping_utilise: !!scraping
->>>>>>> 99df27b1481503a4319172145f5d7e7703abdd39
         });
         //Réponse
         res.json({
-<<<<<<< HEAD
-            success: true,
-            message: 'Voyage généré avec succès',
-            data: {
-                voyageId: voyage._id,
-                itineraire: itineraireData,
-                promptsRestants: user.abonnement === 'free' ? 10 - user.promptsUtilises : 'Illimité'
-=======
             succes: true,
             promptsRestants: 10 - (user.promptsUtilises + 1),
             voyageId: voyage._id,
@@ -483,16 +403,11 @@ Réponds UNIQUEMENT en JSON avec cette structure :
                 hotels_trouves:   scraping?.hotels?.length || 0,
                 vols_trouves:     scraping?.vols?.length   || 0,
                 restos_trouves:   scraping?.restos?.length || 0,
->>>>>>> 99df27b1481503a4319172145f5d7e7703abdd39
             }
         });
 
     } catch (err) {
-<<<<<<< HEAD
         console.error('Erreur génération voyage:', err);
-=======
-        console.error('❌ Erreur genererVoyage:', err);
->>>>>>> 99df27b1481503a4319172145f5d7e7703abdd39
         res.status(500).json({ message: err.message });
     }
 };
