@@ -2,32 +2,41 @@ import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import styles from "./Landing.module.css";
 
-// ── Assets Figma ────────────────────────────────────────────────
-const imgParis        = "https://www.figma.com/api/mcp/asset/92bdf3fb-5f9e-480d-9079-1c2180415fd7";
-const imgTokyo        = "https://www.figma.com/api/mcp/asset/171ebab0-6ce1-4d6a-b1de-c1013733cc56";
-const imgNewYork      = "https://www.figma.com/api/mcp/asset/cb04f00d-596e-444e-bfdc-cb71011d9ba3";
-const imgMarrakech    = "https://www.figma.com/api/mcp/asset/cace39cf-0811-45bb-a19b-04aada7e7774";
-const imgSpaceBg      = "https://www.figma.com/api/mcp/asset/d42b2bd3-40e7-4c81-9e00-2f6037d84ee4";
-const imgAvatar       = "https://www.figma.com/api/mcp/asset/5f1a2aee-8987-4cde-a559-838323f1b3f2";
-const imgAvatar1      = "https://www.figma.com/api/mcp/asset/d1d5ba7d-f6ef-4d71-a594-3c553de39126";
-const imgAvatar2      = "https://www.figma.com/api/mcp/asset/b11aad4e-a6e5-4523-a1b5-bc781996e1e1";
-const imgAvatar3      = "https://www.figma.com/api/mcp/asset/b852701a-89c0-4c57-a396-5c4f33f2eb4d";
-const imgTrip         = "https://www.figma.com/api/mcp/asset/2d1d879d-a4d2-4bc2-98bf-7842a9327598";
-const imgTrip1        = "https://www.figma.com/api/mcp/asset/e592ac33-41cb-4f66-a2e8-c27ba00eed12";
-const imgLogoGroup    = "https://www.figma.com/api/mcp/asset/7a5ce784-e9e9-4ed6-aa7b-adc4cd67a502";
-const imgIconAI       = "https://www.figma.com/api/mcp/asset/7fcf71f1-40e1-4dd3-9b79-ee4ee4331312";
-const imgIconCommunity= "https://www.figma.com/api/mcp/asset/c6cb727c-10ea-4a6f-bc2a-08669c4a1d16";
-const imgIconVoice    = "https://www.figma.com/api/mcp/asset/64ca7c34-2675-4bb8-bd3e-de86f9ac60b2";
-const imgIconAll      = "https://www.figma.com/api/mcp/asset/08ed1961-af49-4eae-b73f-655e2d2bb560";
-const imgIconPin      = "https://www.figma.com/api/mcp/asset/dc36d9d9-516f-410c-bb9f-b105d793f18e";
-const imgIconHeart    = "https://www.figma.com/api/mcp/asset/292336c0-8311-4ec5-bb54-54820d08304e";
-const imgIconComment  = "https://www.figma.com/api/mcp/asset/ae969c0b-1158-480a-aeda-45131b3848fe";
-const imgIconDark     = "https://www.figma.com/api/mcp/asset/89237d47-bdf6-45f0-9122-d83426d715db";
-const imgIconTranslate= "https://www.figma.com/api/mcp/asset/2deabd7e-8ea3-4d37-a349-37e2cf0710c9";
-const imgFooterLogo   = "https://www.figma.com/api/mcp/asset/c3a61fd3-9247-4d1d-80d2-c1f31a6f8b75";
-const imgGlobe        = "https://www.figma.com/api/mcp/asset/ce67d7c1-e338-4383-8ae7-5ea7ae0b31e4";
+// DESTINATIONS
+import imgParis from "../../assets/images/destinations/paris.png";
+import imgTokyo from "../../assets/images/destinations/tokyo.png";
+import imgNewYork from "../../assets/images/destinations/new-york.png";
+import imgMarrakech from "../../assets/images/destinations/marrakech.png";
 
-// ── Données ────────────────────────────────────────────────────────
+// BACKGROUND
+import imgSpaceBg from "../../assets/images/backgrounds/space-bg.png";
+
+// COMMUNITY
+import imgAvatar from "../../assets/images/community/avatar.png";
+import imgAvatar1 from "../../assets/images/community/avatar-1.png";
+import imgAvatar2 from "../../assets/images/community/avatar-2.png";
+import imgAvatar3 from "../../assets/images/community/avatar-3.png";
+import imgTrip from "../../assets/images/community/trip-mark.png";
+import imgTrip1 from "../../assets/images/community/trip-sarah.png";
+
+// LOGO
+import imgLogoGroup from "../../assets/logos/logo.png";
+import imgFooterLogo from "../../assets/logos/logo-light.png";
+
+// ICONS
+import imgIconAI from "../../assets/icons/icon-ai.png";
+import imgIconCommunity from "../../assets/icons/icon-community.png";
+import imgIconVoice from "../../assets/icons/icon-voice.png";
+import imgIconAll from "../../assets/icons/icon-all-in-one.png";
+import imgIconDark from "../../assets/icons/icon-dark-mode.png";
+import ImgIconLight from "../../assets/icons/icon-dark-mode-light.png";
+
+import imgIconTranslate from "../../assets/icons/icon-translate.png";
+import imgGlobLight from "../../assets/icons/icon-globe-light.png";
+import imgGlobe from "../../assets/icons/icon-globe.png";
+import imgIconHeart from "../../assets/icons/Icon_heart.png";
+import imgIconComment from "../../assets/icons/Icon_comments.png";
+// Donneee ────────────────────────────────────────────────────────
 const DESTINATIONS = [
   { img: imgParis,     name: "Paris",     country: "France",     price: "~450€",  count: "1.2k intéressés", tags: ["Culture", "Gastronomie"] },
   { img: imgTokyo,     name: "Tokyo",     country: "Japon",      price: "~1200€", count: "3.4k intéressés", tags: ["Technologie", "Cuisine"] },
@@ -71,9 +80,11 @@ const footerCols = [
   { title: "Suivez-nous", links: ["Instagram", "Twitter", "TikTok"] },
 ];
 
+
 // ── Composant ──────────────────────────────────────────────────────
 export default function Landing() {
   const navigate = useNavigate();
+
   const isAuthenticated = !!localStorage.getItem("libertia_token");
 
   // State
@@ -83,7 +94,7 @@ export default function Landing() {
   const [isListening, setIsListening] = useState(false);
   const [micError, setMicError]       = useState(null);
   const [menuOpen, setMenuOpen]       = useState(false); // ← menu hamburger
-
+  const [theme, setTheme] = useState("dark");
   // Filtrage destinations
   const filtered = query.trim().length >= 1
     ? DESTINATIONS.filter((d) =>
@@ -104,7 +115,10 @@ export default function Landing() {
       setPanelOpen(true);
     }
   };
-
+  
+  const toggleTheme = () => {
+  setTheme((prev) => (prev === "dark" ? "light" : "dark"));
+  };
   // Clic destination
   const handleDestClick = (dest) => {
     sessionStorage.setItem("libertia_prompt", `Je veux visiter ${dest.name}, ${dest.country}`);
@@ -137,7 +151,7 @@ export default function Landing() {
   };
 
   return (
-    <div className={styles.page}>
+    <div className={styles.page} data-theme={theme}>
       <div className={styles.background}>
 
         {/* ── NAVBAR ── */}
@@ -154,10 +168,14 @@ export default function Landing() {
             ))}
           </div>
 
+
           {/* Actions desktop */}
           <div className={styles.navActions}>
+        <button className={styles.themeBtn} onClick={toggleTheme}>
+            <img src={theme === "dark" ? imgIconDark : ImgIconLight} alt="theme" style={{ width: 20, height: 20 }} />
+          </button>
             <button className={styles.langBtn}>
-              <img src={imgGlobe} alt="" style={{ width: 18, height: 18 }} />
+              <img src={theme === "dark" ? imgGlobe : imgGlobLight }  alt="" style={{ width: 18, height: 18 }} />
               FR
             </button>
             <Link to="/login">
@@ -395,7 +413,7 @@ export default function Landing() {
                       <span className={styles.destPrice}>{dest.price}</span>
                     </div>
                     <div className={styles.destMeta}>
-                      <img src={imgIconPin} alt="" className={styles.destMetaIcon} />
+                      {/* <img src={imgIconPin} alt="" className={styles.destMetaIcon} /> */}
                       <span className={styles.destMetaText}>{dest.count}</span>
                     </div>
                   </div>

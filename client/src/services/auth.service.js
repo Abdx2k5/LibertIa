@@ -10,8 +10,13 @@
 //   updateProfile  → { success: true, data: { _id, nom, email, ... } }
 // =============================================================
 
-import api from "./api";
+import axios from "axios";
 
+// ================= API CONFIG =================
+const api = axios.create({
+  baseURL: "http://localhost:5000/api",
+  withCredentials: true,
+});
 const authService = {
 
   // ── POST /api/auth/register ───────────────────────────────
