@@ -3,14 +3,14 @@ import styles from "./Profile.module.css";
 import { useAuthStore } from "../../store/authStore";
 import authService from "../../services/Auth.service";
 import { FREEMIUM } from "../../utils/constants";
+import EditProfileForm from "./EditProfileForm";
 
 const imgAvatar = "https://www.figma.com/api/mcp/asset/0926e5cc-1f5e-4862-a22b-22daa1cef4d7";
 
 export default function Profile() {
   const { user, updateUser } = useAuthStore();
-  const [form, setForm]       = useState({ nom: "", prenom: "", email: "" });
-  const [editing, setEditing] = useState(false);
-  const [loading, setLoading] = useState(false);
+  const [form, setForm]           = useState({ nom: "", prenom: "", email: "" });
+  const [editing, setEditing]     = useState(false);
   const [successMsg, setSuccessMsg] = useState(false);
 
   const promptsUsed = user?.promptsUtilises || 0;
@@ -20,20 +20,10 @@ export default function Profile() {
     if (user) setForm({ nom: user.nom || "", prenom: user.prenom || "", email: user.email || "" });
   }, [user]);
 
-  const handleSave = async (e) => {
-    e.preventDefault();
-    setLoading(true);
-    try {
-      const updated = await authService.updateProfile(form);
-      updateUser(updated.user || updated);
-      setEditing(false);
-      setSuccessMsg(true);
-      setTimeout(() => setSuccessMsg(false), 3000);
-    } catch {
-      // gérer l'erreur
-    } finally {
-      setLoading(false);
-    }
+  const handleSaved = () => {
+    setEditing(false);
+    setSuccessMsg(true);
+    setTimeout(() => setSuccessMsg(false), 3000);
   };
 
   return (
@@ -88,31 +78,38 @@ export default function Profile() {
         </div>
 
         {/* ── Formulaire infos ── */}
-        <div className={styles.section}>
-          <h2 className={styles.sectionTitle}>Informations personnelles</h2>
-          <form onSubmit={handleSave}>
-            <div className={styles.fieldGrid}>
+        {editing ? (
+          <EditProfileForm
+            onCancel={() => setEditing(false)}
+            onSaved={handleSaved}
+          />
+        ) : (
+          <div className={styles.section}>
+            <h2 className={styles.sectionTitle}>Informations personnelles</h2>
 
+            {successMsg && (
+              <p style={{ fontSize: 13, color: "#4ade80", marginBottom: 8 }}>
+                ✓ Profil mis à jour avec succès !
+              </p>
+            )}
+
+            <div className={styles.fieldGrid}>
               <div className={styles.fieldGroup}>
                 <label className={styles.label}>Nom</label>
                 <input
-                  className={`${styles.input} ${!editing ? styles.inputDisabled : ""}`}
+                  className={`${styles.input} ${styles.inputDisabled}`}
                   value={form.nom}
-                  onChange={(e) => setForm({ ...form, nom: e.target.value })}
-                  disabled={!editing}
+                  disabled
                 />
               </div>
-
               <div className={styles.fieldGroup}>
                 <label className={styles.label}>Prénom</label>
                 <input
-                  className={`${styles.input} ${!editing ? styles.inputDisabled : ""}`}
+                  className={`${styles.input} ${styles.inputDisabled}`}
                   value={form.prenom}
-                  onChange={(e) => setForm({ ...form, prenom: e.target.value })}
-                  disabled={!editing}
+                  disabled
                 />
               </div>
-
               <div className={`${styles.fieldGroup} ${styles.fieldFull}`}>
                 <label className={styles.label}>Email</label>
                 <input
@@ -122,31 +119,19 @@ export default function Profile() {
                   title="L'email ne peut pas être modifié"
                 />
               </div>
+            </div>
 
-            </div>
-            {successMsg && (
-            <p style={{ fontSize: 13, color: "#4ade80", marginBottom: 8 }}>
-               Profil mis à jour avec succès !
-              </p>
-              )}
             <div className={styles.actions}>
-              {editing ? (
-                <>
-                  <button type="button" className={styles.btnCancel} onClick={() => setEditing(false)}>
-                    Annuler
-                  </button>
-                  <button type="submit" className={styles.btnSave} disabled={loading}>
-                    {loading ? "Sauvegarde..." : "Sauvegarder"}
-                  </button>
-                </>
-              ) : (
-                <button type="button" className={styles.btnSave} onClick={() => setEditing(true)}>
-                  Modifier le profil
-                </button>
-              )}
+              <button
+                type="button"
+                className={styles.btnSave}
+                onClick={() => setEditing(true)}
+              >
+                Modifier le profil
+              </button>
             </div>
-          </form>
-        </div>
+          </div>
+        )}
 
         {/* ── Zone danger ── */}
         <div className={styles.section}>
