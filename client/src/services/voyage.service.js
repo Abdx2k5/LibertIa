@@ -1,10 +1,97 @@
 import api from "./api";
 
+// ─────────────────────────────────────────────
+//  Helper — get token from storage
+//  (adapte selon où tu stockes le JWT)
+// ─────────────────────────────────────────────
+function getToken() {
+  // Zustand persiste souvent dans localStorage sous une clé
+  // Adapte cette ligne selon ton authStore
+  try {
+    const raw = localStorage.getItem('auth-storage') 
+             || localStorage.getItem('authStore')
+             || localStorage.getItem('token');
+    if (!raw) return null;
+    // Si c'est un JSON Zustand persist
+    const parsed = JSON.parse(raw);
+    return parsed?.state?.token || parsed?.token || raw;
+  } catch {
+    return localStorage.getItem('token');
+  }
+}
+
 const voyageService = {
-  // POST /api/voyages/generer
+  // ── Génération classique (non-stream) ──
   generer: async (prompt) => {
     const response = await api.post("/api/voyages/generer", { prompt });
     return response.data;
+  },
+
+  // ── Génération avec streaming SSE ──
+  // callbacks: { onStatus, onToken, onDone, onError }
+  streamGenerer: async (prompt, callbacks = {}) => {
+    const { onStatus, onToken, onDone, onError } = callbacks;
+
+    const token = getToken();
+
+    const response = await fetch(
+      `${import.meta.env.VITE_API_URL || 'http://localhost:5000'}/api/voyages/generer/stream`,
+      {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          ...(token ? { Authorization: `Bearer ${token}` } : {})
+        },
+        body: JSON.stringify({ prompt }),
+      }
+    );
+
+    if (!response.ok) {
+      const err = await response.json().catch(() => ({ message: 'Erreur serveur' }));
+      onError?.(err.message || 'Erreur serveur');
+      return;
+    }
+
+    const reader = response.body.getReader();
+    const decoder = new TextDecoder();
+    let buffer = '';
+
+    while (true) {
+      const { done, value } = await reader.read();
+      if (done) break;
+
+      buffer += decoder.decode(value, { stream: true });
+
+      // SSE peut arriver en morceaux — on traite ligne par ligne
+      const lines = buffer.split('\n');
+      // La dernière ligne peut être incomplète, on la remet en buffer
+      buffer = lines.pop();
+
+      for (const line of lines) {
+        if (line.startsWith('event: ')) {
+          // on lit l'event name mais on le récupère avec la data juste après
+          continue;
+        }
+        if (line.startsWith('data: ')) {
+          const raw = line.slice(6).trim();
+          if (!raw) continue;
+
+          try {
+            const payload = JSON.parse(raw);
+
+            // On détermine le type d'event en regardant les clés du payload
+            if (payload.step)   onStatus?.(payload);   // event: status
+            if (payload.token !== undefined) onToken?.(payload.token);  // event: token
+            if (payload.voyageId) onDone?.(payload);   // event: done
+            if (payload.message && !payload.step && !payload.voyageId) {
+              onError?.(payload.message);               // event: error
+            }
+          } catch {
+            // ligne SSE malformée, on ignore
+          }
+        }
+      }
+    }
   },
 
   // GET /api/voyages/mes-voyages
