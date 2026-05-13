@@ -72,6 +72,32 @@
 
 .sectionTitle { font-size: 18px; font-weight: 600; color: #fff; margin: 0 0 20px; }
 
+.sectionHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 20px;
+}
+
+.sectionHeader .sectionTitle { margin: 0; }
+
+.btnEdit {
+  background: none;
+  border: 1px solid rgba(139,92,246,0.3);
+  border-radius: 6px;
+  padding: 8px 16px;
+  font-size: 13px;
+  color: #a78bfa;
+  cursor: pointer;
+  font-family: 'Inter', sans-serif;
+  transition: all 0.2s;
+}
+
+.btnEdit:hover {
+  border-color: rgba(139,92,246,0.6);
+  background-color: rgba(139,92,246,0.1);
+}
+
 /* ── Form fields ── */
 .fieldGrid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
 .fieldGroup{ display: flex; flex-direction: column; gap: 8px; }
@@ -89,6 +115,63 @@
 .input::placeholder { color: #94a3b8; }
 .input:focus        { border-color: rgba(110,231,243,0.4); }
 .inputDisabled      { opacity: 0.5; cursor: not-allowed; }
+.inputError         { border-color: rgba(239,68,68,0.5) !important; }
+
+.textarea {
+  width: 100%;
+  background-color: #0f1724;
+  border: 1px solid rgba(255,255,255,0.08);
+  border-radius: 6px;
+  padding: 13px 17px;
+  font-size: 15px;
+  color: #e7f0ff;
+  outline: none;
+  box-sizing: border-box;
+  font-family: 'Inter', sans-serif;
+  transition: border-color 0.2s;
+  resize: vertical;
+  min-height: 120px;
+}
+.textarea::placeholder { color: #94a3b8; }
+.textarea:focus { border-color: rgba(110,231,243,0.4); }
+
+.selectInput {
+  width: 100%;
+  background-color: #0f1724;
+  border: 1px solid rgba(255,255,255,0.08);
+  border-radius: 6px;
+  padding: 13px 17px;
+  font-size: 15px;
+  color: #e7f0ff;
+  outline: none;
+  box-sizing: border-box;
+  font-family: 'Inter', sans-serif;
+  transition: border-color 0.2s;
+}
+.selectInput:focus { border-color: rgba(110,231,243,0.4); }
+.selectInput option {
+  background-color: #0f1724;
+  color: #e7f0ff;
+}
+
+.charCounter {
+  font-size: 12px;
+  color: #94a3b8;
+  margin-top: 6px;
+  text-align: right;
+}
+
+.errorText {
+  font-size: 12px;
+  color: #f87171;
+  margin-top: 4px;
+}
+
+.errorMsg {
+  font-size: 13px;
+  color: #ef4444;
+  margin-bottom: 16px;
+}
 
 /* ── Prompt counter ── */
 .promptWrap {
@@ -105,6 +188,60 @@
 
 /* ── Actions ── */
 .actions { display: flex; gap: 12px; justify-content: flex-end; margin-top: 8px; }
+
+.formActions {
+  display: flex;
+  gap: 12px;
+  justify-content: flex-end;
+  margin-top: 16px;
+  padding-top: 16px;
+  border-top: 1px solid rgba(255,255,255,0.08);
+}
+
+.viewMode {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.viewRow {
+  display: flex;
+  gap: 12px;
+  padding: 12px 0;
+  border-bottom: 1px solid rgba(255,255,255,0.05);
+}
+
+.viewRow:last-child {
+  border-bottom: none;
+}
+
+.viewLabel {
+  font-size: 14px;
+  font-weight: 500;
+  color: #a1a1aa;
+  min-width: 100px;
+}
+
+.viewValue {
+  font-size: 14px;
+  color: #e7f0ff;
+  flex: 1;
+}
+
+.bioText {
+  font-size: 14px;
+  color: #e7f0ff;
+  line-height: 1.5;
+  word-wrap: break-word;
+  margin: 0;
+}
+
+.bioPlaceholder {
+  font-size: 14px;
+  color: #94a3b8;
+  font-style: italic;
+  margin: 0;
+}
 
 .btnSave {
   background: linear-gradient(135deg, #06b6d4, #8b5cf6);
@@ -132,3 +269,80 @@
   font-family: 'Inter', sans-serif; transition: all 0.2s;
 }
 .btnDanger:hover { background: rgba(239,68,68,0.2); }
+
+/* ── Preferences ── */
+.preferencesGrid {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.preferenceItem {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 16px;
+  background-color: rgba(255,255,255,0.02);
+  border: 1px solid rgba(255,255,255,0.05);
+  border-radius: 8px;
+}
+
+.preferenceCheck {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.preferenceCheck input[type="checkbox"] {
+  width: 18px;
+  height: 18px;
+  cursor: pointer;
+  accent-color: #8b5cf6;
+}
+
+.preferenceCheck label {
+  font-size: 14px;
+  font-weight: 500;
+  color: #e7f0ff;
+  cursor: pointer;
+  margin: 0;
+}
+
+.preferenceDesc {
+  font-size: 13px;
+  color: #94a3b8;
+  margin-left: 26px;
+}
+
+.preferencesList {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.prefItem {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-size: 14px;
+  color: #e7f0ff;
+  padding: 8px 0;
+}
+
+.prefCheck {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+  height: 20px;
+  border-radius: 4px;
+  background-color: rgba(139,92,246,0.2);
+  font-size: 12px;
+  color: #a78bfa;
+  font-weight: 600;
+}
+
+.prefLabel {
+  font-weight: 500;
+  color: #a1a1aa;
+}

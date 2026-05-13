@@ -18,6 +18,12 @@ const authService = {
     const response = await api.get("/api/auth/me");
     return response.data;
   },
+
+  // PUT /api/auth/update-profile
+  updateProfile: async (data) => {
+    const response = await api.put("/api/auth/update-profile", data);
+    return response.data;
+  },
 };
 
 export default authService;
