@@ -1,0 +1,113 @@
+.content {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  padding: 20px 0;
+}
+
+.linkSection {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.label {
+  font-size: 14px;
+  font-weight: 600;
+  color: #e7f0ff;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.linkContainer {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.linkInput {
+  flex: 1;
+  padding: 10px 12px;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(0, 255, 255, 0.15);
+  border-radius: 8px;
+  color: #06b6d4;
+  font-size: 13px;
+  font-family: 'Courier New', monospace;
+  outline: none;
+  transition: all 0.2s ease;
+}
+
+.linkInput:focus {
+  border-color: rgba(0, 255, 255, 0.4);
+  background: rgba(0, 255, 255, 0.05);
+}
+
+.divider {
+  text-align: center;
+  font-size: 12px;
+  color: #a1a1aa;
+  position: relative;
+  padding: 10px 0;
+}
+
+.divider::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.1), transparent);
+}
+
+.divider {
+  position: relative;
+  z-index: 1;
+  background: #0b1026;
+  display: inline-block;
+  width: 100%;
+  text-align: center;
+}
+
+.socialButtons {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
+}
+
+.socialBtn {
+  width: 100%;
+  padding: 12px;
+  font-size: 14px;
+}
+
+@media (max-width: 1024px) {
+  .content {
+    gap: 16px;
+    padding: 16px 0;
+  }
+
+  .socialButtons {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .linkInput {
+    font-size: 12px;
+    padding: 8px 10px;
+  }
+}
+
+@media (max-width: 640px) {
+  .socialButtons {
+    grid-template-columns: 1fr;
+  }
+
+  .linkContainer {
+    flex-direction: column;
+  }
+
+  .linkContainer button {
+    width: 100%;
+  }
+}

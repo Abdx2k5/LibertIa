@@ -3,6 +3,9 @@ import styles from "./Dashboard.module.css";
 import { useAuth } from "../../hooks/useAuth";
 import { useVoyage } from "../../hooks/useVoyage";
 import { FREEMIUM } from "../../utils/constants";
+import { ProgressBar, ShareButton, DeleteButton } from "../../components/ui";
+import ShareModal from "../../components/modals/ShareModal";
+import DeleteConfirmModal from "../../components/modals/DeleteConfirmModal";
 
 // ── Assets Figma ──────────────────────────────────────────────
 const imgProfile      = "https://www.figma.com/api/mcp/asset/0926e5cc-1f5e-4862-a22b-22daa1cef4d7";
@@ -49,6 +52,9 @@ export default function Dashboard() {
 
   const [activeFilter, setActiveFilter]     = useState(null);
   const [showLimitModal, setShowLimitModal] = useState(false);
+  const [shareModalOpen, setShareModalOpen] = useState(false);
+  const [deleteModalOpen, setDeleteModalOpen] = useState(false);
+  const [selectedVoyage, setSelectedVoyage] = useState(null);
 
   const promptsUsed = user?.promptsUtilises || 0;
   const promptsLeft = FREEMIUM.MAX_FREE_PROMPTS - promptsUsed;
@@ -64,6 +70,29 @@ export default function Dashboard() {
     await generer(fullPrompt);
     setPrompt("");
     getMesVoyages();
+  };
+
+  const handleShareClick = (voyageId) => {
+    const voyage = voyages.find(v => v._id === voyageId || v.id === voyageId);
+    setSelectedVoyage(voyage);
+    setShareModalOpen(true);
+  };
+
+  const handleDeleteClick = (voyageId) => {
+    const voyage = voyages.find(v => v._id === voyageId || v.id === voyageId);
+    setSelectedVoyage(voyage);
+    setDeleteModalOpen(true);
+  };
+
+  const handleConfirmDelete = async () => {
+    if (selectedVoyage) {
+      // TODO: Call API to delete voyage when backend is ready
+      console.log("Deleting voyage:", selectedVoyage);
+      setDeleteModalOpen(false);
+      setSelectedVoyage(null);
+      // After deletion, refresh voyages list:
+      // await getMesVoyages();
+    }
   };
 
   return (
@@ -152,8 +181,15 @@ export default function Dashboard() {
             {promptsLeft <= 2 && <span className={styles.promptWarn}> — Passez à Premium !</span>}
           </div>
 
+          {/* Progress Bar - Show during generation */}
+          {loading && (
+            <div style={{ marginTop: '20px', maxWidth: '600px', margin: '20px auto 0' }}>
+              <ProgressBar progress={65} label="Scraping en cours..." status="generating" />
+            </div>
+          )}
+
           {error   && <div className={styles.errorText}>{error}</div>}
-          {loading && <div className={styles.loadingText}>🤖 L'IA génère votre itinéraire...</div>}
+          {!loading && <div className={styles.loadingText}> </div>}
         </section>
 
         {/* ── DASHBOARD SPLIT ── */}
@@ -184,7 +220,25 @@ export default function Dashboard() {
                     </div>
                   )}
                 </div>
-                <button className={styles.historyBtn}>{v.btnLabel || "Voir"}</button>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', alignItems: 'flex-end' }}>
+                  <button className={styles.historyBtn}>{v.btnLabel || "Voir"}</button>
+                  {v._id || v.id ? (
+                    <div style={{ display: 'flex', gap: '6px' }}>
+                      <ShareButton 
+                        voyageId={v._id || v.id} 
+                        onShare={handleShareClick}
+                        variant="outline"
+                        size="sm"
+                      />
+                      <DeleteButton 
+                        voyageId={v._id || v.id} 
+                        onDelete={handleDeleteClick}
+                        variant="danger"
+                        size="sm"
+                      />
+                    </div>
+                  ) : null}
+                </div>
               </div>
             ))}
 
@@ -264,6 +318,33 @@ export default function Dashboard() {
             </button>
           </div>
         </div>
+      )}
+
+      {/* ── SHARE MODAL ── */}
+      {selectedVoyage && (
+        <ShareModal
+          isOpen={shareModalOpen}
+          onClose={() => {
+            setShareModalOpen(false);
+            setSelectedVoyage(null);
+          }}
+          voyageTitle={selectedVoyage.title || selectedVoyage.prompt || "Mon voyage"}
+          voyageId={selectedVoyage._id || selectedVoyage.id}
+        />
+      )}
+
+      {/* ── DELETE MODAL ── */}
+      {selectedVoyage && (
+        <DeleteConfirmModal
+          isOpen={deleteModalOpen}
+          onClose={() => {
+            setDeleteModalOpen(false);
+            setSelectedVoyage(null);
+          }}
+          onConfirm={handleConfirmDelete}
+          voyageTitle={selectedVoyage.title || selectedVoyage.prompt || "Mon voyage"}
+          loading={false}
+        />
       )}
 
     </div>

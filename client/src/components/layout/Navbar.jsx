@@ -1,6 +1,7 @@
 import { Link, useNavigate, useLocation } from "react-router-dom";
 import styles from "./Navbar.module.css";
 import { useAuthStore } from "../../store/authStore";
+import { LogoutButton } from "../../components/ui";
 
 const imgLogo   = "https://www.figma.com/api/mcp/asset/d93104aa-ce16-42fe-b9cd-8bbe43f0929d";
 const imgGlobe  = "https://www.figma.com/api/mcp/asset/ce67d7c1-e338-4383-8ae7-5ea7ae0b31e4";
@@ -17,12 +18,7 @@ const NAV_LINKS = [
 export default function Navbar() {
   const navigate  = useNavigate();
   const location  = useLocation();
-  const { isAuthenticated, logout } = useAuthStore();
-
-  const handleLogout = () => {
-    logout();
-    navigate("/");
-  };
+  const { isAuthenticated } = useAuthStore();
 
   return (
     <nav className={styles.navbar}>
@@ -54,9 +50,7 @@ export default function Navbar() {
             <div className={styles.avatar} onClick={() => navigate("/profile")}>
               <img src={imgAvatar} alt="Profil" className={styles.avatarImg} />
             </div>
-            <button className={styles.btnOutline} onClick={handleLogout}>
-              Déconnexion
-            </button>
+            <LogoutButton variant="outline" size="md" />
           </>
         ) : (
           <>

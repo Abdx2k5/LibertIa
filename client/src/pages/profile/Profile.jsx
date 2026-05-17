@@ -3,6 +3,7 @@ import styles from "./Profile.module.css";
 import { useAuthStore } from "../../store/authStore";
 import authService from "../../services/Auth.service";
 import { FREEMIUM } from "../../utils/constants";
+import { LogoutButton } from "../../components/ui";
 
 const imgAvatar = "https://www.figma.com/api/mcp/asset/0926e5cc-1f5e-4862-a22b-22daa1cef4d7";
 
@@ -543,7 +544,10 @@ export default function Profile() {
           {/* ── Zone danger ── */}
           <div className={styles.section}>
             <h2 className={styles.sectionTitle}>Zone dangereuse</h2>
-            <button type="button" className={styles.btnDanger}>Supprimer mon compte</button>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+              <LogoutButton variant="outline" size="md" />
+              <button type="button" className={styles.btnDanger}>Supprimer mon compte</button>
+            </div>
           </div>
         </form>
 

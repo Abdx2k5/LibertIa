@@ -18,6 +18,18 @@ const voyageService = {
     const response = await api.get(`/api/voyages/${id}`);
     return response.data;
   },
+
+  // DELETE /api/voyages/:id
+  deleteVoyage: async (id) => {
+    const response = await api.delete(`/api/voyages/${id}`);
+    return response.data;
+  },
+
+  // POST /api/voyages/:id/share
+  shareVoyage: async (id, shareData = {}) => {
+    const response = await api.post(`/api/voyages/${id}/share`, shareData);
+    return response.data;
+  },
 };
 
 export default voyageService;
