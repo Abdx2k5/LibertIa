@@ -2,6 +2,7 @@ import { useState, useEffect, useCallback } from "react";
 import styles from "./Dashboard.module.css";
 import { useAuthStore } from "../../store/authStore";
 import { useVoyage } from "../../hooks/useVoyage";
+import StreamingOutput from "../../components/ui/StreamingOutput";
 
 const imgProfile      = "https://www.figma.com/api/mcp/asset/0926e5cc-1f5e-4862-a22b-22daa1cef4d7";
 const imgSeoul        = "https://www.figma.com/api/mcp/asset/3c1af9b5-dd28-4164-be5d-ba041556100d";
@@ -41,7 +42,7 @@ export default function Dashboard() {
   return localStorage.getItem("theme") === "dark";
 });
   const { user } = useAuthStore();
-  const { generer, getMesVoyages, voyages, loading, error } = useVoyage();
+  const { getMesVoyages, voyages } = useVoyage();
 
   // ── Lit sessionStorage une seule fois (fix cascading renders) ──
   const [prompt, setPrompt] = useState(() => {
@@ -49,6 +50,8 @@ export default function Dashboard() {
     if (saved) { sessionStorage.removeItem("libertia_prompt"); return saved; }
     return "";
   });
+  const [streamPrompt, setStreamPrompt] = useState("");
+  const [streamId, setStreamId] = useState(0);
 
   const [activeFilter, setActiveFilter]     = useState(null);
   const [showLimitModal, setShowLimitModal] = useState(false);
@@ -70,7 +73,7 @@ export default function Dashboard() {
 useEffect(() => {
   localStorage.setItem("theme", dark ? "dark" : "light");
 }, [dark]);
-  const handleSubmit = async (e) => {
+  const handleSubmit = (e) => {
     e.preventDefault();
     if (!prompt.trim()) return;
 
@@ -78,9 +81,9 @@ useEffect(() => {
     if (!canGenerate) { setShowLimitModal(true); return; }
 
     const fullPrompt = activeFilter ? `${prompt} [Filtre: ${activeFilter}]` : prompt;
-    await generer(fullPrompt);
+    setStreamPrompt(fullPrompt);
+    setStreamId((id) => id + 1);
     setPrompt("");
-    getMesVoyages(); // rafraîchit l'historique
   };
 
   return (
@@ -127,7 +130,6 @@ useEffect(() => {
                   placeholder="Dites où vous voulez aller, combien de temps, votre budget..."
                   value={prompt}
                   onChange={(e) => setPrompt(e.target.value)}
-                  disabled={loading}
                 />
                 <div className={styles.searchFilters}>
                   {FILTERS.map((f) => (
@@ -144,7 +146,7 @@ useEffect(() => {
               <button type="button" className={styles.micBtn}>
                 <img src={imgIconMic} alt="Micro" className={styles.btnImg} />
               </button>
-              <button type="submit" className={styles.sendBtn} disabled={loading}>
+              <button type="submit" className={styles.sendBtn}>
                 <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#000" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
                   <line x1="5" y1="12" x2="19" y2="12"/>
                   <polyline points="13 6 19 12 13 18"/>
@@ -165,8 +167,7 @@ useEffect(() => {
             )}
           </div>
 
-          {error   && <div className={styles.errorText}>{error}</div>}
-          {loading && <div className={styles.loadingText}>🤖 L'IA génère votre itinéraire...</div>}
+          {streamPrompt && <StreamingOutput key={streamId} prompt={streamPrompt} />}
         </section>
 
         {/* ── DASHBOARD SPLIT ── */}

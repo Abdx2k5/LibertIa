@@ -5,19 +5,7 @@ import api from "./api";
 //  (adapte selon où tu stockes le JWT)
 // ─────────────────────────────────────────────
 function getToken() {
-  // Zustand persiste souvent dans localStorage sous une clé
-  // Adapte cette ligne selon ton authStore
-  try {
-    const raw = localStorage.getItem('auth-storage') 
-             || localStorage.getItem('authStore')
-             || localStorage.getItem('token');
-    if (!raw) return null;
-    // Si c'est un JSON Zustand persist
-    const parsed = JSON.parse(raw);
-    return parsed?.state?.token || parsed?.token || raw;
-  } catch {
-    return localStorage.getItem('token');
-  }
+  return localStorage.getItem("libertia_token");
 }
 
 const voyageService = {
