@@ -3,6 +3,7 @@ import styles from "./Dashboard.module.css";
 import { useAuthStore } from "../../store/authStore";
 import { useVoyage } from "../../hooks/useVoyage";
 import StreamingOutput from "../../components/ui/StreamingOutput";
+import { VolCard, HotelCard, ActiviteCard } from "../../components/ui";
 
 const imgProfile      = "https://www.figma.com/api/mcp/asset/0926e5cc-1f5e-4862-a22b-22daa1cef4d7";
 const imgSeoul        = "https://www.figma.com/api/mcp/asset/3c1af9b5-dd28-4164-be5d-ba041556100d";
@@ -37,12 +38,114 @@ const SUGGESTIONS = [
 
 const MAX_FREE_PROMPTS = 10;
 
+// Mock data for cards
+const MOCK_VOLS = [
+  {
+    compagnie: "Air France",
+    numero: "AF 275",
+    depart: { ville: "Paris", heure: "08:30" },
+    arrivee: { ville: "Tokyo", heure: "06:20+1" },
+    duree: "14h50",
+    escales: 0,
+    prix: 780,
+    classe: "Économique"
+  },
+  {
+    compagnie: "Lufthansa",
+    numero: "LH 512",
+    depart: { ville: "Berlin", heure: "10:15" },
+    arrivee: { ville: "Tokyo", heure: "08:45+1" },
+    duree: "15h30",
+    escales: 1,
+    prix: 650,
+    classe: "Économique"
+  },
+  {
+    compagnie: "JAL",
+    numero: "JL 789",
+    depart: { ville: "Paris", heure: "14:00" },
+    arrivee: { ville: "Tokyo", heure: "12:30+1" },
+    duree: "13h30",
+    escales: 0,
+    prix: 920,
+    classe: "Affaires"
+  }
+];
+
+const MOCK_HOTELS = [
+  {
+    nom: "APA Hotel Asakusa",
+    etoiles: 3,
+    note: 4.2,
+    avis: 1580,
+    quartier: "Asakusa",
+    prixNuit: 65,
+    nuits: 10,
+    prixTotal: 650,
+    services: ["Petit-déjeuner", "Wifi", "Bon transport"],
+    budgetStatus: "ok"
+  },
+  {
+    nom: "Tokyo Daiichi Hotel",
+    etoiles: 4,
+    note: 4.5,
+    avis: 2340,
+    quartier: "Shibuya",
+    prixNuit: 120,
+    nuits: 10,
+    prixTotal: 1200,
+    services: ["Petit-déjeuner", "Spa", "Parking"],
+    budgetStatus: "warning"
+  },
+  {
+    nom: "Mitsui Garden Hotel",
+    etoiles: 5,
+    note: 4.8,
+    avis: 3100,
+    quartier: "Ginza",
+    prixNuit: 180,
+    nuits: 10,
+    prixTotal: 1800,
+    services: ["Petit-déjeuner", "Concierge", "Wifi", "Restaurant"],
+    budgetStatus: "exceeded"
+  }
+];
+
+const MOCK_ACTIVITES = [
+  {
+    titre: "Temple Senso-ji",
+    note: 4.75,
+    duree: "3h",
+    prix: 25,
+    categorie: "Culture"
+  },
+  {
+    titre: "Traversée de Shibuya Crossing",
+    note: 4.6,
+    duree: "2h",
+    prix: 0,
+    categorie: "Découverte"
+  },
+  {
+    titre: "Parc Rikugien et jardins",
+    note: 4.4,
+    duree: "2h30",
+    prix: 35,
+    categorie: "Nature"
+  }
+];
+
 export default function Dashboard() {
   const [dark, setDark] = useState(() => {
   return localStorage.getItem("theme") === "dark";
 });
   const { user } = useAuthStore();
   const { getMesVoyages, voyages } = useVoyage();
+
+  // ── Selected items state ──
+  const [selectedVol, setSelectedVol] = useState(null);
+  const [selectedHotel, setSelectedHotel] = useState(null);
+  const [addedActivites, setAddedActivites] = useState([]);
 
   // ── Lit sessionStorage une seule fois (fix cascading renders) ──
   const [prompt, setPrompt] = useState(() => {
@@ -84,6 +187,22 @@ useEffect(() => {
     setStreamPrompt(fullPrompt);
     setStreamId((id) => id + 1);
     setPrompt("");
+  };
+
+  const handleSelectVol = (vol) => {
+    setSelectedVol(selectedVol?.numero === vol.numero ? null : vol);
+  };
+
+  const handleSelectHotel = (hotel) => {
+    setSelectedHotel(selectedHotel?.nom === hotel.nom ? null : hotel);
+  };
+
+  const handleAddActivite = (activite) => {
+    if (addedActivites.some((a) => a.titre === activite.titre)) {
+      setAddedActivites(addedActivites.filter((a) => a.titre !== activite.titre));
+    } else {
+      setAddedActivites([...addedActivites, activite]);
+    }
   };
 
   return (
@@ -168,6 +287,67 @@ useEffect(() => {
           </div>
 
           {streamPrompt && <StreamingOutput key={streamId} prompt={streamPrompt} />}
+        </section>
+
+        {/* ── VOLS, HÔTELS, ACTIVITÉS SECTION ── */}
+        <section style={{ marginTop: "48px", marginBottom: "48px" }}>
+          {/* Vols */}
+          <div style={{ marginBottom: "40px" }}>
+            <div className={styles.sectionHeader}>
+              <span style={{ fontSize: "20px" }}>✈️</span>
+              <h2 className={styles.sectionTitle}>Vols disponibles</h2>
+            </div>
+            <p className={styles.sectionSub}>Sélectionnez un vol pour votre voyage.</p>
+            <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))", gap: "16px" }}>
+              {MOCK_VOLS.map((vol) => (
+                <VolCard
+                  key={vol.numero}
+                  vol={vol}
+                  onSelect={handleSelectVol}
+                  isSelected={selectedVol?.numero === vol.numero}
+                />
+              ))}
+            </div>
+          </div>
+
+          {/* Hôtels */}
+          <div style={{ marginBottom: "40px" }}>
+            <div className={styles.sectionHeader}>
+              <span style={{ fontSize: "20px" }}>🏨</span>
+              <h2 className={styles.sectionTitle}>Hébergements</h2>
+            </div>
+            <p className={styles.sectionSub}>Choisissez votre hôtel pour l'étape.</p>
+            <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))", gap: "16px" }}>
+              {MOCK_HOTELS.map((hotel) => (
+                <HotelCard
+                  key={hotel.nom}
+                  hotel={hotel}
+                  onSelect={handleSelectHotel}
+                  isSelected={selectedHotel?.nom === hotel.nom}
+                  budgetRestant={1500}
+                />
+              ))}
+            </div>
+          </div>
+
+          {/* Activités */}
+          <div>
+            <div className={styles.sectionHeader}>
+              <span style={{ fontSize: "20px" }}>🎭</span>
+              <h2 className={styles.sectionTitle}>Activités recommandées</h2>
+            </div>
+            <p className={styles.sectionSub}>Découvrez les meilleurs attractions et expériences.</p>
+            <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))", gap: "16px" }}>
+              {MOCK_ACTIVITES.map((activite) => (
+                <ActiviteCard
+                  key={activite.titre}
+                  activite={activite}
+                  onAdd={handleAddActivite}
+                  isAdded={addedActivites.some((a) => a.titre === activite.titre)}
+                />
+              ))}
+            </div>
+          </div>
         </section>
 
         {/* ── DASHBOARD SPLIT ── */}

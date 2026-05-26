@@ -15,3 +15,6 @@ export { default as Badge   } from "./Badge";
 export { default as Spinner } from "./Spinner";
 export { default as Pill    } from "./Pill";
 export { default as ItineraireJourJour } from "./ItineraireJourJour";
+export { default as VolCard } from "./VolCard";
+export { default as HotelCard } from "./HotelCard";
+export { default as ActiviteCard } from "./ActiviteCard";
