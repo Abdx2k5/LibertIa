@@ -711,10 +711,10 @@
 .panelDestPrice { font-size: 13px; font-weight: 600; color: #a78bfa; align-self: center; flex-shrink: 0; }
 
 .panelAiBtn {
-  background: linear-gradient(135deg, #06b6d4, #8b5cf6);
+  background: linear-gradient(135deg, #A78BFA, #8b5cf6);
   border: none; border-radius: 8px;
   padding: 12px 20px; font-size: 14px; font-weight: 700;
-  color: #061826; cursor: pointer;
+  color: #fff; cursor: pointer;
   display: flex; align-items: center; justify-content: center;
   gap: 8px; transition: opacity 0.2s;
   font-family: 'Inter', sans-serif;
