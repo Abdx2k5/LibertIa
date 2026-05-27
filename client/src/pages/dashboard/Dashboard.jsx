@@ -1,13 +1,12 @@
 import { useState, useEffect, useCallback } from "react";
 import styles from "./Dashboard.module.css";
-import { useAuth } from "../../hooks/useAuth";
+import { useAuthStore } from "../../store/authStore";
 import { useVoyage } from "../../hooks/useVoyage";
 import { FREEMIUM } from "../../utils/constants";
 import { ProgressBar, ShareButton, DeleteButton } from "../../components/ui";
 import ShareModal from "../../components/modals/ShareModal";
 import DeleteConfirmModal from "../../components/modals/DeleteConfirmModal";
 
-// ── Assets Figma ──────────────────────────────────────────────
 const imgProfile      = "https://www.figma.com/api/mcp/asset/0926e5cc-1f5e-4862-a22b-22daa1cef4d7";
 const imgSeoul        = "https://www.figma.com/api/mcp/asset/3c1af9b5-dd28-4164-be5d-ba041556100d";
 const imgLisbonne     = "https://www.figma.com/api/mcp/asset/70e1e8fa-050a-4109-9a22-d6a1ac34a25d";
@@ -36,19 +35,128 @@ const DEMO_HISTORY = [
 
 const SUGGESTIONS = [
   { id: 1, img: null,     city: "Osaka, Japon",        desc: "Découvrez la capitale gastronomique du Japon.", tag: "Vous avez aimé Tokyo", price: "~1200€", type: "Vol + Hôtel" },
-  { id: 2, img: imgSeoul, city: "Séoul, Corée du Sud", desc: "Une ville moderne, vibrante et accessible pour les voyageurs solitaires.", tag: "Idéal Voyage Solo", price: "~1300€", type: "Vol + Hôtel" },
+  { id: 2, img: imgSeoul, city: "Séoul, Corée du Sud", desc: "Une ville moderne et accessible pour les voyageurs solitaires.", tag: "Idéal Voyage Solo", price: "~1300€", type: "Vol + Hôtel" },
+];
+
+const MAX_FREE_PROMPTS = 10;
+
+// Mock data for cards
+const MOCK_VOLS = [
+  {
+    compagnie: "Air France",
+    numero: "AF 275",
+    depart: { ville: "Paris", heure: "08:30" },
+    arrivee: { ville: "Tokyo", heure: "06:20+1" },
+    duree: "14h50",
+    escales: 0,
+    prix: 780,
+    classe: "Économique"
+  },
+  {
+    compagnie: "Lufthansa",
+    numero: "LH 512",
+    depart: { ville: "Berlin", heure: "10:15" },
+    arrivee: { ville: "Tokyo", heure: "08:45+1" },
+    duree: "15h30",
+    escales: 1,
+    prix: 650,
+    classe: "Économique"
+  },
+  {
+    compagnie: "JAL",
+    numero: "JL 789",
+    depart: { ville: "Paris", heure: "14:00" },
+    arrivee: { ville: "Tokyo", heure: "12:30+1" },
+    duree: "13h30",
+    escales: 0,
+    prix: 920,
+    classe: "Affaires"
+  }
+];
+
+const MOCK_HOTELS = [
+  {
+    nom: "APA Hotel Asakusa",
+    etoiles: 3,
+    note: 4.2,
+    avis: 1580,
+    quartier: "Asakusa",
+    prixNuit: 65,
+    nuits: 10,
+    prixTotal: 650,
+    services: ["Petit-déjeuner", "Wifi", "Bon transport"],
+    budgetStatus: "ok"
+  },
+  {
+    nom: "Tokyo Daiichi Hotel",
+    etoiles: 4,
+    note: 4.5,
+    avis: 2340,
+    quartier: "Shibuya",
+    prixNuit: 120,
+    nuits: 10,
+    prixTotal: 1200,
+    services: ["Petit-déjeuner", "Spa", "Parking"],
+    budgetStatus: "warning"
+  },
+  {
+    nom: "Mitsui Garden Hotel",
+    etoiles: 5,
+    note: 4.8,
+    avis: 3100,
+    quartier: "Ginza",
+    prixNuit: 180,
+    nuits: 10,
+    prixTotal: 1800,
+    services: ["Petit-déjeuner", "Concierge", "Wifi", "Restaurant"],
+    budgetStatus: "exceeded"
+  }
+];
+
+const MOCK_ACTIVITES = [
+  {
+    titre: "Temple Senso-ji",
+    note: 4.75,
+    duree: "3h",
+    prix: 25,
+    categorie: "Culture"
+  },
+  {
+    titre: "Traversée de Shibuya Crossing",
+    note: 4.6,
+    duree: "2h",
+    prix: 0,
+    categorie: "Découverte"
+  },
+  {
+    titre: "Parc Rikugien et jardins",
+    note: 4.4,
+    duree: "2h30",
+    prix: 35,
+    categorie: "Nature"
+  }
 ];
 
 export default function Dashboard() {
-  const { user } = useAuth();
-  const { generer, getMesVoyages, voyages, loading, error } = useVoyage();
+  const [dark, setDark] = useState(() => {
+  return localStorage.getItem("theme") === "dark";
+});
+  const { user } = useAuthStore();
+  const { getMesVoyages, voyages } = useVoyage();
 
-  // Lit sessionStorage une seule fois via lazy init — pas de useEffect
+  // ── Selected items state ──
+  const [selectedVol, setSelectedVol] = useState(null);
+  const [selectedHotel, setSelectedHotel] = useState(null);
+  const [addedActivites, setAddedActivites] = useState([]);
+
+  // ── Lit sessionStorage une seule fois (fix cascading renders) ──
   const [prompt, setPrompt] = useState(() => {
     const saved = sessionStorage.getItem("libertia_prompt");
     if (saved) { sessionStorage.removeItem("libertia_prompt"); return saved; }
     return "";
   });
+  const [streamPrompt, setStreamPrompt] = useState("");
+  const [streamId, setStreamId] = useState(0);
 
   const [activeFilter, setActiveFilter]     = useState(null);
   const [showLimitModal, setShowLimitModal] = useState(false);
@@ -56,20 +164,50 @@ export default function Dashboard() {
   const [deleteModalOpen, setDeleteModalOpen] = useState(false);
   const [selectedVoyage, setSelectedVoyage] = useState(null);
 
-  const promptsUsed = user?.promptsUtilises || 0;
-  const promptsLeft = FREEMIUM.MAX_FREE_PROMPTS - promptsUsed;
+  // ── Calcul prompts restants ────────────────────────────────────
+  // user.promptsRestants vient directement du backend :
+  //   → free    : nombre (ex: 7)
+  //   → premium : "Illimité"
+  const isPremium   = user?.abonnement === "premium";
+  const promptsLeft = isPremium ? "∞" : (user?.promptsRestants ?? MAX_FREE_PROMPTS);
+  const canGenerate = isPremium || (typeof promptsLeft === "number" && promptsLeft > 0);
 
   const loadVoyages = useCallback(() => { getMesVoyages(); }, [getMesVoyages]);
   useEffect(() => { loadVoyages(); }, [loadVoyages]);
+  useEffect(() => {
+  localStorage.setItem("theme", dark ? "dark" : "light");
+}, [dark]);
 
-  const handleSubmit = async (e) => {
+useEffect(() => {
+  localStorage.setItem("theme", dark ? "dark" : "light");
+}, [dark]);
+  const handleSubmit = (e) => {
     e.preventDefault();
     if (!prompt.trim()) return;
-    if (promptsLeft <= 0) { setShowLimitModal(true); return; }
+
+    // Vérifie si l'user peut encore générer
+    if (!canGenerate) { setShowLimitModal(true); return; }
+
     const fullPrompt = activeFilter ? `${prompt} [Filtre: ${activeFilter}]` : prompt;
-    await generer(fullPrompt);
+    setStreamPrompt(fullPrompt);
+    setStreamId((id) => id + 1);
     setPrompt("");
-    getMesVoyages();
+  };
+
+  const handleSelectVol = (vol) => {
+    setSelectedVol(selectedVol?.numero === vol.numero ? null : vol);
+  };
+
+  const handleSelectHotel = (hotel) => {
+    setSelectedHotel(selectedHotel?.nom === hotel.nom ? null : hotel);
+  };
+
+  const handleAddActivite = (activite) => {
+    if (addedActivites.some((a) => a.titre === activite.titre)) {
+      setAddedActivites(addedActivites.filter((a) => a.titre !== activite.titre));
+    } else {
+      setAddedActivites([...addedActivites, activite]);
+    }
   };
 
   const handleShareClick = (voyageId) => {
@@ -96,7 +234,7 @@ export default function Dashboard() {
   };
 
   return (
-    <div className={styles.page}>
+    <div className={`${styles.page} ${dark ? styles.dark : ""}`}>
 
       {/* ── NAVBAR ── */}
       <nav className={styles.navbar}>
@@ -110,15 +248,10 @@ export default function Dashboard() {
           ))}
         </div>
         <div className={styles.navRight}>
-          <button className={styles.navIconBtn}>
-            <img src={imgMoon} alt="" className={styles.navIconImg} />
-          </button>
-          <button className={styles.navIconBtn}>
-            <img src={imgGlobe} alt="" className={styles.navIconImg} />
-            FR
-          </button>
+          <button className={styles.navIconBtn} onClick={() => setDark(!dark)}><img src={imgMoon} alt="" className={styles.navIconImg} /></button>
+          <button className={styles.navIconBtn}><img src={imgGlobe} alt="" className={styles.navIconImg} />FR</button>
           <div className={styles.navAvatar}>
-            <img src={imgProfile} alt={user?.nom || "Profil"} className={styles.navAvatarImg} />
+            <img src={user?.profilePhoto || imgProfile} alt={user?.nom || "Profil"} className={styles.navAvatarImg} />
           </div>
           <div className={styles.navBadge}>
             <img src={imgIconAssistant} alt="" style={{ width: 13, height: 13 }} />
@@ -133,7 +266,7 @@ export default function Dashboard() {
         <section className={styles.hero}>
           <h1 className={styles.heroTitle}>Où votre imagination vous porte-t-elle aujourd'hui ?</h1>
           <p className={styles.heroSubtitle}>
-            Je suis votre assistant de voyage personnel. Je trouve vols, hôtels et activités selon vos envies.
+            Bonjour {user?.nom?.split(" ")[0] || ""}  ! Je trouve vols, hôtels et activités selon vos envies.
           </p>
 
           <form onSubmit={handleSubmit} style={{ width: "100%", display: "flex", justifyContent: "center" }}>
@@ -144,7 +277,6 @@ export default function Dashboard() {
                   placeholder="Dites où vous voulez aller, combien de temps, votre budget..."
                   value={prompt}
                   onChange={(e) => setPrompt(e.target.value)}
-                  disabled={loading}
                 />
                 <div className={styles.searchFilters}>
                   {FILTERS.map((f) => (
@@ -158,14 +290,10 @@ export default function Dashboard() {
                   ))}
                 </div>
               </div>
-
-              {/* Bouton micro */}
               <button type="button" className={styles.micBtn}>
                 <img src={imgIconMic} alt="Micro" className={styles.btnImg} />
               </button>
-
-              {/* Bouton envoi */}
-              <button type="submit" className={styles.sendBtn} disabled={loading}>
+              <button type="submit" className={styles.sendBtn}>
                 <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#000" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
                   <line x1="5" y1="12" x2="19" y2="12"/>
                   <polyline points="13 6 19 12 13 18"/>
@@ -174,11 +302,16 @@ export default function Dashboard() {
             </div>
           </form>
 
-          {/* Compteur prompts */}
+          {/* ── Compteur prompts ── */}
+          {/* Vient directement de user.promptsRestants (backend) */}
           <div className={styles.promptCounter}>
             <span>Prompts restants :</span>
-            <span className={styles.promptNum}>{promptsLeft}/{FREEMIUM.MAX_FREE_PROMPTS}</span>
-            {promptsLeft <= 2 && <span className={styles.promptWarn}> — Passez à Premium !</span>}
+            <span className={styles.promptNum}>
+              {isPremium ? "∞" : `${promptsLeft}/${MAX_FREE_PROMPTS}`}
+            </span>
+            {!isPremium && typeof promptsLeft === "number" && promptsLeft <= 2 && (
+              <span className={styles.promptWarn}> — Passez à Premium !</span>
+            )}
           </div>
 
           {/* Progress Bar - Show during generation */}
@@ -203,6 +336,7 @@ export default function Dashboard() {
             </div>
             <p className={styles.sectionSub}>Retrouvez vos dernières conversations et recherches.</p>
 
+            {/* Données réelles si disponibles, sinon démo */}
             {(voyages.length > 0 ? voyages : DEMO_HISTORY).map((v) => (
               <div key={v.id || v._id} className={styles.historyCard}>
                 <div>
@@ -241,7 +375,6 @@ export default function Dashboard() {
                 </div>
               </div>
             ))}
-
             <button className={styles.seeAllBtn}>Voir tout l'historique</button>
           </div>
 
@@ -256,10 +389,7 @@ export default function Dashboard() {
             <div className={styles.suggestGrid}>
               {SUGGESTIONS.map((dest) => (
                 <div key={dest.id} className={styles.suggestCard}>
-                  {dest.img
-                    ? <img src={dest.img} alt={dest.city} className={styles.suggestImg} />
-                    : <div className={styles.suggestPlaceholder} />
-                  }
+                  {dest.img ? <img src={dest.img} alt={dest.city} className={styles.suggestImg} /> : <div className={styles.suggestPlaceholder} />}
                   <div className={styles.suggestBody}>
                     <div className={styles.suggestTag}>
                       <img src={imgIconStar} alt="" className={styles.suggestTagIcon} />
@@ -278,7 +408,6 @@ export default function Dashboard() {
                 </div>
               ))}
 
-              {/* Card Lisbonne */}
               <div className={styles.suggestWide}>
                 <img src={imgLisbonne} alt="Lisbonne" className={styles.suggestWideImg} />
                 <div className={styles.suggestWideBody}>
@@ -287,9 +416,7 @@ export default function Dashboard() {
                     <span className={styles.suggestTagText}>Budget 1500€ respecté</span>
                   </div>
                   <h3 className={styles.suggestCity}>Lisbonne, Portugal</h3>
-                  <p className={styles.suggestDesc}>
-                    Excellente alternative pour du soleil, une culture riche et une gastronomie exceptionnelle.
-                  </p>
+                  <p className={styles.suggestDesc}>Excellente alternative pour du soleil, une culture riche et une gastronomie exceptionnelle.</p>
                   <div className={styles.suggestFooter}>
                     <div className={styles.suggestPrice}>~600€</div>
                     <button className={styles.exploreBtn}>Explorer</button>
@@ -298,7 +425,6 @@ export default function Dashboard() {
               </div>
             </div>
           </div>
-
         </div>
       </div>
 
@@ -309,7 +435,7 @@ export default function Dashboard() {
             <div className={styles.modalEmoji}>🚀</div>
             <h2 className={styles.modalTitle}>Limite atteinte !</h2>
             <p className={styles.modalText}>
-              Vous avez utilisé vos {FREEMIUM.MAX_FREE_PROMPTS} prompts gratuits ce mois-ci.
+              Vous avez utilisé vos {MAX_FREE_PROMPTS} prompts gratuits ce mois-ci.
               Passez à Premium pour des itinéraires illimités.
             </p>
             <button className={styles.modalBtnPrimary}>Passer à Premium</button>

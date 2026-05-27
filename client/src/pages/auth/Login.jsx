@@ -2,10 +2,10 @@ import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import styles from "./Login.module.css";
 import { useAuthStore } from "../../store/authStore";
-import authService from "../../services/Auth.service";
-import imgIllustration from "../../assets/TravelerIllustration.png";
+import authService from "../../services/auth.service";
+import imgIllustration from "../../assets/images/backgrounds/TravelerIllustration.png";
 // ── Assets Figma ──────────────────────────────────────────────
-const imgLogo      = "https://www.figma.com/api/mcp/asset/d93104aa-ce16-42fe-b9cd-8bbe43f0929d";
+import imgLogo      from "../../assets/logos/logo.png";
 //const imgHero      = "https://www.figma.com/api/mcp/asset/2d1d879d-a4d2-4bc2-98bf-7842a9327598";
 const imgSpaceBg   = "https://www.figma.com/api/mcp/asset/d42b2bd3-40e7-4c81-9e00-2f6037d84ee4";
 const imgGlobe     = "https://www.figma.com/api/mcp/asset/ce67d7c1-e338-4383-8ae7-5ea7ae0b31e4";
@@ -30,8 +30,23 @@ export default function Login() {
     setLoading(true);
     setError(null);
     try {
+            // ── Appel API ──────────────────────────────────────────────
+      // POST /api/auth/login → { _id, nom, email, abonnement, profilePhoto, promptsRestants, token }
       const data = await authService.login({ email, motDePasse: password });
-      login(data.user, data.token);
+      // ── Stocke l'user ET le token dans le store ────────────────
+      // La réponse est à PLAT (pas data.user) — on reconstruit l'objet user
+      login(
+        {
+          _id:          data._id,
+          nom:          data.nom,
+          email:        data.email,
+          abonnement:   data.abonnement,
+          profilePhoto: data.profilePhoto,
+          promptsRestants: data.promptsRestants,
+        },
+        data.token
+      );
+ 
       navigate("/dashboard");
     } catch (err) {
       setError(err.response?.data?.message || "Email ou mot de passe incorrect.");

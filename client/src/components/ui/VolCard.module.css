@@ -1,0 +1,184 @@
+.card {
+  background: #1e1f27;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 12px;
+  padding: 16px;
+  cursor: pointer;
+  position: relative;
+  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.3);
+  transition: all 0.3s ease;
+}
+
+.card:hover {
+  border-color: rgba(170, 59, 255, 0.4);
+  transform: translateY(-2px);
+}
+
+.card.selected {
+  border: 1.5px solid #aa3bff;
+}
+
+.checkmark {
+  position: absolute;
+  top: 8px;
+  right: 12px;
+  width: 24px;
+  height: 24px;
+  background: #aa3bff;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #f3f4f6;
+  font-weight: 600;
+  font-size: 12px;
+}
+
+.content {
+  display: grid;
+  grid-template-columns: 60px 1fr 100px;
+  gap: 16px;
+  align-items: center;
+  margin-bottom: 12px;
+}
+
+.left {
+  display: flex;
+  justify-content: center;
+}
+
+.logoCircle {
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #aa3bff, #7c2dd9);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #f3f4f6;
+  font-weight: 700;
+  font-size: 14px;
+}
+
+.middle {
+  flex: 1;
+}
+
+.routeRow {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.location {
+  flex: 0 0 auto;
+  min-width: 60px;
+}
+
+.ville {
+  color: #f3f4f6;
+  font-weight: 600;
+  font-size: 13px;
+  line-height: 1.3;
+}
+
+.heure {
+  color: #6b7280;
+  font-size: 12px;
+  margin-top: 2px;
+}
+
+.dotted {
+  flex: 1;
+  min-width: 80px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  position: relative;
+}
+
+.dotted svg {
+  flex: 1;
+  height: 2px;
+  stroke: rgba(255, 255, 255, 0.1);
+}
+
+.duree {
+  color: #6b7280;
+  font-size: 12px;
+  font-weight: 500;
+  white-space: nowrap;
+}
+
+.right {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 8px;
+}
+
+.prix {
+  color: #00d9ff;
+  font-weight: 700;
+  font-size: 16px;
+}
+
+.reserverBtn {
+  background: #aa3bff;
+  color: #f3f4f6;
+  border: none;
+  border-radius: 6px;
+  padding: 6px 12px;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.reserverBtn:hover {
+  background: #7c2dd9;
+}
+
+.bottom {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  padding-top: 12px;
+  border-top: 1px solid rgba(255, 255, 255, 0.05);
+  flex-wrap: wrap;
+}
+
+.escales {
+  flex: 1;
+}
+
+.pill {
+  display: inline-block;
+  background: rgba(255, 255, 255, 0.08);
+  color: #6b7280;
+  padding: 4px 10px;
+  border-radius: 12px;
+  font-size: 12px;
+  font-weight: 500;
+}
+
+.pillGreen {
+  display: inline-block;
+  background: rgba(74, 222, 128, 0.15);
+  color: #4ade80;
+  padding: 4px 10px;
+  border-radius: 12px;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.classe {
+  color: #6b7280;
+  font-size: 12px;
+}
+
+.numero {
+  color: #6b7280;
+  font-size: 12px;
+  font-weight: 500;
+}

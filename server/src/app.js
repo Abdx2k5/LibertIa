@@ -13,7 +13,10 @@ const app = express();
 connectDB();
 
 // Middlewares
-app.use(cors());
+app.use(cors({
+    origin: "http://localhost:5173",
+    credentials: true
+}));
 app.use(express.json());
 // SA3 — Protection injections NoSQL : supprime les clés contenant $ ou . dans req.body/params/query
 app.use(mongoSanitize({ replaceWith: '_' }));

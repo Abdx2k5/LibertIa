@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import styles from "./Profile.module.css";
 import { useAuthStore } from "../../store/authStore";
 import authService from "../../services/Auth.service";
-import { FREEMIUM } from "../../utils/constants";
+import { GaleriePhoto } from "../../components/ui";
 import { LogoutButton } from "../../components/ui";
 
 const imgAvatar = "https://www.figma.com/api/mcp/asset/0926e5cc-1f5e-4862-a22b-22daa1cef4d7";
@@ -35,6 +35,7 @@ export default function Profile() {
   const promptsUsed = user?.promptsUtilises || 0;
   const promptsLeft = FREEMIUM.MAX_FREE_PROMPTS - promptsUsed;
 
+  // ── Pré-remplit le formulaire depuis le store ─────────────
   useEffect(() => {
     if (user) {
       setForm({
@@ -125,6 +126,84 @@ export default function Profile() {
     return isValid;
   };
 
+  // Validation functions
+  const validateField = (name, value) => {
+    const newErrors = { ...errors };
+    switch (name) {
+      case "nom":
+        if (!value.trim()) {
+          newErrors.nom = "Le nom est requis";
+        } else if (value.length < 2 || value.length > 50) {
+          newErrors.nom = "Le nom doit contenir entre 2 et 50 caractères";
+        } else {
+          delete newErrors.nom;
+        }
+        break;
+      case "prenom":
+        if (!value.trim()) {
+          newErrors.prenom = "Le prénom est requis";
+        } else if (value.length < 2 || value.length > 50) {
+          newErrors.prenom = "Le prénom doit contenir entre 2 et 50 caractères";
+        } else {
+          delete newErrors.prenom;
+        }
+        break;
+      case "age":
+        if (value && (isNaN(value) || value < 13 || value > 120)) {
+          newErrors.age = "L'âge doit être entre 13 et 120";
+        } else {
+          delete newErrors.age;
+        }
+        break;
+      case "bio":
+        if (value && value.length > 500) {
+          newErrors.bio = "La bio ne peut pas dépasser 500 caractères";
+        } else {
+          delete newErrors.bio;
+        }
+        break;
+      default:
+        break;
+    }
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
+
+  const validateForm = () => {
+    let isValid = true;
+    const newErrors = {};
+
+    if (!form.nom.trim()) {
+      newErrors.nom = "Le nom est requis";
+      isValid = false;
+    } else if (form.nom.length < 2 || form.nom.length > 50) {
+      newErrors.nom = "Le nom doit contenir entre 2 et 50 caractères";
+      isValid = false;
+    }
+
+    if (!form.prenom.trim()) {
+      newErrors.prenom = "Le prénom est requis";
+      isValid = false;
+    } else if (form.prenom.length < 2 || form.prenom.length > 50) {
+      newErrors.prenom = "Le prénom doit contenir entre 2 et 50 caractères";
+      isValid = false;
+    }
+
+    if (form.age && (isNaN(form.age) || form.age < 13 || form.age > 120)) {
+      newErrors.age = "L'âge doit être entre 13 et 120";
+      isValid = false;
+    }
+
+    if (form.bio && form.bio.length > 500) {
+      newErrors.bio = "La bio ne peut pas dépasser 500 caractères";
+      isValid = false;
+    }
+
+    setErrors(newErrors);
+    return isValid;
+  };
+
+  // ── Sauvegarde → PUT /api/auth/profile ───────────────────
   const handleSave = async (e) => {
     e.preventDefault();
     if (!validateForm()) {
@@ -136,8 +215,17 @@ export default function Profile() {
     setErrorMsg("");
 
     try {
-      const updated = await authService.updateProfile(form);
-      updateUser(updated.user || updated);
+      // authService.updateProfile retourne directement data.data (objet user)
+      // car le backend retourne { success: true, data: { _id, nom, ... } }
+      const updated = await authService.updateProfile({
+        nom:  form.nom,
+        age:  form.age  || undefined,
+        bio:  form.bio  || undefined,
+      });
+
+      // Met à jour le store avec les nouvelles données
+      updateUser(updated); // ← directement, pas updated.user ni updated.data
+
       setEditingSection(null);
       setSuccessMsg(true);
       setTimeout(() => setSuccessMsg(false), 3000);
@@ -173,23 +261,30 @@ export default function Profile() {
         <div className={styles.hero}>
           <div className={styles.avatarWrap}>
             <div className={styles.avatar}>
-              <img src={imgAvatar} alt="Avatar" className={styles.avatarImg} />
+              <img
+                src={user?.profilePhoto && user.profilePhoto !== "default-avatar.png"
+                  ? user.profilePhoto
+                  : imgAvatar}
+                alt="Avatar"
+                className={styles.avatarImg}
+              />
             </div>
             <button className={styles.avatarEditBtn} title="Changer la photo">✏️</button>
           </div>
           <div className={styles.heroInfo}>
-            <h1 className={styles.heroName}>{user?.prenom} {user?.nom}</h1>
+            <h1 className={styles.heroName}>{user?.nom || "Utilisateur"}</h1>
             <p className={styles.heroEmail}>{user?.email}</p>
             <div className={styles.heroBadge}>
-              ✨ {user?.role === "premium" ? "Membre Premium" : "Membre Gratuit"}
+              {isPremium ? "✨ Membre Premium" : "🆓 Membre Gratuit"}
             </div>
+            {user?.bio && <p style={{ fontSize: 14, color: "#a1a1aa", marginTop: 8 }}>{user.bio}</p>}
           </div>
         </div>
 
         {/* ── Stats ── */}
         <div className={styles.statsBar}>
           <div className={styles.statCard}>
-            <span className={styles.statNum}>{user?.promptsUtilises || 0}</span>
+            <span className={styles.statNum}>{promptsUsed}</span>
             <span className={styles.statLabel}>Itinéraires générés</span>
           </div>
           <div className={styles.statCard}>
@@ -197,22 +292,28 @@ export default function Profile() {
             <span className={styles.statLabel}>Prompts restants</span>
           </div>
           <div className={styles.statCard}>
-            <span className={styles.statNum}>0</span>
-            <span className={styles.statLabel}>Voyages partagés</span>
+            <span className={styles.statNum}>{user?.followers?.length || 0}</span>
+            <span className={styles.statLabel}>Abonnés</span>
           </div>
         </div>
 
-        {/* ── Compteur freemium ── */}
+        {/* ── Abonnement ── */}
         <div className={styles.section}>
           <h2 className={styles.sectionTitle}>Mon abonnement</h2>
           <div className={styles.promptWrap}>
             <div className={styles.promptInfo}>
-              <span className={styles.promptTitle}>Prompts IA ce mois</span>
+              <span className={styles.promptTitle}>
+                {isPremium ? "Premium — Illimité" : "Gratuit — Prompts IA ce mois"}
+              </span>
               <span className={styles.promptSub}>
-                {promptsUsed} utilisés sur {FREEMIUM.MAX_FREE_PROMPTS} disponibles
+                {isPremium
+                  ? "Vous avez accès à des itinéraires illimités"
+                  : `${promptsUsed} utilisés sur ${MAX_FREE_PROMPTS} disponibles`}
               </span>
             </div>
-            <span className={styles.promptNum}>{promptsLeft}/{FREEMIUM.MAX_FREE_PROMPTS}</span>
+            <span className={styles.promptNum}>
+              {isPremium ? "∞" : `${promptsLeft}/${MAX_FREE_PROMPTS}`}
+            </span>
           </div>
         </div>
 
@@ -541,12 +642,35 @@ export default function Profile() {
             )}
           </div>
 
-          {/* ── Zone danger ── */}
+          {/* ── Mes souvenirs personnels ── */}
+        <div className={styles.section}>
+          <h2 className={styles.sectionTitle}>Mes souvenirs personnels</h2>
+          <GaleriePhoto
+            photos={[
+              { id: "1", url: null, titre: "Temple Senso-ji", lieu: "Tokyo", date: "Mars 2024" },
+              { id: "2", url: null, titre: "Mont Fuji", lieu: "Fuji", date: "Mars 2024" },
+              { id: "3", url: null, titre: "Arashiyama Bamboo Grove", lieu: "Kyoto", date: "Avril 2024" },
+              { id: "4", url: null, titre: "Shibuya Crossing", lieu: "Tokyo", date: "Mars 2024" },
+              { id: "5", url: null, titre: "Fushimi Inari", lieu: "Kyoto", date: "Avril 2024" },
+              { id: "6", url: null, titre: "Nezu Shrine", lieu: "Tokyo", date: "Mars 2024" },
+              { id: "7", url: null, titre: "Gion District", lieu: "Kyoto", date: "Avril 2024" },
+              { id: "8", url: null, titre: "Hiroshima Peace Memorial", lieu: "Hiroshima", date: "Mai 2024" },
+            ]}
+            colonnes={3}
+          />
+        </div>
+
+        {/* ── Zone danger ──*/}
           <div className={styles.section}>
             <h2 className={styles.sectionTitle}>Zone dangereuse</h2>
             <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
               <LogoutButton variant="outline" size="md" />
-              <button type="button" className={styles.btnDanger}>Supprimer mon compte</button>
+              <button
+            type="button" className={styles.btnDanger}
+            onClick={() => alert("Fonctionnalité à venir — Abdelwahab doit ajouter DELETE /api/auth/account")}
+          >
+            Supprimer mon compte
+          </button>
             </div>
           </div>
         </form>
