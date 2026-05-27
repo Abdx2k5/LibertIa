@@ -1,0 +1,273 @@
+/* =============================================================
+   FICHIER  : src/components/ui/GaleriePhoto.module.css
+   TÂCHE    : T76 — Styles pour galerie de photos + lightbox
+============================================================= */
+
+/* ── GALERIE GRID ── */
+.galerie {
+  display: grid;
+  gap: 8px;
+  width: 100%;
+}
+
+/* ── PHOTO CELL ── */
+.photoCell {
+  position: relative;
+  aspect-ratio: 1;
+  border-radius: 12px;
+  overflow: hidden;
+  cursor: pointer;
+  background: #1e1f27;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.photoImg {
+  width: 100%;
+  height: 100%;
+  background-size: cover;
+  background-position: center;
+  transition: transform 0.3s ease;
+}
+
+.photoCell:hover .photoImg {
+  transform: scale(1.05);
+}
+
+/* ── HOVER OVERLAY ── */
+.overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.6);
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  align-items: flex-start;
+  padding: 16px;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.photoCell:hover .overlay {
+  opacity: 1;
+}
+
+.overlayContent {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.overlayTitre {
+  margin: 0;
+  font-size: 14px;
+  font-weight: 700;
+  color: #f3f4f6;
+}
+
+.overlayMeta {
+  margin: 0;
+  font-size: 12px;
+  color: #d1d5db;
+}
+
+.fullscreenIcon {
+  font-size: 24px;
+  color: #f3f4f6;
+  position: absolute;
+  bottom: 16px;
+  right: 16px;
+}
+
+/* ── LIGHTBOX BACKDROP ── */
+.lightboxBackdrop {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.92);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999;
+  animation: fadeIn 0.3s ease;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+/* ── LIGHTBOX CONTAINER ── */
+.lightbox {
+  position: relative;
+  width: 90vw;
+  height: 90vh;
+  max-width: 1200px;
+  max-height: 800px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+/* ── LIGHTBOX IMAGE ── */
+.lightboxImageContainer {
+  flex: 1;
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+}
+
+.lightboxImage {
+  width: 100%;
+  height: 100%;
+  background-size: contain;
+  background-position: center;
+  background-repeat: no-repeat;
+  border-radius: 8px;
+  animation: fadeInImage 0.5s ease;
+}
+
+@keyframes fadeInImage {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+/* ── LIGHTBOX INFO (bottom-left) ── */
+.lightboxInfo {
+  position: absolute;
+  bottom: 20px;
+  left: 20px;
+  z-index: 10;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.lightboxTitre {
+  margin: 0;
+  font-size: 18px;
+  font-weight: 700;
+  color: #f3f4f6;
+}
+
+.lightboxMeta {
+  margin: 0;
+  font-size: 14px;
+  color: #d1d5db;
+}
+
+/* ── CLOSE BUTTON (top-right) ── */
+.closeBtn {
+  position: absolute;
+  top: 20px;
+  right: 20px;
+  z-index: 10;
+  background: transparent;
+  border: none;
+  color: #f3f4f6;
+  font-size: 28px;
+  cursor: pointer;
+  padding: 0;
+  width: 36px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: color 0.2s ease;
+}
+
+.closeBtn:hover {
+  color: #aa3bff;
+}
+
+/* ── COUNTER (top-center) ── */
+.counter {
+  position: absolute;
+  top: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 10;
+  background: rgba(0, 0, 0, 0.5);
+  color: #f3f4f6;
+  padding: 8px 16px;
+  border-radius: 20px;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+/* ── NAVIGATION BUTTONS ── */
+.navBtn {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  color: #f3f4f6;
+  font-size: 24px;
+  width: 48px;
+  height: 48px;
+  border-radius: 8px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+  z-index: 10;
+}
+
+.navBtn:hover {
+  background: rgba(170, 59, 255, 0.2);
+  border-color: rgba(170, 59, 255, 0.4);
+  color: #aa3bff;
+}
+
+.prevBtn {
+  left: 20px;
+}
+
+.nextBtn {
+  right: 20px;
+}
+
+/* ── RESPONSIVE ── */
+@media (max-width: 768px) {
+  .lightbox {
+    width: 95vw;
+    height: 95vh;
+  }
+
+  .navBtn {
+    width: 40px;
+    height: 40px;
+    font-size: 20px;
+  }
+
+  .lightboxTitre {
+    font-size: 16px;
+  }
+
+  .lightboxMeta {
+    font-size: 13px;
+  }
+
+  .closeBtn {
+    font-size: 24px;
+    width: 32px;
+    height: 32px;
+  }
+}

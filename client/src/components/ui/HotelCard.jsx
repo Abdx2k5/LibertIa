@@ -1,7 +1,6 @@
-import { useState } from "react";
 import styles from "./HotelCard.module.css";
 
-export default function HotelCard({ hotel, onSelect, isSelected, budgetRestant }) {
+export default function HotelCard({ hotel, onSelect, isSelected }) {
   const getBadgeClass = (status) => {
     if (status === "warning") return styles.badgeWarning;
     if (status === "exceeded") return styles.badgeExceeded;

@@ -1,4 +1,3 @@
-import { useState } from "react";
 import styles from "./ActiviteCard.module.css";
 
 export default function ActiviteCard({ activite, onAdd, isAdded }) {

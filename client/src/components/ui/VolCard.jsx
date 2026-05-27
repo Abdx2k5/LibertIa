@@ -1,4 +1,3 @@
-import { useState } from "react";
 import styles from "./VolCard.module.css";
 
 export default function VolCard({ vol, onSelect, isSelected }) {

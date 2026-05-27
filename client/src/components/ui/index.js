@@ -19,3 +19,4 @@ export { default as VolCard } from "./VolCard";
 export { default as HotelCard } from "./HotelCard";
 export { default as ActiviteCard } from "./ActiviteCard";
 export { default as PostCard } from "./PostCard";
+export { default as GaleriePhoto } from "./GaleriePhoto";

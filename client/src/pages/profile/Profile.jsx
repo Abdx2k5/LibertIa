@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import styles from "./Profile.module.css";
 import { useAuthStore } from "../../store/authStore";
 import authService from "../../services/Auth.service";
+import { GaleriePhoto } from "../../components/ui";
 
 const imgAvatar = "https://www.figma.com/api/mcp/asset/0926e5cc-1f5e-4862-a22b-22daa1cef4d7";
 
@@ -209,8 +210,26 @@ export default function Profile() {
             </div>
           </form>
         </div>
-{/**************************************************************/}
-        {/* ── Zone danger ── */}
+
+        {/* ── Mes souvenirs personnels ── */}
+        <div className={styles.section}>
+          <h2 className={styles.sectionTitle}>Mes souvenirs personnels</h2>
+          <GaleriePhoto
+            photos={[
+              { id: "1", url: null, titre: "Temple Senso-ji", lieu: "Tokyo", date: "Mars 2024" },
+              { id: "2", url: null, titre: "Mont Fuji", lieu: "Fuji", date: "Mars 2024" },
+              { id: "3", url: null, titre: "Arashiyama Bamboo Grove", lieu: "Kyoto", date: "Avril 2024" },
+              { id: "4", url: null, titre: "Shibuya Crossing", lieu: "Tokyo", date: "Mars 2024" },
+              { id: "5", url: null, titre: "Fushimi Inari", lieu: "Kyoto", date: "Avril 2024" },
+              { id: "6", url: null, titre: "Nezu Shrine", lieu: "Tokyo", date: "Mars 2024" },
+              { id: "7", url: null, titre: "Gion District", lieu: "Kyoto", date: "Avril 2024" },
+              { id: "8", url: null, titre: "Hiroshima Peace Memorial", lieu: "Hiroshima", date: "Mai 2024" },
+            ]}
+            colonnes={3}
+          />
+        </div>
+
+        {/* ── Zone danger ──*/}
         <div className={styles.section}>
           <h2 className={styles.sectionTitle}>Zone dangereuse</h2>
           <button
