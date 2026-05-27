@@ -3,7 +3,7 @@ import styles from "./Dashboard.module.css";
 import { useAuthStore } from "../../store/authStore";
 import { useVoyage } from "../../hooks/useVoyage";
 import { FREEMIUM } from "../../utils/constants";
-import { ProgressBar, ShareButton, DeleteButton } from "../../components/ui";
+import { ProgressBar, ShareButton, DeleteButton, StreamingOutput, ItineraireJourJour, VolCard, HotelCard, ActiviteCard } from "../../components/ui";
 import ShareModal from "../../components/modals/ShareModal";
 import DeleteConfirmModal from "../../components/modals/DeleteConfirmModal";
 
@@ -163,6 +163,8 @@ export default function Dashboard() {
   const [shareModalOpen, setShareModalOpen] = useState(false);
   const [deleteModalOpen, setDeleteModalOpen] = useState(false);
   const [selectedVoyage, setSelectedVoyage] = useState(null);
+  const [loading] = useState(false);
+  const [error] = useState(null);
 
   // ── Calcul prompts restants ────────────────────────────────────
   // user.promptsRestants vient directement du backend :
@@ -325,7 +327,83 @@ useEffect(() => {
           {!loading && <div className={styles.loadingText}> </div>}
         </section>
 
-        {/* ── DASHBOARD SPLIT ── */}
+        {/* ── RESULTS SECTION ── */}
+        {streamPrompt && (
+          <section className={styles.resultsSection} style={{ animation: `${styles.fadeIn} 0.4s ease` }}>
+            {/* AI Streaming block */}
+            <div className={styles.streamingWrapper}>
+              <StreamingOutput prompt={streamPrompt} key={streamId} />
+            </div>
+
+            {/* Results grid with title and subsections */}
+            <div style={{ animation: `${styles.fadeIn} 0.4s ease` }}>
+              <h2 style={{ fontSize: 28, fontWeight: 700, color: '#f3f4f6', marginBottom: 8, position: 'relative', paddingBottom: 12 }}>
+                Résultats de votre recherche
+                <div style={{ position: 'absolute', bottom: 0, left: 0, width: 60, height: 3, background: '#aa3bff', borderRadius: 2 }} />
+              </h2>
+
+              {/* Flights subsection */}
+              <div>
+                <div className={styles.subsectionLabel}>✈️ Vols disponibles</div>
+                <div className={styles.cardsGrid}>
+                  {MOCK_VOLS.map((v) => (
+                    <VolCard key={v.numero} vol={v} onSelect={handleSelectVol} isSelected={selectedVol?.numero === v.numero} />
+                  ))}
+                </div>
+              </div>
+
+              {/* Hotels subsection */}
+              <div>
+                <div className={styles.subsectionLabel}>🏨 Hébergements</div>
+                <div className={styles.cardsGrid}>
+                  {MOCK_HOTELS.map((h) => (
+                    <HotelCard key={h.nom} hotel={h} onSelect={handleSelectHotel} isSelected={selectedHotel?.nom === h.nom} budgetRestant={70} />
+                  ))}
+                </div>
+              </div>
+
+              {/* Activities subsection */}
+              <div>
+                <div className={styles.subsectionLabel}>🏃 Activités recommandées</div>
+                <div className={styles.cardsGrid}>
+                  {MOCK_ACTIVITES.map((a) => (
+                    <ActiviteCard key={a.titre} activite={a} onAdd={handleAddActivite} isAdded={addedActivites.some(x => x.titre === a.titre)} />
+                  ))}
+                </div>
+              </div>
+
+              {/* Itinerary block */}
+              <div style={{ marginTop: 32 }}>
+                <ItineraireJourJour voyage={null} />
+              </div>
+            </div>
+          </section>
+        )}
+
+        {/* ── SELECTION SUMMARY BAR ── */}
+        {selectedVol && selectedHotel && (
+          <div className={styles.confirmBar}>
+            <div style={{ display: 'flex', gap: 32, alignItems: 'center', flex: 1 }}>
+              <div>
+                <div style={{ fontSize: 12, color: '#a1a1aa' }}>Vol</div>
+                <div style={{ fontSize: 15, fontWeight: 600, color: '#f3f4f6' }}>{selectedVol.compagnie} {selectedVol.numero}</div>
+                <div style={{ fontSize: 14, fontWeight: 500, color: '#aa3bff' }}>{selectedVol.prix}€</div>
+              </div>
+              <div>
+                <div style={{ fontSize: 12, color: '#a1a1aa' }}>Hôtel</div>
+                <div style={{ fontSize: 15, fontWeight: 600, color: '#f3f4f6' }}>{selectedHotel.nom}</div>
+                <div style={{ fontSize: 14, fontWeight: 500, color: '#aa3bff' }}>{selectedHotel.prixTotal}€</div>
+              </div>
+            </div>
+            <div style={{ textAlign: 'right' }}>
+              <div className={styles.confirmBarTotal}>
+                Total : {selectedVol.prix + selectedHotel.prixTotal}€
+              </div>
+            </div>
+            <button className={styles.confirmBtn}>Confirmer la réservation →</button>
+          </div>
+        )}
+
         <div className={styles.dashboard}>
 
           {/* Colonne gauche — Historique */}

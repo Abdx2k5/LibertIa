@@ -7,7 +7,6 @@
 //     from "../../components/ui";
 // =============================================================
 
-<<<<<<< HEAD
 export { default as Button         } from "./Button";
 export { default as Input          } from "./Input";
 export { default as Card           } from "./Card";
@@ -19,18 +18,10 @@ export { default as LogoutButton   } from "./LogoutButton";
 export { default as ProgressBar    } from "./ProgressBar";
 export { default as ShareButton    } from "./ShareButton";
 export { default as DeleteButton   } from "./DeleteButton";
-=======
-export { default as Button  } from "./Button";
-export { default as Input   } from "./Input";
-export { default as Card    } from "./Card";
-export { default as Modal   } from "./Modal";
-export { default as Badge   } from "./Badge";
-export { default as Spinner } from "./Spinner";
-export { default as Pill    } from "./Pill";
 export { default as ItineraireJourJour } from "./ItineraireJourJour";
 export { default as VolCard } from "./VolCard";
 export { default as HotelCard } from "./HotelCard";
 export { default as ActiviteCard } from "./ActiviteCard";
 export { default as PostCard } from "./PostCard";
 export { default as GaleriePhoto } from "./GaleriePhoto";
->>>>>>> Annulation/generation
+export { default as StreamingOutput } from "./StreamingOutput";

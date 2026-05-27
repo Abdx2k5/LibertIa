@@ -268,3 +268,84 @@
 
   --shadow-card: 0 18px 50px rgba(0, 0, 0, 0.4);
 }
+
+/* ── Results Section ── */
+.resultsSection {
+  margin-top: 40px;
+  padding: 0 0 120px;
+}
+
+.streamingWrapper {
+  max-width: 760px;
+  margin: 0 auto 32px;
+}
+
+.cardsGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 16px;
+  margin-bottom: 32px;
+}
+
+.subsectionLabel {
+  font-size: 18px;
+  font-weight: 600;
+  color: #f3f4f6;
+  margin: 24px 0 12px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+/* ── Confirmation Bar ── */
+.confirmBar {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: rgba(14, 14, 18, 0.95);
+  backdrop-filter: blur(12px);
+  border-top: 1px solid rgba(170, 59, 255, 0.3);
+  padding: 16px 32px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  z-index: 100;
+}
+
+.confirmBarTotal {
+  font-size: 20px;
+  font-weight: 700;
+  color: #aa3bff;
+}
+
+.confirmBtn {
+  background: linear-gradient(135deg, #aa3bff, #7c3aed);
+  border: none;
+  border-radius: 10px;
+  padding: 12px 28px;
+  font-size: 14px;
+  font-weight: 600;
+  color: #fff;
+  cursor: pointer;
+  font-family: 'Inter', sans-serif;
+  transition: opacity 0.2s;
+  flex-shrink: 0;
+}
+
+.confirmBtn:hover {
+  opacity: 0.9;
+}
+
+/* ── Animations ── */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(16px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}

@@ -4,6 +4,9 @@ import { useAuthStore } from "../../store/authStore";
 import authService from "../../services/Auth.service";
 import { GaleriePhoto } from "../../components/ui";
 import { LogoutButton } from "../../components/ui";
+import { FREEMIUM } from "../../utils/constants";
+
+const MAX_FREE_PROMPTS = FREEMIUM.MAX_FREE_PROMPTS;
 
 const imgAvatar = "https://www.figma.com/api/mcp/asset/0926e5cc-1f5e-4862-a22b-22daa1cef4d7";
 
@@ -18,6 +21,7 @@ const DEFAULT_PREFERENCES = {
 
 export default function Profile() {
   const { user, updateUser } = useAuthStore();
+  const isPremium = user?.abonnement === "premium";
   const [form, setForm] = useState({
     nom: "",
     prenom: "",
@@ -48,83 +52,6 @@ export default function Profile() {
       });
     }
   }, [user]);
-
-  // Validation functions
-  const validateField = (name, value) => {
-    const newErrors = { ...errors };
-    switch (name) {
-      case "nom":
-        if (!value.trim()) {
-          newErrors.nom = "Le nom est requis";
-        } else if (value.length < 2 || value.length > 50) {
-          newErrors.nom = "Le nom doit contenir entre 2 et 50 caractères";
-        } else {
-          delete newErrors.nom;
-        }
-        break;
-      case "prenom":
-        if (!value.trim()) {
-          newErrors.prenom = "Le prénom est requis";
-        } else if (value.length < 2 || value.length > 50) {
-          newErrors.prenom = "Le prénom doit contenir entre 2 et 50 caractères";
-        } else {
-          delete newErrors.prenom;
-        }
-        break;
-      case "age":
-        if (value && (isNaN(value) || value < 13 || value > 120)) {
-          newErrors.age = "L'âge doit être entre 13 et 120";
-        } else {
-          delete newErrors.age;
-        }
-        break;
-      case "bio":
-        if (value && value.length > 500) {
-          newErrors.bio = "La bio ne peut pas dépasser 500 caractères";
-        } else {
-          delete newErrors.bio;
-        }
-        break;
-      default:
-        break;
-    }
-    setErrors(newErrors);
-    return Object.keys(newErrors).length === 0;
-  };
-
-  const validateForm = () => {
-    let isValid = true;
-    const newErrors = {};
-
-    if (!form.nom.trim()) {
-      newErrors.nom = "Le nom est requis";
-      isValid = false;
-    } else if (form.nom.length < 2 || form.nom.length > 50) {
-      newErrors.nom = "Le nom doit contenir entre 2 et 50 caractères";
-      isValid = false;
-    }
-
-    if (!form.prenom.trim()) {
-      newErrors.prenom = "Le prénom est requis";
-      isValid = false;
-    } else if (form.prenom.length < 2 || form.prenom.length > 50) {
-      newErrors.prenom = "Le prénom doit contenir entre 2 et 50 caractères";
-      isValid = false;
-    }
-
-    if (form.age && (isNaN(form.age) || form.age < 13 || form.age > 120)) {
-      newErrors.age = "L'âge doit être entre 13 et 120";
-      isValid = false;
-    }
-
-    if (form.bio && form.bio.length > 500) {
-      newErrors.bio = "La bio ne peut pas dépasser 500 caractères";
-      isValid = false;
-    }
-
-    setErrors(newErrors);
-    return isValid;
-  };
 
   // Validation functions
   const validateField = (name, value) => {

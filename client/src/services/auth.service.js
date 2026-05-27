@@ -69,12 +69,6 @@ const authService = {
     const res = await api.post("/auth/logout");
     return res.data;
   },
-
-  // PUT /api/auth/update-profile
-  updateProfile: async (data) => {
-    const response = await api.put("/api/auth/update-profile", data);
-    return response.data;
-  },
 };
 
 export default authService;
