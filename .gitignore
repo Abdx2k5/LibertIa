@@ -3,3 +3,5 @@ reset_kanban.js
 .envnode_modules/
 reset_kanban.js
 .env
+server/.env
+server/.env
