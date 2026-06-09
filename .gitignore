@@ -5,3 +5,4 @@ reset_kanban.js
 .env
 server/.env
 server/.env
+ai/chroma_db/
