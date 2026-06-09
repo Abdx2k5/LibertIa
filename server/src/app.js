@@ -5,6 +5,7 @@ require('dotenv').config();
 const connectDB = require('./config/db');
 const authRoutes = require('./routes/authRoutes');
 const voyageRoutes = require('./routes/voyageRoutes');
+const compagnonRoutes = require('./routes/compagnonRoutes');
 
 const app = express();
 
@@ -16,7 +17,6 @@ app.use(cors({
 }));
 app.use(express.json());
 
-// SA3 — Protection injections NoSQL
 app.use((req, res, next) => {
     const sanitize = (obj) => {
         if (obj && typeof obj === 'object') {
@@ -35,6 +35,7 @@ app.use((req, res, next) => {
 
 app.use('/api/auth', authRoutes);
 app.use('/api/voyages', voyageRoutes);
+app.use('/api/compagnon', compagnonRoutes);
 
 app.get('/', (_req, res) => {
     res.json({ message: '🐦 Libertia API is running', version: '1.0.0' });
