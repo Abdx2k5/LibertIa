@@ -1,55 +1,62 @@
 const axios = require('axios');
 const { spawn } = require('child_process');
-const path  = require('path');
-
-// Racine du projet (LibertIa/) — un niveau au-dessus de server/
+const path = require('path');
 const ROOT = path.join(__dirname, '..', '..', '..');
 const User = require('../models/User');
 const Voyage = require('../models/Voyage');
 
 // ─────────────────────────────────────────────
-//  HELPER — Appel Python (scraping + RAG)
+//  CONFIG Groq
 // ─────────────────────────────────────────────
+const DS_API_URL = 'https://api.groq.com/openai/v1/chat/completions';
+const DS_MODEL = 'llama-3.3-70b-versatile';
 
-/**
- * Lance un script Python et retourne le résultat JSON
- */
-function runPython(script, args = []) {
-    return new Promise((resolve, reject) => {
-        const python = spawn('python', [script, ...args]);
-        let output = '';
-        let error  = '';
+// ─────────────────────────────────────────────
+//  HELPER — Appel Groq
+// ─────────────────────────────────────────────
+async function appelIA(systemPrompt, userPrompt, opts = {}) {
+    const { temperature = 0.7, max_tokens = 2000, retries = 2 } = opts;
 
-        python.stdout.on('data', (data) => output += data.toString());
-        python.stderr.on('data', (data) => error  += data.toString());
+    for (let tentative = 1; tentative <= retries; tentative++) {
+        try {
+            const response = await axios.post(DS_API_URL, {
+                model: DS_MODEL,
+                messages: [
+                    { role: 'system', content: systemPrompt },
+                    { role: 'user', content: userPrompt }
+                ],
+                temperature,
+                max_tokens,
+                stream: false
+            }, {
+                headers: {
+                    'Authorization': `Bearer ${process.env.GROQ_API_KEY}`,
+                    'Content-Type': 'application/json'
+                },
+                timeout: 60000
+            });
 
-        python.on('close', (code) => {
-            if (code !== 0) {
-                console.error(`⚠️  Python error (${script}):`, error);
-                resolve(null); // Ne pas bloquer si scraping échoue
-            } else {
-                try {
-                    resolve(JSON.parse(output));
-                } catch {
-                    resolve(null);
-                }
+            return response.data.choices[0].message.content;
+
+        } catch (err) {
+            const detail = JSON.stringify(err.response?.data) || err.message;
+            console.error(`❌ Groq tentative ${tentative}/${retries}:`, detail);
+
+            if (tentative === retries) {
+                if (err.response?.status === 401) throw new Error('Clé API Groq invalide');
+                if (err.response?.status === 429) throw new Error('Limite API Groq atteinte — réessayez dans quelques secondes');
+                throw new Error(`Erreur IA: ${detail}`);
             }
-        });
-    });
+            await new Promise(r => setTimeout(r, 2000 * tentative));
+        }
+    }
 }
 
-/**
- * Lance le scraping pour une destination
- */
+// ─────────────────────────────────────────────
+//  HELPER — Python (scraping + RAG)
+// ─────────────────────────────────────────────
 function scraperDestination(destination, checkin, checkout, origine) {
     return new Promise((resolve) => {
-        const args = [
-            destination,
-            checkin    || getDateIn(7),   // défaut : dans 7 jours
-            checkout   || getDateIn(10),  // défaut : 3 nuits
-            origine    || 'CMN'
-        ];
-
         const python = spawn('python', ['-c', `
 import sys
 sys.path.insert(0, r'${ROOT}')
@@ -57,10 +64,10 @@ from ai.scraper import scrape_destination_complete
 import json
 
 result = scrape_destination_complete(
-    destination="${args[0]}",
-    checkin="${args[1]}",
-    checkout="${args[2]}",
-    origine="${args[3]}"
+    destination="${destination}",
+    checkin="${checkin}",
+    checkout="${checkout}",
+    origine="${origine}"
 )
 
 def clean(obj):
@@ -76,22 +83,15 @@ print(json.dumps(clean(result)))
         let output = '';
         python.stdout.on('data', (d) => output += d.toString());
         python.stderr.on('data', (d) => process.stderr.write(d));
-
-        python.on('close', (code) => {
+        python.on('close', () => {
             try {
                 const lines = output.trim().split('\n');
-                const jsonLine = lines[lines.length - 1]; // Dernière ligne = JSON
-                resolve(JSON.parse(jsonLine));
-            } catch {
-                resolve(null);
-            }
+                resolve(JSON.parse(lines[lines.length - 1]));
+            } catch { resolve(null); }
         });
     });
 }
 
-/**
- * Récupère le contexte RAG pour une destination
- */
 function getRAGContexte(query, destination) {
     return new Promise((resolve) => {
         const python = spawn('python', ['-c', `
@@ -106,24 +106,17 @@ print(json.dumps({"contexte": contexte}))
 
         let output = '';
         python.stdout.on('data', (d) => output += d.toString());
-        python.stderr.on('data', () => {});
-
+        python.stderr.on('data', () => { });
         python.on('close', () => {
             try {
                 const lines = output.trim().split('\n');
-                const jsonLine = lines[lines.length - 1];
-                const parsed = JSON.parse(jsonLine);
+                const parsed = JSON.parse(lines[lines.length - 1]);
                 resolve(parsed.contexte || '');
-            } catch {
-                resolve('');
-            }
+            } catch { resolve(''); }
         });
     });
 }
 
-// ─────────────────────────────────────────────
-//  HELPER — Dates
-// ─────────────────────────────────────────────
 function getDateIn(jours) {
     const d = new Date();
     d.setDate(d.getDate() + jours);
@@ -131,13 +124,13 @@ function getDateIn(jours) {
 }
 
 // ─────────────────────────────────────────────
-//  HELPER — Extraire infos du prompt via Mistral
+//  HELPER — Extraire infos du prompt
 // ─────────────────────────────────────────────
 async function extraireInfosPrompt(prompt) {
     try {
-        const response = await axios.post('http://localhost:11434/api/generate', {
-            model: 'mistral',
-            prompt: `Extrait les informations de voyage depuis ce texte et réponds UNIQUEMENT en JSON valide :
+        const text = await appelIA(
+            'Tu es un extracteur d\'informations de voyage. Réponds UNIQUEMENT en JSON valide, sans texte avant ou après.',
+            `Extrait les informations de voyage depuis ce texte :
 "${prompt}"
 
 JSON attendu :
@@ -148,20 +141,15 @@ JSON attendu :
   "origine": "code IATA ville départ ou CMN",
   "budget": "low/medium/high ou null",
   "duree_jours": nombre ou 3,
-  "preferences": ["culture", "plage", "gastronomie", etc]
-}
+  "preferences": ["culture", "plage", "gastronomie"]
+}`,
+            { temperature: 0.1, max_tokens: 300 }
+        );
 
-Réponds UNIQUEMENT avec le JSON, sans texte avant ou après.`,
-            stream: false,
-            options: { temperature: 0.1, num_predict: 300 }
-        });
-
-        const text = response.data.response;
         const jsonMatch = text.match(/\{[\s\S]*\}/);
         if (jsonMatch) return JSON.parse(jsonMatch[0]);
-    } catch {}
+    } catch { }
 
-    // Fallback par défaut
     return {
         destination: null,
         checkin: getDateIn(7),
@@ -173,99 +161,71 @@ Réponds UNIQUEMENT avec le JSON, sans texte avant ou après.`,
     };
 }
 
-// ─────────────────────────────────────────────
-//  HELPER — Formater les données scraping
-//  pour les injecter dans le prompt Mistral
-// ─────────────────────────────────────────────
 function formaterDonneesScraping(scraping) {
     if (!scraping) return '';
-
     let texte = '\n=== DONNÉES TEMPS RÉEL ===\n\n';
-
-    // Hôtels (Booking + Airbnb)
     const hebergements = [...(scraping.hotels || []), ...(scraping.airbnb || [])];
     if (hebergements.length > 0) {
-        texte += '🏨 HÉBERGEMENTS DISPONIBLES (prix réels) :\n';
+        texte += 'HÉBERGEMENTS DISPONIBLES (prix réels) :\n';
         hebergements.slice(0, 5).forEach(h => {
             texte += `- ${h.nom} | ${h.prix_nuit} | Note: ${h.note} | ${h.source}\n`;
-            if (h.lien_booking) texte += `  → Réserver: ${h.lien_booking}\n`;
+            if (h.lien_booking) texte += `  Réserver: ${h.lien_booking}\n`;
         });
         texte += '\n';
     }
-
-    // Vols
-    if (scraping.vols && scraping.vols.length > 0) {
-        texte += '✈️  VOLS DISPONIBLES (prix réels) :\n';
+    if (scraping.vols?.length > 0) {
+        texte += 'VOLS DISPONIBLES (prix réels) :\n';
         scraping.vols.slice(0, 3).forEach(v => {
-            texte += `- ${v.compagnie} | ${v.prix} | Durée: ${v.duree} | ${v.horaires}\n`;
+            texte += `- ${v.compagnie} | ${v.prix} | Durée: ${v.duree}\n`;
         });
         texte += '\n';
     }
-
-    // Restaurants
-    if (scraping.restos && scraping.restos.length > 0) {
-        texte += '🍽️  RESTAURANTS :\n';
+    if (scraping.restos?.length > 0) {
+        texte += 'RESTAURANTS :\n';
         scraping.restos.slice(0, 5).forEach(r => {
             texte += `- ${r.nom} | Note: ${r.note} | ${r.cuisine}\n`;
-            if (r.lien) texte += `  → Voir: ${r.lien}\n`;
         });
         texte += '\n';
     }
-
     return texte;
 }
 
 // ─────────────────────────────────────────────
-//  CONTROLLER PRINCIPAL
+//  @POST /api/voyages/generer
 // ─────────────────────────────────────────────
-
-// @POST /api/voyages/generer
 const genererVoyage = async (req, res) => {
     try {
         const { prompt } = req.body;
         const userId = req.user._id;
-        
-        // 1. Validation des inputs 
-        // Protège contre les requêtes vides ou trop courtes
-        if (!prompt || prompt.trim().length < 5) {
-            return res.status(400).json({ 
-                success: false,
-                message: 'Le prompt doit contenir au moins 5 caractères' 
-            });
-        }  
 
-        // Vérification freemium
-        const user = await User.findById(userId);
-        if (!user) {
-            return res.status(404).json({ 
+        if (!prompt || prompt.trim().length < 5) {
+            return res.status(400).json({
                 success: false,
-                message: 'Utilisateur non trouvé' 
+                message: 'Le prompt doit contenir au moins 5 caractères'
             });
         }
-        // Utilisation de la méthode du modèle User
+
+        const user = await User.findById(userId);
+        if (!user) return res.status(404).json({ success: false, message: 'Utilisateur non trouvé' });
         if (!user.peutGenerer()) {
             return res.status(403).json({
                 success: false,
-                message: 'Limite de générations atteinte - passez en premium pour continuer',
+                message: 'Limite atteinte — passez en premium',
                 code: 'QUOTA_EXCEEDED',
                 promptsRestants: user.promptsRestants()
             });
         }
 
-        // ── ÉTAPE 1 : Extraire destination + dates du prompt ──
-        console.log('🔍 Extraction infos prompt...');
+        console.log('🔍 Extraction infos prompt via Groq...');
         const infos = await extraireInfosPrompt(prompt);
         const destination = infos.destination || 'Paris';
-        const checkin     = infos.checkin     || getDateIn(7);
-        const checkout    = infos.checkout    || getDateIn(10);
-        const origine     = infos.origine     || 'CMN';
+        const checkin = infos.checkin || getDateIn(7);
+        const checkout = infos.checkout || getDateIn(10);
+        const origine = infos.origine || 'CMN';
+        console.log(`📍 ${destination} | ${checkin} → ${checkout}`);
 
-        console.log(`📍 Destination: ${destination} | ${checkin} → ${checkout}`);
-
-        // ── ÉTAPE 2 : RAG — contexte local (parallèle avec scraping) ──
-        // ── ÉTAPE 3 : Scraping temps réel ──
         console.log('🔄 RAG + Scraping en parallèle...');
-        const scrapingTimeout = new Promise(resolve => setTimeout(() => resolve(null), 120000));
+        const scrapingTimeout = new Promise(r => setTimeout(() => r(null), 120000));
         const [ragContexte, scraping] = await Promise.all([
             getRAGContexte(prompt, destination),
             Promise.race([scraperDestination(destination, checkin, checkout, origine), scrapingTimeout])
@@ -273,13 +233,15 @@ const genererVoyage = async (req, res) => {
 
         const donneesScraping = formaterDonneesScraping(scraping);
 
-        // ── ÉTAPE 4 : Construire le prompt enrichi pour Mistral ──
-        const promptEnrichi = `Tu es LibertIa, un expert en voyage personnalisé.
+        console.log('🤖 Génération itinéraire via Groq...');
+        const systemPrompt = `Tu es LibertIa, un expert en voyage personnalisé.
+Tu génères des itinéraires complets et personnalisés en JSON.
+Réponds UNIQUEMENT en JSON valide, sans texte avant ou après.`;
 
-DEMANDE DE L'UTILISATEUR :
+        const userPrompt = `DEMANDE :
 "${prompt}"
 
-INFORMATIONS EXTRAITES :
+INFORMATIONS :
 - Destination : ${destination}
 - Dates : ${checkin} au ${checkout}
 - Budget : ${infos.budget || 'moyen'}
@@ -288,9 +250,8 @@ INFORMATIONS EXTRAITES :
 ${ragContexte}
 ${donneesScraping}
 
-En utilisant les données ci-dessus, génère un itinéraire complet et personnalisé.
-Intègre les vrais hôtels, vols et restaurants fournis avec leurs prix réels.
-Réponds UNIQUEMENT en JSON avec cette structure :
+Génère un itinéraire complet avec les vraies données fournies.
+Structure JSON requise :
 {
   "destination": "",
   "duree_jours": 0,
@@ -305,118 +266,75 @@ Réponds UNIQUEMENT en JSON avec cette structure :
       "soir":       {"activite": "", "lieu": "", "duree": ""}
     }
   ],
-  "hebergement_recommande": {
-    "nom": "",
-    "prix_nuit": "",
-    "lien": ""
-  },
-  "vol_recommande": {
-    "compagnie": "",
-    "prix": "",
-    "duree": ""
-  },
+  "hebergement_recommande": {"nom": "", "prix_nuit": "", "lien": ""},
+  "vol_recommande": {"compagnie": "", "prix": "", "duree": ""},
   "restaurants_recommandes": [],
   "conseils": [],
-  "budget_detail": {
-    "hotel": "",
-    "transport": "",
-    "repas": "",
-    "activites": "",
-    "total": ""
-  }
+  "budget_detail": {"hotel": "", "transport": "", "repas": "", "activites": "", "total": ""}
 }`;
 
-        // ── ÉTAPE 5 : Génération Mistral ──
-        console.log('🤖 Génération Mistral...');
-        const response = await axios.post('http://localhost:11434/api/generate', {
-            model: 'mistral',
-            prompt: promptEnrichi,
-            stream: false,
-            options: {
-                temperature: 0.7,
-                num_predict: 1500,
-                num_ctx: 4096
-            }
-        }, { timeout: 120000 }); // 2 minutes
+        const responseText = await appelIA(systemPrompt, userPrompt, { temperature: 0.7, max_tokens: 2000 });
 
-        // ── ÉTAPE 6 : Parser la réponse ──
-        let itineraire;
+        let itineraireData;
         try {
-            const text = response.data.response;
-            const jsonMatch = text.match(/\{[\s\S]*\}/);
+            const jsonMatch = responseText.match(/\{[\s\S]*\}/);
             itineraireData = JSON.parse(jsonMatch[0]);
-            // Validation minimale (présence de destination et jours)
-            if (!itineraireData.destination || !itineraireData.jours) {
-                throw new Error('Structure JSON incomplète');
-            }
-        } catch (parseError) {
-            console.error('Erreur parsing JSON:', parseError.message);
-            // Fallback : on garde le prompt comme titre et on crée un itinéraire minimal
+            if (!itineraireData.destination || !itineraireData.jours) throw new Error('Structure incomplète');
+        } catch {
             itineraireData = {
-                destination: prompt.split(' ').slice(0, 2).join(' ') || 'Destination inconnue',
+                destination,
                 duree_jours: 3,
                 budget_estime: 'À définir',
-                jours: [
-                    {
-                        jour: 1,
-                        matin: { activite: 'Exploration libre', lieu: 'Centre-ville', duree: '3h' },
-                        apres_midi: { activite: 'Visites', lieu: 'À découvrir', duree: '3h' },
-                        soir: { activite: 'Dîner', lieu: 'Restaurant local', duree: '2h' }
-                    }
-                ],
-                conseils: ['Vérifiez les conditions locales', 'Réservez à l\'avance'],
-                budget_detail: {
-                    hotel: 'À définir',
-                    transport: 'À définir',
-                    repas: 'À définir',
-                    activites: 'À définir'
-                }
+                checkin, checkout,
+                jours: [{
+                    jour: 1,
+                    matin: { activite: 'Exploration', lieu: 'Centre-ville', duree: '3h' },
+                    apres_midi: { activite: 'Visites', lieu: 'À découvrir', duree: '3h' },
+                    soir: { activite: 'Dîner', lieu: 'Restaurant local', duree: '2h' }
+                }],
+                conseils: ['Vérifiez les conditions locales'],
+                budget_detail: { hotel: 'À définir', transport: 'À définir', repas: 'À définir', activites: 'À définir', total: 'À définir' }
             };
         }
 
-        // ── ÉTAPE 7 : Sauvegarder ──
-        await User.findByIdAndUpdate(userId, {
-            $inc: { promptsUtilises: 1 }
-        });
+        await User.findByIdAndUpdate(userId, { $inc: { promptsUtilises: 1 } });
 
         const voyage = await Voyage.create({
             user: userId,
             prompt,
-            itineraire,
+            itineraire: itineraireData,
+            titre: `${destination} — ${checkin}`,
             destination,
-            checkin,
-            checkout,
+            dates: {
+                start: new Date(checkin),
+                end: new Date(checkout)
+            },
             scraping_utilise: !!scraping
         });
-        //Réponse
+
         res.json({
             succes: true,
-            promptsRestants: 10 - (user.promptsUtilises + 1),
+            promptsRestants: user.promptsRestants() - 1,
             voyageId: voyage._id,
-            itineraire,
+            itineraire: itineraireData,
             meta: {
-                destination,
-                checkin,
-                checkout,
-                rag_utilise:      !!ragContexte,
+                destination, checkin, checkout,
+                modele: DS_MODEL,
+                rag_utilise: !!ragContexte,
                 scraping_utilise: !!scraping,
-                hotels_trouves:   scraping?.hotels?.length || 0,
-                vols_trouves:     scraping?.vols?.length   || 0,
-                restos_trouves:   scraping?.restos?.length || 0,
+                hotels_trouves: scraping?.hotels?.length || 0,
+                vols_trouves: scraping?.vols?.length || 0,
+                restos_trouves: scraping?.restos?.length || 0,
             }
         });
 
     } catch (err) {
-        console.error('Erreur génération voyage:', err);
-        res.status(500).json({ message: err.message });
+        console.error('❌ Erreur genererVoyage:', err);
+        res.status(500).json({ success: false, message: err.message });
     }
 };
 
-/**
- * desc    Obtenir tous les voyages de l'utilisateur
- * route   GET /api/voyages/mes-voyages
- * access  Private
- */
+// @GET /api/voyages/mes-voyages
 const getMesVoyages = async (req, res) => {
     try {
         const voyages = await Voyage.find({ user: req.user._id }).sort({ createdAt: -1 });
@@ -426,38 +344,25 @@ const getMesVoyages = async (req, res) => {
     }
 };
 
-/**
- * @ desc    Obtenir un voyage par ID
- * @ route   GET /api/voyages/:id
- * @ access  Private
- */
+// @GET /api/voyages/:id
 const getVoyage = async (req, res) => {
     try {
         const voyage = await Voyage.findById(req.params.id);
-        if (!voyage) {
-            return res.status(404).json({ message: 'Voyage non trouvé' });
-        }
-        // Vérifier que l'utilisateur est propriétaire (si privé)
+        if (!voyage) return res.status(404).json({ message: 'Voyage non trouvé' });
         if (!voyage.partage && voyage.user._id.toString() !== req.user._id.toString()) {
             return res.status(403).json({ success: false, message: 'Non autorisé' });
         }
-// Si le champ vues existe, on l'incrémente  on peut l'ajouter plus tard)
         res.json(voyage);
     } catch (err) {
         res.status(500).json({ message: err.message });
     }
 };
 
-/**
- * AJOUT : Supprimer un voyage
- * DELETE /api/voyages/:id
- */
+// @DELETE /api/voyages/:id
 const supprimerVoyage = async (req, res) => {
     try {
         const voyage = await Voyage.findById(req.params.id);
-        if (!voyage) {
-            return res.status(404).json({ success: false, message: 'Voyage non trouvé' });
-        }
+        if (!voyage) return res.status(404).json({ success: false, message: 'Voyage non trouvé' });
         if (voyage.user.toString() !== req.user._id.toString()) {
             return res.status(403).json({ success: false, message: 'Non autorisé' });
         }
@@ -468,66 +373,47 @@ const supprimerVoyage = async (req, res) => {
     }
 };
 
-/**
- * AJOUT : Basculer la visibilité publique/privée
- * PATCH /api/voyages/:id/partage
- */
+// @PATCH /api/voyages/:id/partage
 const togglePartage = async (req, res) => {
     try {
         const voyage = await Voyage.findById(req.params.id);
-        if (!voyage) {
-            return res.status(404).json({ success: false, message: 'Voyage non trouvé' });
-        }
+        if (!voyage) return res.status(404).json({ success: false, message: 'Voyage non trouvé' });
         if (voyage.user.toString() !== req.user._id.toString()) {
             return res.status(403).json({ success: false, message: 'Non autorisé' });
         }
         voyage.partage = !voyage.partage;
         await voyage.save();
-        res.json({
-            success: true,
-            message: voyage.partage ? 'Voyage partagé publiquement' : 'Voyage privé',
-            partage: voyage.partage
-        });
+        res.json({ success: true, partage: voyage.partage });
     } catch (err) {
         res.status(500).json({ success: false, message: err.message });
     }
 };
 
-/**
- * AJOUT : Ajouter un like (utilise la méthode du modèle Voyage)
- * POST /api/voyages/:id/like
- */
+// @POST /api/voyages/:id/like
 const ajouterLike = async (req, res) => {
     try {
         const voyage = await Voyage.findById(req.params.id);
-        if (!voyage) {
-            return res.status(404).json({ success: false, message: 'Voyage non trouvé' });
-        }
-        // Empêcher de liker son propre voyage (optionnel)
+        if (!voyage) return res.status(404).json({ success: false, message: 'Voyage non trouvé' });
         if (voyage.user.toString() === req.user._id.toString()) {
             return res.status(400).json({ success: false, message: 'Vous ne pouvez pas liker votre propre voyage' });
         }
-        await voyage.ajouterLike(req.user._id); // méthode du modèle
+        await voyage.ajouterLike(req.user._id);
         res.json({ success: true, likeCount: voyage.likeCount });
     } catch (err) {
         res.status(500).json({ success: false, message: err.message });
     }
 };
 
-/**
- * AJOUT : Retirer un like (utilise la méthode du modèle Voyage)
- * DELETE /api/voyages/:id/like
- */
+// @DELETE /api/voyages/:id/like
 const retirerLike = async (req, res) => {
     try {
         const voyage = await Voyage.findById(req.params.id);
-        if (!voyage) {
-            return res.status(404).json({ success: false, message: 'Voyage non trouvé' });
-        }
-        await voyage.retirerLike(req.user._id); // méthode du modèle
+        if (!voyage) return res.status(404).json({ success: false, message: 'Voyage non trouvé' });
+        await voyage.retirerLike(req.user._id);
         res.json({ success: true, likeCount: voyage.likeCount });
     } catch (err) {
         res.status(500).json({ success: false, message: err.message });
     }
 };
-module.exports = { genererVoyage, getMesVoyages, getVoyage ,supprimerVoyage, togglePartage, ajouterLike, retirerLike};
+
+module.exports = { genererVoyage, getMesVoyages, getVoyage, supprimerVoyage, togglePartage, ajouterLike, retirerLike };

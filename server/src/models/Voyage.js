@@ -65,9 +65,8 @@ const voyageSchema = new mongoose.Schema({
 }, { timestamps: true });
 
 //Met à jour likeCount avant sauvegarde
-voyageSchema.pre('save', function(next) {
+voyageSchema.pre('save', function() {
     this.likeCount = this.likes.length;
-    next();
 });
 
 // Ajouter un like
