@@ -25,3 +25,4 @@ export { default as ActiviteCard } from "./ActiviteCard";
 export { default as PostCard } from "./PostCard";
 export { default as GaleriePhoto } from "./GaleriePhoto";
 export { default as StreamingOutput } from "./StreamingOutput";
+export { default as MicroAnimated } from "./MicroAnimated";

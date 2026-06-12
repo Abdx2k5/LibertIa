@@ -1,0 +1,114 @@
+.button {
+  width: 52px;
+  height: 52px;
+  border-radius: 50%;
+  background: #1e1f27;
+  border: 1.5px solid rgba(170,59,255,0.3);
+  cursor: pointer;
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s;
+  flex-shrink: 0;
+  color: #ffffff;
+  padding: 0;
+  overflow: visible;
+}
+
+.button:not(.disabled):not(.listening):not(.processing):hover {
+  border-color: #aa3bff;
+  transform: scale(1.05);
+}
+
+.button:focus-visible {
+  outline: 2px solid #aa3bff;
+  outline-offset: 2px;
+}
+
+.disabled {
+  cursor: not-allowed;
+  opacity: 0.5;
+  color: rgba(255,255,255,0.55);
+}
+
+.listening {
+  background: rgba(170,59,255,0.15);
+  border-color: #aa3bff;
+}
+
+.processing {
+  border-color: rgba(170,59,255,0.55);
+}
+
+.icon {
+  position: relative;
+  z-index: 2;
+  transition: color 0.2s;
+}
+
+.listening .icon {
+  color: #aa3bff;
+}
+
+.processing .icon {
+  color: #A78BFA;
+}
+
+.rings {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+}
+
+.ringOne,
+.ringTwo,
+.ringThree {
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  border: 1.5px solid rgba(170,59,255,0.7);
+  animation: pulse 1.5s ease-out infinite;
+  opacity: 0;
+}
+
+.ringTwo {
+  animation-delay: 0.25s;
+}
+
+.ringThree {
+  animation-delay: 0.5s;
+}
+
+.processingRing {
+  position: absolute;
+  inset: -5px;
+  border: 2px solid rgba(170,59,255,0.18);
+  border-top: 2px solid #aa3bff;
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+  pointer-events: none;
+}
+
+@keyframes pulse {
+  0% {
+    transform: scale(1);
+    opacity: 0.45;
+  }
+
+  100% {
+    transform: scale(1.8);
+    opacity: 0;
+  }
+}
+
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+
+  to {
+    transform: rotate(360deg);
+  }
+}

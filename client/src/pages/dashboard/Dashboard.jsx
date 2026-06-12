@@ -3,7 +3,7 @@ import styles from "./Dashboard.module.css";
 import { useAuthStore } from "../../store/authStore";
 import { useVoyage } from "../../hooks/useVoyage";
 import { FREEMIUM } from "../../utils/constants";
-import { ProgressBar, ShareButton, DeleteButton, StreamingOutput, ItineraireJourJour, VolCard, HotelCard, ActiviteCard } from "../../components/ui";
+import { ProgressBar, ShareButton, DeleteButton, StreamingOutput, ItineraireJourJour, VolCard, HotelCard, ActiviteCard, MicroAnimated } from "../../components/ui";
 import ShareModal from "../../components/modals/ShareModal";
 import DeleteConfirmModal from "../../components/modals/DeleteConfirmModal";
 
@@ -16,7 +16,6 @@ const imgGlobe        = "https://www.figma.com/api/mcp/asset/13bb7fda-e931-4924-
 const imgIconCalendar = "https://www.figma.com/api/mcp/asset/b038d18f-b513-43cf-bec5-084801418108";
 const imgIconHistory  = "https://www.figma.com/api/mcp/asset/3fa574be-7875-4154-9644-e254d1207162";
 const imgIconSuggests = "https://www.figma.com/api/mcp/asset/03afb187-49b3-467b-a113-1d28212aa74d";
-const imgIconMic      = "https://www.figma.com/api/mcp/asset/855a4c97-7b80-49ae-9d3e-40688b2e60c7";
 const imgIconStar     = "https://www.figma.com/api/mcp/asset/03c56ae0-a2fe-4cd1-a8c1-7a98c835b6fe";
 const imgIconAssistant= "https://www.figma.com/api/mcp/asset/da457562-2f7c-406b-9c8f-af640f84933e";
 
@@ -292,9 +291,7 @@ useEffect(() => {
                   ))}
                 </div>
               </div>
-              <button type="button" className={styles.micBtn}>
-                <img src={imgIconMic} alt="Micro" className={styles.btnImg} />
-              </button>
+              <MicroAnimated onResult={(text) => setPrompt(text)} disabled={!canGenerate} />
               <button type="submit" className={styles.sendBtn}>
                 <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#000" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
                   <line x1="5" y1="12" x2="19" y2="12"/>
