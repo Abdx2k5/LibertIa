@@ -135,6 +135,32 @@ function parseNumber(value) {
 }
 
 // ─────────────────────────────────────────────
+//  HELPER T50 — Niveaux de visibilité autorisés
+// ─────────────────────────────────────────────
+const VISIBILITES = ['prive', 'amis', 'public'];
+
+// ─────────────────────────────────────────────
+//  HELPER T50 — Un voyage est-il visible pour cet utilisateur ?
+//   - propriétaire        → toujours
+//   - visibilite "public" → tout le monde
+//   - visibilite "amis"   → propriétaire + ses followers
+//   - visibilite "prive"  → propriétaire uniquement
+// ─────────────────────────────────────────────
+async function estVoyageVisiblePour(voyage, user) {
+    if (!user) return voyage.visibilite === 'public';
+    if (voyage.user.toString() === user._id.toString()) return true;
+
+    if (voyage.visibilite === 'public') return true;
+
+    if (voyage.visibilite === 'amis') {
+        const proprietaire = await User.findById(voyage.user).select('followers');
+        return !!proprietaire?.followers?.some(f => f.toString() === user._id.toString());
+    }
+
+    return false;
+}
+
+// ─────────────────────────────────────────────
 //  HELPER — Extraire infos du prompt
 // ─────────────────────────────────────────────
 async function extraireInfosPrompt(prompt) {
@@ -360,7 +386,7 @@ const getVoyage = async (req, res) => {
     try {
         const voyage = await Voyage.findById(req.params.id);
         if (!voyage) return res.status(404).json({ message: 'Voyage non trouvé' });
-        if (!voyage.partage && voyage.user._id.toString() !== req.user._id.toString()) {
+        if (!(await estVoyageVisiblePour(voyage, req.user))) {
             return res.status(403).json({ success: false, message: 'Non autorisé' });
         }
         res.json(voyage);
@@ -517,7 +543,7 @@ const getConseils = async (req, res) => {
     try {
         const voyage = await Voyage.findById(req.params.id);
         if (!voyage) return res.status(404).json({ success: false, message: 'Voyage non trouvé' });
-        if (!voyage.partage && voyage.user.toString() !== req.user._id.toString()) {
+        if (!(await estVoyageVisiblePour(voyage, req.user))) {
             return res.status(403).json({ success: false, message: 'Non autorisé' });
         }
         res.json({ success: true, conseils: voyage.itineraire?.conseils || [] });
@@ -564,7 +590,48 @@ JSON attendu :
     }
 };
 
+// @GET /api/voyages/:id/privacite
+const getPrivacite = async (req, res) => {
+    try {
+        const voyage = await Voyage.findById(req.params.id);
+        if (!voyage) return res.status(404).json({ success: false, message: 'Voyage non trouvé' });
+        if (voyage.user.toString() !== req.user._id.toString()) {
+            return res.status(403).json({ success: false, message: 'Non autorisé' });
+        }
+        res.json({ success: true, visibilite: voyage.visibilite, partage: voyage.partage });
+    } catch (err) {
+        res.status(500).json({ success: false, message: err.message });
+    }
+};
+
+// @PATCH /api/voyages/:id/privacite
+const updatePrivacite = async (req, res) => {
+    try {
+        const voyage = await Voyage.findById(req.params.id);
+        if (!voyage) return res.status(404).json({ success: false, message: 'Voyage non trouvé' });
+        if (voyage.user.toString() !== req.user._id.toString()) {
+            return res.status(403).json({ success: false, message: 'Non autorisé' });
+        }
+
+        const { visibilite } = req.body;
+        if (!VISIBILITES.includes(visibilite)) {
+            return res.status(400).json({
+                success: false,
+                message: `visibilite doit être l'une de : ${VISIBILITES.join(', ')}`
+            });
+        }
+
+        voyage.visibilite = visibilite;
+        await voyage.save();
+
+        res.json({ success: true, visibilite: voyage.visibilite, partage: voyage.partage });
+    } catch (err) {
+        res.status(500).json({ success: false, message: err.message });
+    }
+};
+
 module.exports = {
     genererVoyage, getMesVoyages, getVoyage, supprimerVoyage, togglePartage, ajouterLike, retirerLike,
-    getBudget, updateBudget, recalculerBudget, getConseils, regenererConseils
+    getBudget, updateBudget, recalculerBudget, getConseils, regenererConseils,
+    getPrivacite, updatePrivacite
 };

@@ -12,7 +12,9 @@ const {
     updateBudget,
     recalculerBudget,
     getConseils,
-    regenererConseils
+    regenererConseils,
+    getPrivacite,
+    updatePrivacite
 } = require('../controllers/voyageController');
 const { proteger } = require('../middlewares/authMiddleware');
 
@@ -30,5 +32,8 @@ router.post('/:id/budget/recalculer', proteger, recalculerBudget);
 
 router.get('/:id/conseils', proteger, getConseils);
 router.post('/:id/conseils/regenerer', proteger, regenererConseils);
+
+router.get('/:id/privacite', proteger, getPrivacite);
+router.patch('/:id/privacite', proteger, updatePrivacite);
 
 module.exports = router;
