@@ -10,6 +10,78 @@
 
 .main { max-width: 900px; margin: 0 auto; padding: 40px 24px; }
 
+/* ── Layout avec sidebar de navigation ── */
+.layout {
+  max-width: 1100px; margin: 0 auto; padding: 40px 24px;
+  display: flex; gap: 24px; align-items: flex-start;
+}
+
+/* ── Sidebar de navigation des sections ── */
+.sideNav {
+  width: 240px; flex-shrink: 0;
+  position: sticky; top: 24px;
+  display: flex; flex-direction: column; gap: 16px;
+}
+
+.sideNavCard {
+  backdrop-filter: blur(6px);
+  background-color: rgba(255,255,255,0.03);
+  border: 1px solid rgba(255,255,255,0.08);
+  border-radius: 16px; padding: 20px;
+  display: flex; flex-direction: column; align-items: center; gap: 10px;
+  text-align: center;
+}
+
+.sideNavAvatar {
+  width: 64px; height: 64px; border-radius: 50%;
+  border: 2px solid rgba(139,92,246,0.4); overflow: hidden;
+}
+.sideNavAvatarImg { width: 100%; height: 100%; object-fit: cover; }
+.sideNavName  { font-size: 15px; font-weight: 700; color: #fff; }
+.sideNavEmail { font-size: 12px; color: #94a3b8; word-break: break-all; }
+
+.navList {
+  display: flex; flex-direction: column; gap: 4px;
+  backdrop-filter: blur(6px);
+  background-color: rgba(255,255,255,0.03);
+  border: 1px solid rgba(255,255,255,0.08);
+  border-radius: 16px; padding: 8px;
+}
+
+.navBtn {
+  display: flex; align-items: center; gap: 12px;
+  padding: 11px 14px; border-radius: 10px;
+  font-size: 14px; font-weight: 500; color: #94a3b8;
+  background: none; border: none; cursor: pointer;
+  text-align: left; width: 100%;
+  font-family: 'Inter', sans-serif; transition: all 0.15s;
+}
+.navBtn:hover { background-color: rgba(255,255,255,0.05); color: #fff; }
+
+.navBtnActive {
+  background: linear-gradient(135deg, rgba(6,182,212,0.15), rgba(139,92,246,0.15));
+  border: 1px solid rgba(139,92,246,0.3);
+  color: #fff;
+}
+
+.navBtnIcon { font-size: 17px; flex-shrink: 0; width: 22px; text-align: center; }
+
+/* ── Colonne de contenu ── */
+.content { flex: 1; min-width: 0; }
+
+.fadeIn { animation: profileFadeIn 0.25s ease; }
+@keyframes profileFadeIn {
+  from { opacity: 0; transform: translateY(6px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+@media (max-width: 860px) {
+  .layout { flex-direction: column; }
+  .sideNav { width: 100%; position: relative; top: 0; }
+  .navList { flex-direction: row; overflow-x: auto; gap: 6px; }
+  .navBtn { width: auto; white-space: nowrap; }
+}
+
 /* ── Hero profil ── */
 .hero {
   display: flex; gap: 32px; align-items: center;

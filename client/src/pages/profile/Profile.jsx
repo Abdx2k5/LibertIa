@@ -1,10 +1,11 @@
 import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import styles from "./Profile.module.css";
 import { useAuthStore } from "../../store/authStore";
 import authService from "../../services/Auth.service";
 import { GaleriePhoto } from "../../components/ui";
 import { LogoutButton } from "../../components/ui";
-import { FREEMIUM } from "../../utils/constants";
+import { FREEMIUM, ROUTES } from "../../utils/constants";
 
 const MAX_FREE_PROMPTS = FREEMIUM.MAX_FREE_PROMPTS;
 
@@ -19,9 +20,22 @@ const DEFAULT_PREFERENCES = {
   language: "fr",
 };
 
+// Sections affichées via la sidebar de navigation du profil
+const SECTIONS = [
+  { id: "overview",     label: "Vue d'ensemble",  icon: "🏠" },
+  { id: "info",         label: "Informations",    icon: "👤" },
+  { id: "bio",          label: "À propos de moi", icon: "📝" },
+  { id: "preferences",  label: "Préférences",     icon: "⚙️" },
+  { id: "subscription", label: "Abonnement",      icon: "✨" },
+  { id: "memories",     label: "Mes souvenirs",   icon: "📸" },
+  { id: "security",     label: "Sécurité",        icon: "🔒" },
+];
+
 export default function Profile() {
+  const navigate = useNavigate();
   const { user, updateUser } = useAuthStore();
   const isPremium = user?.abonnement === "premium";
+  const [activeSection, setActiveSection] = useState("overview");
   const [form, setForm] = useState({
     nom: "",
     prenom: "",
@@ -38,6 +52,9 @@ export default function Profile() {
 
   const promptsUsed = user?.promptsUtilises || 0;
   const promptsLeft = FREEMIUM.MAX_FREE_PROMPTS - promptsUsed;
+  const avatarSrc = user?.profilePhoto && user.profilePhoto !== "default-avatar.png"
+    ? user.profilePhoto
+    : imgAvatar;
 
   // ── Pré-remplit le formulaire depuis le store ─────────────
   useEffect(() => {
@@ -182,425 +199,497 @@ export default function Profile() {
 
   return (
     <div className={styles.page}>
-      <div className={styles.main}>
+      <div className={styles.layout}>
 
-        {/* ── Hero profil ── */}
-        <div className={styles.hero}>
-          <div className={styles.avatarWrap}>
-            <div className={styles.avatar}>
-              <img
-                src={user?.profilePhoto && user.profilePhoto !== "default-avatar.png"
-                  ? user.profilePhoto
-                  : imgAvatar}
-                alt="Avatar"
-                className={styles.avatarImg}
-              />
+        {/* ── Sidebar de navigation du profil ── */}
+        <aside className={styles.sideNav}>
+          <div className={styles.sideNavCard}>
+            <div className={styles.sideNavAvatar}>
+              <img src={avatarSrc} alt="Avatar" className={styles.sideNavAvatarImg} />
             </div>
-            <button className={styles.avatarEditBtn} title="Changer la photo">✏️</button>
-          </div>
-          <div className={styles.heroInfo}>
-            <h1 className={styles.heroName}>{user?.nom || "Utilisateur"}</h1>
-            <p className={styles.heroEmail}>{user?.email}</p>
+            <div className={styles.sideNavName}>{user?.nom || "Utilisateur"}</div>
+            <div className={styles.sideNavEmail}>{user?.email}</div>
             <div className={styles.heroBadge}>
               {isPremium ? "✨ Membre Premium" : "🆓 Membre Gratuit"}
             </div>
-            {user?.bio && <p style={{ fontSize: 14, color: "#a1a1aa", marginTop: 8 }}>{user.bio}</p>}
-          </div>
-        </div>
-
-        {/* ── Stats ── */}
-        <div className={styles.statsBar}>
-          <div className={styles.statCard}>
-            <span className={styles.statNum}>{promptsUsed}</span>
-            <span className={styles.statLabel}>Itinéraires générés</span>
-          </div>
-          <div className={styles.statCard}>
-            <span className={styles.statNum}>{promptsLeft}</span>
-            <span className={styles.statLabel}>Prompts restants</span>
-          </div>
-          <div className={styles.statCard}>
-            <span className={styles.statNum}>{user?.followers?.length || 0}</span>
-            <span className={styles.statLabel}>Abonnés</span>
-          </div>
-        </div>
-
-        {/* ── Abonnement ── */}
-        <div className={styles.section}>
-          <h2 className={styles.sectionTitle}>Mon abonnement</h2>
-          <div className={styles.promptWrap}>
-            <div className={styles.promptInfo}>
-              <span className={styles.promptTitle}>
-                {isPremium ? "Premium — Illimité" : "Gratuit — Prompts IA ce mois"}
-              </span>
-              <span className={styles.promptSub}>
-                {isPremium
-                  ? "Vous avez accès à des itinéraires illimités"
-                  : `${promptsUsed} utilisés sur ${MAX_FREE_PROMPTS} disponibles`}
-              </span>
-            </div>
-            <span className={styles.promptNum}>
-              {isPremium ? "∞" : `${promptsLeft}/${MAX_FREE_PROMPTS}`}
-            </span>
-          </div>
-        </div>
-
-        {/* ── Formulaire infos ── */}
-        <form onSubmit={handleSave}>
-          {errorMsg && (
-            <div className={styles.errorMsg} style={{ fontSize: 13, color: "#ef4444", marginBottom: 16 }}>
-              {errorMsg}
-            </div>
-          )}
-          {successMsg && (
-            <p style={{ fontSize: 13, color: "#4ade80", marginBottom: 8 }}>
-              Profil mis à jour avec succès !
-            </p>
-          )}
-
-          {/* Section 1: Informations personnelles */}
-          <div className={styles.section}>
-            <div className={styles.sectionHeader}>
-              <h2 className={styles.sectionTitle}>Informations personnelles</h2>
-              {editingSection !== "info" && (
-                <button
-                  type="button"
-                  className={styles.btnEdit}
-                  onClick={() => setEditingSection("info")}
-                >
-                  Modifier
-                </button>
-              )}
-            </div>
-
-            {editingSection === "info" ? (
-              <div className={styles.fieldGrid}>
-                <div className={styles.fieldGroup}>
-                  <label className={styles.label}>Nom</label>
-                  <input
-                    type="text"
-                    className={`${styles.input} ${errors.nom ? styles.inputError : ""}`}
-                    value={form.nom}
-                    onChange={(e) => {
-                      setForm({ ...form, nom: e.target.value });
-                      validateField("nom", e.target.value);
-                    }}
-                  />
-                  {errors.nom && <span className={styles.errorText}>{errors.nom}</span>}
-                </div>
-
-                <div className={styles.fieldGroup}>
-                  <label className={styles.label}>Prénom</label>
-                  <input
-                    type="text"
-                    className={`${styles.input} ${errors.prenom ? styles.inputError : ""}`}
-                    value={form.prenom}
-                    onChange={(e) => {
-                      setForm({ ...form, prenom: e.target.value });
-                      validateField("prenom", e.target.value);
-                    }}
-                  />
-                  {errors.prenom && <span className={styles.errorText}>{errors.prenom}</span>}
-                </div>
-
-                <div className={`${styles.fieldGroup} ${styles.fieldFull}`}>
-                  <label className={styles.label}>Email</label>
-                  <input
-                    type="email"
-                    className={`${styles.input} ${styles.inputDisabled}`}
-                    value={form.email}
-                    disabled
-                    title="L'email ne peut pas être modifié"
-                  />
-                </div>
-
-                <div className={styles.fieldGroup}>
-                  <label className={styles.label}>Âge (optionnel)</label>
-                  <input
-                    type="number"
-                    className={`${styles.input} ${errors.age ? styles.inputError : ""}`}
-                    value={form.age}
-                    onChange={(e) => {
-                      setForm({ ...form, age: e.target.value });
-                      if (e.target.value) validateField("age", e.target.value);
-                    }}
-                    placeholder="13-120"
-                    min="13"
-                    max="120"
-                  />
-                  {errors.age && <span className={styles.errorText}>{errors.age}</span>}
-                </div>
-
-                <div className={styles.formActions}>
-                  <button type="button" className={styles.btnCancel} onClick={handleCancel}>
-                    Annuler
-                  </button>
-                  <button type="submit" className={styles.btnSave} disabled={loading}>
-                    {loading ? "Sauvegarde..." : "Sauvegarder"}
-                  </button>
-                </div>
-              </div>
-            ) : (
-              <div className={styles.viewMode}>
-                <div className={styles.viewRow}>
-                  <span className={styles.viewLabel}>Nom:</span>
-                  <span className={styles.viewValue}>{form.nom}</span>
-                </div>
-                <div className={styles.viewRow}>
-                  <span className={styles.viewLabel}>Prénom:</span>
-                  <span className={styles.viewValue}>{form.prenom}</span>
-                </div>
-                <div className={styles.viewRow}>
-                  <span className={styles.viewLabel}>Email:</span>
-                  <span className={styles.viewValue}>{form.email}</span>
-                </div>
-                {form.age && (
-                  <div className={styles.viewRow}>
-                    <span className={styles.viewLabel}>Âge:</span>
-                    <span className={styles.viewValue}>{form.age}</span>
-                  </div>
-                )}
-              </div>
-            )}
           </div>
 
-          {/* Section 2: Bio */}
-          <div className={styles.section}>
-            <div className={styles.sectionHeader}>
-              <h2 className={styles.sectionTitle}>À propos de moi</h2>
-              {editingSection !== "bio" && (
-                <button
-                  type="button"
-                  className={styles.btnEdit}
-                  onClick={() => setEditingSection("bio")}
-                >
-                  Modifier
-                </button>
-              )}
-            </div>
-
-            {editingSection === "bio" ? (
-              <div className={styles.fieldGroup} style={{ marginBottom: 16 }}>
-                <label className={styles.label}>Bio</label>
-                <textarea
-                  className={`${styles.textarea} ${errors.bio ? styles.inputError : ""}`}
-                  value={form.bio}
-                  onChange={(e) => {
-                    setForm({ ...form, bio: e.target.value });
-                    validateField("bio", e.target.value);
-                  }}
-                  placeholder="Parlez-nous un peu de vous..."
-                  maxLength={500}
-                />
-                <div className={styles.charCounter}>
-                  {form.bio.length}/500 caractères
-                </div>
-                {errors.bio && <span className={styles.errorText}>{errors.bio}</span>}
-
-                <div className={styles.formActions}>
-                  <button type="button" className={styles.btnCancel} onClick={handleCancel}>
-                    Annuler
-                  </button>
-                  <button type="submit" className={styles.btnSave} disabled={loading}>
-                    {loading ? "Sauvegarde..." : "Sauvegarder"}
-                  </button>
-                </div>
-              </div>
-            ) : (
-              <div className={styles.viewMode}>
-                {form.bio ? (
-                  <p className={styles.bioText}>{form.bio}</p>
-                ) : (
-                  <p className={styles.bioPlaceholder}>Aucune bio pour le moment</p>
-                )}
-              </div>
-            )}
-          </div>
-
-          {/* Section 3: Préférences */}
-          <div className={styles.section}>
-            <div className={styles.sectionHeader}>
-              <h2 className={styles.sectionTitle}>Préférences</h2>
-              {editingSection !== "preferences" && (
-                <button
-                  type="button"
-                  className={styles.btnEdit}
-                  onClick={() => setEditingSection("preferences")}
-                >
-                  Modifier
-                </button>
-              )}
-            </div>
-
-            {editingSection === "preferences" ? (
-              <div className={styles.preferencesGrid}>
-                <div className={styles.preferenceItem}>
-                  <div className={styles.preferenceCheck}>
-                    <input
-                      type="checkbox"
-                      id="profilePublic"
-                      checked={form.preferences.profilePublic}
-                      onChange={(e) =>
-                        setForm({
-                          ...form,
-                          preferences: { ...form.preferences, profilePublic: e.target.checked },
-                        })
-                      }
-                    />
-                    <label htmlFor="profilePublic">Profil public</label>
-                  </div>
-                  <span className={styles.preferenceDesc}>Permettre à d'autres utilisateurs de voir votre profil</span>
-                </div>
-
-                <div className={styles.preferenceItem}>
-                  <div className={styles.preferenceCheck}>
-                    <input
-                      type="checkbox"
-                      id="voyagesPublic"
-                      checked={form.preferences.voyagesPublic}
-                      onChange={(e) =>
-                        setForm({
-                          ...form,
-                          preferences: { ...form.preferences, voyagesPublic: e.target.checked },
-                        })
-                      }
-                    />
-                    <label htmlFor="voyagesPublic">Voyages publics</label>
-                  </div>
-                  <span className={styles.preferenceDesc}>Partager vos itinéraires avec la communauté</span>
-                </div>
-
-                <div className={styles.preferenceItem}>
-                  <div className={styles.preferenceCheck}>
-                    <input
-                      type="checkbox"
-                      id="emailNotifications"
-                      checked={form.preferences.emailNotifications}
-                      onChange={(e) =>
-                        setForm({
-                          ...form,
-                          preferences: { ...form.preferences, emailNotifications: e.target.checked },
-                        })
-                      }
-                    />
-                    <label htmlFor="emailNotifications">Notifications par email</label>
-                  </div>
-                  <span className={styles.preferenceDesc}>Recevoir des mises à jour importantes par email</span>
-                </div>
-
-                <div className={styles.preferenceItem}>
-                  <div className={styles.preferenceCheck}>
-                    <input
-                      type="checkbox"
-                      id="newsNotifications"
-                      checked={form.preferences.newsNotifications}
-                      onChange={(e) =>
-                        setForm({
-                          ...form,
-                          preferences: { ...form.preferences, newsNotifications: e.target.checked },
-                        })
-                      }
-                    />
-                    <label htmlFor="newsNotifications">Infolettre hebdomadaire</label>
-                  </div>
-                  <span className={styles.preferenceDesc}>Recevez nos nouvelles et conseils de voyage</span>
-                </div>
-
-                <div className={styles.preferenceItem}>
-                  <label className={styles.label} htmlFor="language">Langue préférée</label>
-                  <select
-                    id="language"
-                    className={styles.selectInput}
-                    value={form.preferences.language}
-                    onChange={(e) =>
-                      setForm({
-                        ...form,
-                        preferences: { ...form.preferences, language: e.target.value },
-                      })
-                    }
-                  >
-                    <option value="fr">Français</option>
-                    <option value="en">English</option>
-                    <option value="ar">العربية</option>
-                  </select>
-                </div>
-
-                <div className={styles.formActions}>
-                  <button type="button" className={styles.btnCancel} onClick={handleCancel}>
-                    Annuler
-                  </button>
-                  <button type="submit" className={styles.btnSave} disabled={loading}>
-                    {loading ? "Sauvegarde..." : "Sauvegarder"}
-                  </button>
-                </div>
-              </div>
-            ) : (
-              <div className={styles.viewMode}>
-                <div className={styles.preferencesList}>
-                  <div className={styles.prefItem}>
-                    <span className={styles.prefCheck}>
-                      {form.preferences.profilePublic ? "✓" : "✗"}
-                    </span>
-                    <span>Profil public</span>
-                  </div>
-                  <div className={styles.prefItem}>
-                    <span className={styles.prefCheck}>
-                      {form.preferences.voyagesPublic ? "✓" : "✗"}
-                    </span>
-                    <span>Voyages publics</span>
-                  </div>
-                  <div className={styles.prefItem}>
-                    <span className={styles.prefCheck}>
-                      {form.preferences.emailNotifications ? "✓" : "✗"}
-                    </span>
-                    <span>Notifications par email</span>
-                  </div>
-                  <div className={styles.prefItem}>
-                    <span className={styles.prefCheck}>
-                      {form.preferences.newsNotifications ? "✓" : "✗"}
-                    </span>
-                    <span>Infolettre hebdomadaire</span>
-                  </div>
-                  <div className={styles.prefItem}>
-                    <span className={styles.prefLabel}>Langue:</span>
-                    <span>{form.preferences.language === "fr" ? "Français" : form.preferences.language === "en" ? "English" : "العربية"}</span>
-                  </div>
-                </div>
-              </div>
-            )}
-          </div>
-
-          {/* ── Mes souvenirs personnels ── */}
-        <div className={styles.section}>
-          <h2 className={styles.sectionTitle}>Mes souvenirs personnels</h2>
-          <GaleriePhoto
-            photos={[
-              { id: "1", url: null, titre: "Temple Senso-ji", lieu: "Tokyo", date: "Mars 2024" },
-              { id: "2", url: null, titre: "Mont Fuji", lieu: "Fuji", date: "Mars 2024" },
-              { id: "3", url: null, titre: "Arashiyama Bamboo Grove", lieu: "Kyoto", date: "Avril 2024" },
-              { id: "4", url: null, titre: "Shibuya Crossing", lieu: "Tokyo", date: "Mars 2024" },
-              { id: "5", url: null, titre: "Fushimi Inari", lieu: "Kyoto", date: "Avril 2024" },
-              { id: "6", url: null, titre: "Nezu Shrine", lieu: "Tokyo", date: "Mars 2024" },
-              { id: "7", url: null, titre: "Gion District", lieu: "Kyoto", date: "Avril 2024" },
-              { id: "8", url: null, titre: "Hiroshima Peace Memorial", lieu: "Hiroshima", date: "Mai 2024" },
-            ]}
-            colonnes={3}
-          />
-        </div>
-
-        {/* ── Zone danger ──*/}
-          <div className={styles.section}>
-            <h2 className={styles.sectionTitle}>Zone dangereuse</h2>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
-              <LogoutButton variant="outline" size="md" />
+          <nav className={styles.navList}>
+            {SECTIONS.map((section) => (
               <button
-            type="button" className={styles.btnDanger}
-            onClick={() => alert("Fonctionnalité à venir — Abdelwahab doit ajouter DELETE /api/auth/account")}
-          >
-            Supprimer mon compte
-          </button>
-            </div>
-          </div>
-        </form>
+                key={section.id}
+                type="button"
+                className={`${styles.navBtn} ${activeSection === section.id ? styles.navBtnActive : ""}`}
+                onClick={() => setActiveSection(section.id)}
+              >
+                <span className={styles.navBtnIcon}>{section.icon}</span>
+                {section.label}
+              </button>
+            ))}
+          </nav>
+        </aside>
+
+        {/* ── Contenu de la section active ── */}
+        <div className={styles.content}>
+          <form onSubmit={handleSave}>
+            {errorMsg && (
+              <div className={styles.errorMsg} style={{ fontSize: 13, color: "#ef4444", marginBottom: 16 }}>
+                {errorMsg}
+              </div>
+            )}
+            {successMsg && (
+              <p style={{ fontSize: 13, color: "#4ade80", marginBottom: 8 }}>
+                Profil mis à jour avec succès !
+              </p>
+            )}
+
+            {/* ── Vue d'ensemble ── */}
+            {activeSection === "overview" && (
+              <div className={styles.fadeIn}>
+                <div className={styles.hero}>
+                  <div className={styles.avatarWrap}>
+                    <div className={styles.avatar}>
+                      <img src={avatarSrc} alt="Avatar" className={styles.avatarImg} />
+                    </div>
+                    <button type="button" className={styles.avatarEditBtn} title="Changer la photo">✏️</button>
+                  </div>
+                  <div className={styles.heroInfo}>
+                    <h1 className={styles.heroName}>{user?.nom || "Utilisateur"}</h1>
+                    <p className={styles.heroEmail}>{user?.email}</p>
+                    <div className={styles.heroBadge}>
+                      {isPremium ? "✨ Membre Premium" : "🆓 Membre Gratuit"}
+                    </div>
+                    {user?.bio && <p style={{ fontSize: 14, color: "#a1a1aa", marginTop: 8 }}>{user.bio}</p>}
+                  </div>
+                </div>
+
+                <div className={styles.statsBar}>
+                  <div className={styles.statCard}>
+                    <span className={styles.statNum}>{promptsUsed}</span>
+                    <span className={styles.statLabel}>Itinéraires générés</span>
+                  </div>
+                  <div className={styles.statCard}>
+                    <span className={styles.statNum}>{promptsLeft}</span>
+                    <span className={styles.statLabel}>Prompts restants</span>
+                  </div>
+                  <div className={styles.statCard}>
+                    <span className={styles.statNum}>{user?.followers?.length || 0}</span>
+                    <span className={styles.statLabel}>Abonnés</span>
+                  </div>
+                </div>
+
+                <div className={styles.section}>
+                  <div className={styles.sectionHeader}>
+                    <h2 className={styles.sectionTitle}>Mon abonnement</h2>
+                    <button type="button" className={styles.btnEdit} onClick={() => setActiveSection("subscription")}>
+                      Voir
+                    </button>
+                  </div>
+                  <div className={styles.promptWrap}>
+                    <div className={styles.promptInfo}>
+                      <span className={styles.promptTitle}>
+                        {isPremium ? "Premium — Illimité" : "Gratuit — Prompts IA ce mois"}
+                      </span>
+                      <span className={styles.promptSub}>
+                        {isPremium
+                          ? "Vous avez accès à des itinéraires illimités"
+                          : `${promptsUsed} utilisés sur ${MAX_FREE_PROMPTS} disponibles`}
+                      </span>
+                    </div>
+                    <span className={styles.promptNum}>
+                      {isPremium ? "∞" : `${promptsLeft}/${MAX_FREE_PROMPTS}`}
+                    </span>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* ── Informations personnelles ── */}
+            {activeSection === "info" && (
+              <div className={`${styles.section} ${styles.fadeIn}`}>
+                <div className={styles.sectionHeader}>
+                  <h2 className={styles.sectionTitle}>Informations personnelles</h2>
+                  {editingSection !== "info" && (
+                    <button
+                      type="button"
+                      className={styles.btnEdit}
+                      onClick={() => setEditingSection("info")}
+                    >
+                      Modifier
+                    </button>
+                  )}
+                </div>
+
+                {editingSection === "info" ? (
+                  <div className={styles.fieldGrid}>
+                    <div className={styles.fieldGroup}>
+                      <label className={styles.label}>Nom</label>
+                      <input
+                        type="text"
+                        className={`${styles.input} ${errors.nom ? styles.inputError : ""}`}
+                        value={form.nom}
+                        onChange={(e) => {
+                          setForm({ ...form, nom: e.target.value });
+                          validateField("nom", e.target.value);
+                        }}
+                      />
+                      {errors.nom && <span className={styles.errorText}>{errors.nom}</span>}
+                    </div>
+
+                    <div className={styles.fieldGroup}>
+                      <label className={styles.label}>Prénom</label>
+                      <input
+                        type="text"
+                        className={`${styles.input} ${errors.prenom ? styles.inputError : ""}`}
+                        value={form.prenom}
+                        onChange={(e) => {
+                          setForm({ ...form, prenom: e.target.value });
+                          validateField("prenom", e.target.value);
+                        }}
+                      />
+                      {errors.prenom && <span className={styles.errorText}>{errors.prenom}</span>}
+                    </div>
+
+                    <div className={`${styles.fieldGroup} ${styles.fieldFull}`}>
+                      <label className={styles.label}>Email</label>
+                      <input
+                        type="email"
+                        className={`${styles.input} ${styles.inputDisabled}`}
+                        value={form.email}
+                        disabled
+                        title="L'email ne peut pas être modifié"
+                      />
+                    </div>
+
+                    <div className={styles.fieldGroup}>
+                      <label className={styles.label}>Âge (optionnel)</label>
+                      <input
+                        type="number"
+                        className={`${styles.input} ${errors.age ? styles.inputError : ""}`}
+                        value={form.age}
+                        onChange={(e) => {
+                          setForm({ ...form, age: e.target.value });
+                          if (e.target.value) validateField("age", e.target.value);
+                        }}
+                        placeholder="13-120"
+                        min="13"
+                        max="120"
+                      />
+                      {errors.age && <span className={styles.errorText}>{errors.age}</span>}
+                    </div>
+
+                    <div className={styles.formActions}>
+                      <button type="button" className={styles.btnCancel} onClick={handleCancel}>
+                        Annuler
+                      </button>
+                      <button type="submit" className={styles.btnSave} disabled={loading}>
+                        {loading ? "Sauvegarde..." : "Sauvegarder"}
+                      </button>
+                    </div>
+                  </div>
+                ) : (
+                  <div className={styles.viewMode}>
+                    <div className={styles.viewRow}>
+                      <span className={styles.viewLabel}>Nom:</span>
+                      <span className={styles.viewValue}>{form.nom}</span>
+                    </div>
+                    <div className={styles.viewRow}>
+                      <span className={styles.viewLabel}>Prénom:</span>
+                      <span className={styles.viewValue}>{form.prenom}</span>
+                    </div>
+                    <div className={styles.viewRow}>
+                      <span className={styles.viewLabel}>Email:</span>
+                      <span className={styles.viewValue}>{form.email}</span>
+                    </div>
+                    {form.age && (
+                      <div className={styles.viewRow}>
+                        <span className={styles.viewLabel}>Âge:</span>
+                        <span className={styles.viewValue}>{form.age}</span>
+                      </div>
+                    )}
+                  </div>
+                )}
+              </div>
+            )}
+
+            {/* ── Bio ── */}
+            {activeSection === "bio" && (
+              <div className={`${styles.section} ${styles.fadeIn}`}>
+                <div className={styles.sectionHeader}>
+                  <h2 className={styles.sectionTitle}>À propos de moi</h2>
+                  {editingSection !== "bio" && (
+                    <button
+                      type="button"
+                      className={styles.btnEdit}
+                      onClick={() => setEditingSection("bio")}
+                    >
+                      Modifier
+                    </button>
+                  )}
+                </div>
+
+                {editingSection === "bio" ? (
+                  <div className={styles.fieldGroup} style={{ marginBottom: 16 }}>
+                    <label className={styles.label}>Bio</label>
+                    <textarea
+                      className={`${styles.textarea} ${errors.bio ? styles.inputError : ""}`}
+                      value={form.bio}
+                      onChange={(e) => {
+                        setForm({ ...form, bio: e.target.value });
+                        validateField("bio", e.target.value);
+                      }}
+                      placeholder="Parlez-nous un peu de vous..."
+                      maxLength={500}
+                    />
+                    <div className={styles.charCounter}>
+                      {form.bio.length}/500 caractères
+                    </div>
+                    {errors.bio && <span className={styles.errorText}>{errors.bio}</span>}
+
+                    <div className={styles.formActions}>
+                      <button type="button" className={styles.btnCancel} onClick={handleCancel}>
+                        Annuler
+                      </button>
+                      <button type="submit" className={styles.btnSave} disabled={loading}>
+                        {loading ? "Sauvegarde..." : "Sauvegarder"}
+                      </button>
+                    </div>
+                  </div>
+                ) : (
+                  <div className={styles.viewMode}>
+                    {form.bio ? (
+                      <p className={styles.bioText}>{form.bio}</p>
+                    ) : (
+                      <p className={styles.bioPlaceholder}>Aucune bio pour le moment</p>
+                    )}
+                  </div>
+                )}
+              </div>
+            )}
+
+            {/* ── Préférences ── */}
+            {activeSection === "preferences" && (
+              <div className={`${styles.section} ${styles.fadeIn}`}>
+                <div className={styles.sectionHeader}>
+                  <h2 className={styles.sectionTitle}>Préférences</h2>
+                  {editingSection !== "preferences" && (
+                    <button
+                      type="button"
+                      className={styles.btnEdit}
+                      onClick={() => setEditingSection("preferences")}
+                    >
+                      Modifier
+                    </button>
+                  )}
+                </div>
+
+                {editingSection === "preferences" ? (
+                  <div className={styles.preferencesGrid}>
+                    <div className={styles.preferenceItem}>
+                      <div className={styles.preferenceCheck}>
+                        <input
+                          type="checkbox"
+                          id="profilePublic"
+                          checked={form.preferences.profilePublic}
+                          onChange={(e) =>
+                            setForm({
+                              ...form,
+                              preferences: { ...form.preferences, profilePublic: e.target.checked },
+                            })
+                          }
+                        />
+                        <label htmlFor="profilePublic">Profil public</label>
+                      </div>
+                      <span className={styles.preferenceDesc}>Permettre à d'autres utilisateurs de voir votre profil</span>
+                    </div>
+
+                    <div className={styles.preferenceItem}>
+                      <div className={styles.preferenceCheck}>
+                        <input
+                          type="checkbox"
+                          id="voyagesPublic"
+                          checked={form.preferences.voyagesPublic}
+                          onChange={(e) =>
+                            setForm({
+                              ...form,
+                              preferences: { ...form.preferences, voyagesPublic: e.target.checked },
+                            })
+                          }
+                        />
+                        <label htmlFor="voyagesPublic">Voyages publics</label>
+                      </div>
+                      <span className={styles.preferenceDesc}>Partager vos itinéraires avec la communauté</span>
+                    </div>
+
+                    <div className={styles.preferenceItem}>
+                      <div className={styles.preferenceCheck}>
+                        <input
+                          type="checkbox"
+                          id="emailNotifications"
+                          checked={form.preferences.emailNotifications}
+                          onChange={(e) =>
+                            setForm({
+                              ...form,
+                              preferences: { ...form.preferences, emailNotifications: e.target.checked },
+                            })
+                          }
+                        />
+                        <label htmlFor="emailNotifications">Notifications par email</label>
+                      </div>
+                      <span className={styles.preferenceDesc}>Recevoir des mises à jour importantes par email</span>
+                    </div>
+
+                    <div className={styles.preferenceItem}>
+                      <div className={styles.preferenceCheck}>
+                        <input
+                          type="checkbox"
+                          id="newsNotifications"
+                          checked={form.preferences.newsNotifications}
+                          onChange={(e) =>
+                            setForm({
+                              ...form,
+                              preferences: { ...form.preferences, newsNotifications: e.target.checked },
+                            })
+                          }
+                        />
+                        <label htmlFor="newsNotifications">Infolettre hebdomadaire</label>
+                      </div>
+                      <span className={styles.preferenceDesc}>Recevez nos nouvelles et conseils de voyage</span>
+                    </div>
+
+                    <div className={styles.preferenceItem}>
+                      <label className={styles.label} htmlFor="language">Langue préférée</label>
+                      <select
+                        id="language"
+                        className={styles.selectInput}
+                        value={form.preferences.language}
+                        onChange={(e) =>
+                          setForm({
+                            ...form,
+                            preferences: { ...form.preferences, language: e.target.value },
+                          })
+                        }
+                      >
+                        <option value="fr">Français</option>
+                        <option value="en">English</option>
+                        <option value="ar">العربية</option>
+                      </select>
+                    </div>
+
+                    <div className={styles.formActions}>
+                      <button type="button" className={styles.btnCancel} onClick={handleCancel}>
+                        Annuler
+                      </button>
+                      <button type="submit" className={styles.btnSave} disabled={loading}>
+                        {loading ? "Sauvegarde..." : "Sauvegarder"}
+                      </button>
+                    </div>
+                  </div>
+                ) : (
+                  <div className={styles.viewMode}>
+                    <div className={styles.preferencesList}>
+                      <div className={styles.prefItem}>
+                        <span className={styles.prefCheck}>
+                          {form.preferences.profilePublic ? "✓" : "✗"}
+                        </span>
+                        <span>Profil public</span>
+                      </div>
+                      <div className={styles.prefItem}>
+                        <span className={styles.prefCheck}>
+                          {form.preferences.voyagesPublic ? "✓" : "✗"}
+                        </span>
+                        <span>Voyages publics</span>
+                      </div>
+                      <div className={styles.prefItem}>
+                        <span className={styles.prefCheck}>
+                          {form.preferences.emailNotifications ? "✓" : "✗"}
+                        </span>
+                        <span>Notifications par email</span>
+                      </div>
+                      <div className={styles.prefItem}>
+                        <span className={styles.prefCheck}>
+                          {form.preferences.newsNotifications ? "✓" : "✗"}
+                        </span>
+                        <span>Infolettre hebdomadaire</span>
+                      </div>
+                      <div className={styles.prefItem}>
+                        <span className={styles.prefLabel}>Langue:</span>
+                        <span>{form.preferences.language === "fr" ? "Français" : form.preferences.language === "en" ? "English" : "العربية"}</span>
+                      </div>
+                    </div>
+                  </div>
+                )}
+              </div>
+            )}
+
+            {/* ── Abonnement ── */}
+            {activeSection === "subscription" && (
+              <div className={`${styles.section} ${styles.fadeIn}`}>
+                <h2 className={styles.sectionTitle}>Mon abonnement</h2>
+                <div className={styles.promptWrap}>
+                  <div className={styles.promptInfo}>
+                    <span className={styles.promptTitle}>
+                      {isPremium ? "Premium — Illimité" : "Gratuit — Prompts IA ce mois"}
+                    </span>
+                    <span className={styles.promptSub}>
+                      {isPremium
+                        ? "Vous avez accès à des itinéraires illimités"
+                        : `${promptsUsed} utilisés sur ${MAX_FREE_PROMPTS} disponibles`}
+                    </span>
+                  </div>
+                  <span className={styles.promptNum}>
+                    {isPremium ? "∞" : `${promptsLeft}/${MAX_FREE_PROMPTS}`}
+                  </span>
+                </div>
+                <div className={styles.formActions} style={{ borderTop: "none", paddingTop: 0, marginTop: 16 }}>
+                  <button
+                    type="button"
+                    className={styles.btnSave}
+                    onClick={() => navigate(ROUTES.SUBSCRIPTION)}
+                  >
+                    {isPremium ? "Gérer mon abonnement" : "Passer à Premium"}
+                  </button>
+                </div>
+              </div>
+            )}
+
+            {/* ── Mes souvenirs personnels ── */}
+            {activeSection === "memories" && (
+              <div className={`${styles.section} ${styles.fadeIn}`}>
+                <h2 className={styles.sectionTitle}>Mes souvenirs personnels</h2>
+                <GaleriePhoto
+                  photos={[
+                    { id: "1", url: null, titre: "Temple Senso-ji", lieu: "Tokyo", date: "Mars 2024" },
+                    { id: "2", url: null, titre: "Mont Fuji", lieu: "Fuji", date: "Mars 2024" },
+                    { id: "3", url: null, titre: "Arashiyama Bamboo Grove", lieu: "Kyoto", date: "Avril 2024" },
+                    { id: "4", url: null, titre: "Shibuya Crossing", lieu: "Tokyo", date: "Mars 2024" },
+                    { id: "5", url: null, titre: "Fushimi Inari", lieu: "Kyoto", date: "Avril 2024" },
+                    { id: "6", url: null, titre: "Nezu Shrine", lieu: "Tokyo", date: "Mars 2024" },
+                    { id: "7", url: null, titre: "Gion District", lieu: "Kyoto", date: "Avril 2024" },
+                    { id: "8", url: null, titre: "Hiroshima Peace Memorial", lieu: "Hiroshima", date: "Mai 2024" },
+                  ]}
+                  colonnes={3}
+                />
+              </div>
+            )}
+
+            {/* ── Sécurité / Zone dangereuse ── */}
+            {activeSection === "security" && (
+              <div className={`${styles.section} ${styles.fadeIn}`}>
+                <h2 className={styles.sectionTitle}>Sécurité du compte</h2>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+                  <LogoutButton variant="outline" size="md" />
+                  <button
+                    type="button" className={styles.btnDanger}
+                    onClick={() => alert("Fonctionnalité à venir — Abdelwahab doit ajouter DELETE /api/auth/account")}
+                  >
+                    Supprimer mon compte
+                  </button>
+                </div>
+              </div>
+            )}
+          </form>
+        </div>
 
       </div>
     </div>

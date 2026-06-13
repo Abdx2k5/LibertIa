@@ -6,9 +6,10 @@ const imgLogo   = "https://www.figma.com/api/mcp/asset/d93104aa-ce16-42fe-b9cd-8
 const imgAvatar = "https://www.figma.com/api/mcp/asset/0926e5cc-1f5e-4862-a22b-22daa1cef4d7";
 
 const NAV_ITEMS = [
-  { label: "Assistant IA",  to: "/dashboard",   emoji: "🤖" },
+  { label: "Assistant IA",  to: "/dashboard",    emoji: "🤖" },
   { label: "Mes Voyages",   to: "/mes-voyages",  emoji: "🗺️" },
   { label: "Profil",        to: "/profile",      emoji: "👤" },
+  { label: "Abonnement",    to: "/abonnement",   emoji: "✨" },
   { label: "Paramètres",    to: "/settings",     emoji: "⚙️" },
 ];
 

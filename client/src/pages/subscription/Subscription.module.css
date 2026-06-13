@@ -1,0 +1,127 @@
+/* ============================================================
+   Subscription.module.css — Page gestion abonnement (T108)
+   ============================================================ */
+
+.page {
+  min-height: 100vh;
+  background: linear-gradient(135deg, #0b1026 0%, #1a1a2e 100%);
+  font-family: 'Inter', sans-serif; color: #fff;
+}
+
+.main { max-width: 900px; margin: 0 auto; padding: 40px 24px; }
+
+.pageTitle { font-size: 28px; font-weight: 700; color: #fff; margin: 0 0 8px; }
+.pageSub   { font-size: 14px; color: #a1a1aa; margin: 0 0 24px; }
+
+/* ── Section ── */
+.section {
+  backdrop-filter: blur(6px);
+  background-color: rgba(255,255,255,0.03);
+  border: 1px solid rgba(255,255,255,0.08);
+  border-radius: 16px; padding: 28px; margin-bottom: 24px;
+}
+
+.sectionTitle { font-size: 18px; font-weight: 600; color: #fff; margin: 0 0 8px; }
+.sectionSub   { font-size: 13px; color: #94a3b8; margin: 0 0 20px; }
+
+/* ── Plan actuel ── */
+.currentPlanRow {
+  display: flex; align-items: center; justify-content: space-between; gap: 24px; flex-wrap: wrap;
+}
+.currentPlanLabel { font-size: 12px; color: #94a3b8; margin-bottom: 4px; }
+.currentPlanName  { font-size: 22px; font-weight: 700; color: #fff; display: flex; align-items: center; }
+
+.currentPlanStats { display: flex; gap: 24px; }
+.statBlock { display: flex; flex-direction: column; align-items: center; gap: 2px; }
+.statNum   { font-size: 22px; font-weight: 700; color: #00ffff; }
+.statLabel { font-size: 12px; color: #a1a1aa; }
+
+/* ── Billing toggle ── */
+.billingToggle {
+  display: inline-flex; gap: 4px; padding: 4px;
+  background-color: rgba(255,255,255,0.04);
+  border: 1px solid rgba(255,255,255,0.08);
+  border-radius: 10px; margin-bottom: 24px;
+}
+
+.billingOption {
+  position: relative;
+  display: flex; align-items: center; gap: 8px;
+  padding: 9px 18px; border-radius: 8px;
+  background: none; border: none; cursor: pointer;
+  font-family: 'Inter', sans-serif; font-size: 13px; font-weight: 500;
+  color: #94a3b8; transition: all 0.15s;
+}
+.billingOptionActive {
+  background: linear-gradient(135deg, #06b6d4 0%, #8b5cf6 100%);
+  color: #061826;
+}
+
+.billingBadge {
+  font-size: 11px; font-weight: 600; color: #4ade80;
+  background: rgba(34,197,94,0.15);
+  border-radius: 8px; padding: 2px 6px;
+}
+.billingOptionActive .billingBadge { color: #061826; background: rgba(0,0,0,0.15); }
+
+/* ── Plans grid ── */
+.plansGrid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+
+.planCard {
+  display: flex; flex-direction: column; gap: 16px;
+  padding: 24px;
+  background-color: rgba(255,255,255,0.02);
+  border: 1px solid rgba(255,255,255,0.08);
+  border-radius: 14px;
+}
+
+.planCardPremium {
+  border: 1px solid rgba(139,92,246,0.4);
+  background-color: rgba(139,92,246,0.06);
+  box-shadow: 0px 8px 32px 0px rgba(139,92,246,0.1);
+}
+
+.planHeader { display: flex; align-items: center; justify-content: space-between; }
+.planName   { font-size: 16px; font-weight: 700; color: #fff; }
+
+.planPrice  { font-size: 30px; font-weight: 700; color: #fff; }
+.planPeriod { font-size: 13px; font-weight: 400; color: #94a3b8; }
+
+.featuresList { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 10px; flex: 1; }
+.featuresList li { display: flex; align-items: flex-start; gap: 10px; font-size: 13px; color: #e7f0ff; line-height: 1.4; }
+
+.checkIcon {
+  flex-shrink: 0;
+  display: inline-flex; align-items: center; justify-content: center;
+  width: 18px; height: 18px; border-radius: 50%;
+  background-color: rgba(34,197,94,0.15); color: #4ade80;
+  font-size: 11px; font-weight: 700; margin-top: 1px;
+}
+
+/* ── Manage subscription ── */
+.manageRow {
+  display: flex; align-items: center; justify-content: space-between; gap: 16px;
+  padding: 14px 0;
+  border-bottom: 1px solid rgba(255,255,255,0.05);
+}
+.manageRow:last-of-type { border-bottom: none; }
+
+.manageInfo { display: flex; flex-direction: column; gap: 4px; }
+.manageLabel { font-size: 12px; color: #94a3b8; }
+.manageValue { font-size: 14px; font-weight: 500; color: #e7f0ff; }
+
+/* ── Danger zone ── */
+.dangerZone {
+  display: flex; align-items: center; justify-content: space-between; gap: 16px;
+  margin-top: 16px; padding-top: 20px;
+  border-top: 1px solid rgba(255,255,255,0.08);
+  flex-wrap: wrap;
+}
+.dangerTitle { font-size: 14px; font-weight: 600; color: #f87171; margin-bottom: 4px; }
+.dangerText  { font-size: 12px; color: #94a3b8; max-width: 420px; }
+
+/* ── Responsive ── */
+@media (max-width: 700px) {
+  .plansGrid { grid-template-columns: 1fr; }
+  .currentPlanRow { flex-direction: column; align-items: flex-start; }
+}
