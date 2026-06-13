@@ -1,0 +1,205 @@
+.card {
+  background: #1e1f27;
+  border: 1px solid rgba(255,255,255,0.08);
+  border-radius: 12px;
+  padding: 24px;
+}
+
+@property --vol-end {
+  syntax: "<angle>";
+  inherits: false;
+  initial-value: 0deg;
+}
+
+@property --hotel-end {
+  syntax: "<angle>";
+  inherits: false;
+  initial-value: 0deg;
+}
+
+@property --activites-end {
+  syntax: "<angle>";
+  inherits: false;
+  initial-value: 0deg;
+}
+
+.layout {
+  display: flex;
+  gap: 24px;
+  align-items: center;
+}
+
+.left {
+  flex: 0 0 200px;
+  display: flex;
+  justify-content: center;
+}
+
+.donut {
+  width: 160px;
+  height: 160px;
+  border-radius: 50%;
+  position: relative;
+  transition: --vol-end 0.8s ease, --hotel-end 0.8s ease, --activites-end 0.8s ease;
+  background: conic-gradient(
+    from -90deg,
+    #aa3bff 0deg var(--vol-end),
+    #A78BFA var(--vol-end) var(--hotel-end),
+    #4ade80 var(--hotel-end) var(--activites-end),
+    #64748b var(--activites-end) 360deg
+  );
+}
+
+.hole {
+  position: absolute;
+  width: 100px;
+  height: 100px;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  border-radius: 50%;
+  background: #1e1f27;
+}
+
+.centerText {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  pointer-events: none;
+}
+
+.total {
+  font-size: 24px;
+  font-weight: 700;
+  color: #ffffff;
+  line-height: 1;
+}
+
+.label {
+  margin-top: 6px;
+  font-size: 13px;
+  color: #a1a1aa;
+}
+
+.right {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.rows {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.row {
+  display: grid;
+  grid-template-columns: 120px 1fr auto;
+  gap: 12px;
+  align-items: center;
+}
+
+.rowHead {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+}
+
+.dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.rowLabel {
+  font-size: 14px;
+  color: #f3f4f6;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.barTrack {
+  height: 6px;
+  border-radius: 4px;
+  background: rgba(255,255,255,0.06);
+  overflow: hidden;
+}
+
+.barFill {
+  height: 100%;
+  border-radius: 4px;
+  transition: width 0.8s ease;
+}
+
+.rowAmount {
+  font-size: 14px;
+  font-weight: 600;
+  color: #f3f4f6;
+  min-width: 74px;
+  text-align: right;
+}
+
+.stats {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.pill {
+  border: 1px solid rgba(255,255,255,0.08);
+  border-radius: 10px;
+  background: rgba(255,255,255,0.03);
+  padding: 12px 14px;
+}
+
+.pillLabel {
+  font-size: 12px;
+  color: #a1a1aa;
+  margin-bottom: 4px;
+}
+
+.pillValue {
+  font-size: 18px;
+  font-weight: 700;
+  color: #f3f4f6;
+}
+
+.pillSuccess {
+  border-color: rgba(74,222,128,0.24);
+  background: rgba(74,222,128,0.08);
+}
+
+.pillSuccess .pillValue {
+  color: #4ade80;
+}
+
+.pillDanger {
+  border-color: rgba(248,113,113,0.24);
+  background: rgba(248,113,113,0.08);
+}
+
+.pillDanger .pillValue {
+  color: #f87171;
+}
+
+@media (max-width: 900px) {
+  .layout {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .left {
+    flex-basis: auto;
+  }
+}

@@ -3,7 +3,7 @@ import styles from "./Dashboard.module.css";
 import { useAuthStore } from "../../store/authStore";
 import { useVoyage } from "../../hooks/useVoyage";
 import { FREEMIUM } from "../../utils/constants";
-import { ProgressBar, ShareButton, DeleteButton, StreamingOutput, ItineraireJourJour, VolCard, HotelCard, ActiviteCard, MicroAnimated } from "../../components/ui";
+import { ProgressBar, ShareButton, DeleteButton, StreamingOutput, ItineraireJourJour, VolCard, HotelCard, ActiviteCard, MicroAnimated, BudgetChart } from "../../components/ui";
 import ShareModal from "../../components/modals/ShareModal";
 import DeleteConfirmModal from "../../components/modals/DeleteConfirmModal";
 
@@ -135,6 +135,13 @@ const MOCK_ACTIVITES = [
     categorie: "Nature"
   }
 ];
+
+const MOCK_BUDGET = {
+  total: 1500,
+  vols: 780,
+  hotel: 650,
+  activites: 70,
+};
 
 export default function Dashboard() {
   const [dark, setDark] = useState(() => {
@@ -330,6 +337,10 @@ useEffect(() => {
             {/* AI Streaming block */}
             <div className={styles.streamingWrapper}>
               <StreamingOutput prompt={streamPrompt} key={streamId} />
+            </div>
+
+            <div style={{ marginTop: 24 }}>
+              <BudgetChart budget={MOCK_BUDGET} />
             </div>
 
             {/* Results grid with title and subsections */}
