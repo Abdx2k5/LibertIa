@@ -7,7 +7,12 @@ const {
     supprimerVoyage,
     togglePartage,
     ajouterLike,
-    retirerLike
+    retirerLike,
+    getBudget,
+    updateBudget,
+    recalculerBudget,
+    getConseils,
+    regenererConseils
 } = require('../controllers/voyageController');
 const { proteger } = require('../middlewares/authMiddleware');
 
@@ -18,5 +23,12 @@ router.delete('/:id', proteger, supprimerVoyage);
 router.patch('/:id/partage', proteger, togglePartage);
 router.post('/:id/like', proteger, ajouterLike);
 router.delete('/:id/like', proteger, retirerLike);
+
+router.get('/:id/budget', proteger, getBudget);
+router.patch('/:id/budget', proteger, updateBudget);
+router.post('/:id/budget/recalculer', proteger, recalculerBudget);
+
+router.get('/:id/conseils', proteger, getConseils);
+router.post('/:id/conseils/regenerer', proteger, regenererConseils);
 
 module.exports = router;
