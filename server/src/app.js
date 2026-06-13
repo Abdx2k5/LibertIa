@@ -7,6 +7,7 @@ const authRoutes = require('./routes/authRoutes');
 const voyageRoutes = require('./routes/voyageRoutes');
 const compagnonRoutes = require('./routes/compagnonRoutes');
 const communityRoutes = require('./routes/communityRoutes');
+const dossierRoutes = require('./routes/dossierRoutes');
 
 const app = express();
 
@@ -16,7 +17,8 @@ app.use(cors({
     origin: "http://localhost:5173",
     credentials: true
 }));
-app.use(express.json());
+// limite augmentée pour l'upload de photos en base64 (T79)
+app.use(express.json({ limit: '5mb' }));
 
 app.use((req, res, next) => {
     const sanitize = (obj) => {
@@ -38,6 +40,7 @@ app.use('/api/auth', authRoutes);
 app.use('/api/voyages', voyageRoutes);
 app.use('/api/compagnon', compagnonRoutes);
 app.use('/api/community', communityRoutes);
+app.use('/api/dossiers', dossierRoutes);
 
 app.get('/', (_req, res) => {
     res.json({ message: '🐦 Libertia API is running', version: '1.0.0' });

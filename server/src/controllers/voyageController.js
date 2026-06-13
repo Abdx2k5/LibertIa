@@ -4,6 +4,8 @@ const path = require('path');
 const ROOT = path.join(__dirname, '..', '..', '..');
 const User = require('../models/User');
 const Voyage = require('../models/Voyage');
+const Comment = require('../models/Comment');
+const Dossier = require('../models/Dossier');
 const { estVoyageVisiblePour } = require('../utils/visibilite');
 
 // ─────────────────────────────────────────────
@@ -383,6 +385,10 @@ const supprimerVoyage = async (req, res) => {
         if (voyage.user.toString() !== req.user._id.toString()) {
             return res.status(403).json({ success: false, message: 'Non autorisé' });
         }
+        await Promise.all([
+            Comment.deleteMany({ voyage: voyage._id }),
+            Dossier.deleteOne({ voyage: voyage._id })
+        ]);
         await voyage.deleteOne();
         res.json({ success: true, message: 'Voyage supprimé' });
     } catch (err) {
