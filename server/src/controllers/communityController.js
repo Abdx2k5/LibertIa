@@ -1,0 +1,165 @@
+const Voyage = require('../models/Voyage');
+const Comment = require('../models/Comment');
+const User = require('../models/User');
+const { estVoyageVisiblePour } = require('../utils/visibilite');
+
+// ─────────────────────────────────────────────
+//  HELPER — Pagination (page/limit depuis req.query)
+// ─────────────────────────────────────────────
+function getPagination(req, { defaultLimit = 10, maxLimit = 20 } = {}) {
+    const page = Math.max(1, parseInt(req.query.page) || 1);
+    const limit = Math.min(maxLimit, Math.max(1, parseInt(req.query.limit) || defaultLimit));
+    return { page, limit, skip: (page - 1) * limit };
+}
+
+const FEED_SELECT = 'titre destination dates budget likes likeCount commentCount visibilite user createdAt itineraire.duree_jours itineraire.budget_estime';
+
+// ─────────────────────────────────────────────
+//  @GET /api/community/feed
+//  Query : page, limit, tri = recent | populaire | abonnements
+// ─────────────────────────────────────────────
+const getFeed = async (req, res) => {
+    try {
+        const { page, limit, skip } = getPagination(req);
+        const tri = req.query.tri || 'recent';
+
+        let query = { visibilite: 'public' };
+        let sort = { createdAt: -1 };
+
+        if (tri === 'populaire') {
+            sort = { likeCount: -1, createdAt: -1 };
+        } else if (tri === 'abonnements') {
+            const moi = await User.findById(req.user._id).select('following');
+            query = {
+                visibilite: { $in: ['public', 'amis'] },
+                user: { $in: moi?.following || [] }
+            };
+        }
+
+        const [voyages, total] = await Promise.all([
+            Voyage.find(query)
+                .select(FEED_SELECT)
+                .sort(sort)
+                .skip(skip)
+                .limit(limit)
+                .populate('user', 'nom profilePhoto'),
+            Voyage.countDocuments(query)
+        ]);
+
+        const feed = voyages.map(v => {
+            const voyage = v.toObject();
+            voyage.aLike = voyage.likes.some(id => id.toString() === req.user._id.toString());
+            delete voyage.likes;
+            return voyage;
+        });
+
+        res.json({
+            success: true,
+            voyages: feed,
+            page,
+            totalPages: Math.ceil(total / limit),
+            total
+        });
+    } catch (err) {
+        res.status(500).json({ success: false, message: err.message });
+    }
+};
+
+// ─────────────────────────────────────────────
+//  @GET /api/community/voyages/:id/commentaires
+// ─────────────────────────────────────────────
+const getCommentaires = async (req, res) => {
+    try {
+        const voyage = await Voyage.findById(req.params.id);
+        if (!voyage) return res.status(404).json({ success: false, message: 'Voyage non trouvé' });
+        if (!(await estVoyageVisiblePour(voyage, req.user))) {
+            return res.status(403).json({ success: false, message: 'Non autorisé' });
+        }
+
+        const { page, limit, skip } = getPagination(req, { defaultLimit: 20, maxLimit: 50 });
+
+        const [commentaires, total] = await Promise.all([
+            Comment.find({ voyage: voyage._id })
+                .sort({ createdAt: -1 })
+                .skip(skip)
+                .limit(limit)
+                .populate('user', 'nom profilePhoto'),
+            Comment.countDocuments({ voyage: voyage._id })
+        ]);
+
+        res.json({
+            success: true,
+            commentaires,
+            page,
+            totalPages: Math.ceil(total / limit),
+            total
+        });
+    } catch (err) {
+        res.status(500).json({ success: false, message: err.message });
+    }
+};
+
+// ─────────────────────────────────────────────
+//  @POST /api/community/voyages/:id/commentaires
+// ─────────────────────────────────────────────
+const ajouterCommentaire = async (req, res) => {
+    try {
+        const texte = (req.body.texte || '').trim();
+        if (!texte) {
+            return res.status(400).json({ success: false, message: 'Le commentaire ne peut pas être vide' });
+        }
+        if (texte.length > 1000) {
+            return res.status(400).json({ success: false, message: 'Le commentaire dépasse 1000 caractères' });
+        }
+
+        const voyage = await Voyage.findById(req.params.id);
+        if (!voyage) return res.status(404).json({ success: false, message: 'Voyage non trouvé' });
+        if (!(await estVoyageVisiblePour(voyage, req.user))) {
+            return res.status(403).json({ success: false, message: 'Non autorisé' });
+        }
+
+        const commentaire = await Comment.create({
+            voyage: voyage._id,
+            user: req.user._id,
+            texte
+        });
+        await commentaire.populate('user', 'nom profilePhoto');
+
+        await Voyage.updateOne({ _id: voyage._id }, { $inc: { commentCount: 1 } });
+
+        res.status(201).json({ success: true, commentaire, commentCount: voyage.commentCount + 1 });
+    } catch (err) {
+        res.status(500).json({ success: false, message: err.message });
+    }
+};
+
+// ─────────────────────────────────────────────
+//  @DELETE /api/community/voyages/:id/commentaires/:commentId
+//  Auteur du commentaire OU propriétaire du voyage
+// ─────────────────────────────────────────────
+const supprimerCommentaire = async (req, res) => {
+    try {
+        const commentaire = await Comment.findById(req.params.commentId);
+        if (!commentaire || commentaire.voyage.toString() !== req.params.id) {
+            return res.status(404).json({ success: false, message: 'Commentaire non trouvé' });
+        }
+
+        const voyage = await Voyage.findById(req.params.id);
+        if (!voyage) return res.status(404).json({ success: false, message: 'Voyage non trouvé' });
+
+        const estAuteur = commentaire.user.toString() === req.user._id.toString();
+        const estProprietaireVoyage = voyage.user.toString() === req.user._id.toString();
+        if (!estAuteur && !estProprietaireVoyage) {
+            return res.status(403).json({ success: false, message: 'Non autorisé' });
+        }
+
+        await commentaire.deleteOne();
+        await Voyage.updateOne({ _id: voyage._id }, { $inc: { commentCount: -1 } });
+
+        res.json({ success: true, commentCount: Math.max(0, voyage.commentCount - 1) });
+    } catch (err) {
+        res.status(500).json({ success: false, message: err.message });
+    }
+};
+
+module.exports = { getFeed, getCommentaires, ajouterCommentaire, supprimerCommentaire };

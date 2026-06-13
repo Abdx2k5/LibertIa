@@ -6,6 +6,7 @@ const connectDB = require('./config/db');
 const authRoutes = require('./routes/authRoutes');
 const voyageRoutes = require('./routes/voyageRoutes');
 const compagnonRoutes = require('./routes/compagnonRoutes');
+const communityRoutes = require('./routes/communityRoutes');
 
 const app = express();
 
@@ -36,6 +37,7 @@ app.use((req, res, next) => {
 app.use('/api/auth', authRoutes);
 app.use('/api/voyages', voyageRoutes);
 app.use('/api/compagnon', compagnonRoutes);
+app.use('/api/community', communityRoutes);
 
 app.get('/', (_req, res) => {
     res.json({ message: '🐦 Libertia API is running', version: '1.0.0' });
