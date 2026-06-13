@@ -1,14 +1,12 @@
 import { useState, useEffect } from "react";
 import styles from "./Profile.module.css";
 import { useAuthStore } from "../../store/authStore";
+import api from "../../services/api";
 import authService from "../../services/Auth.service";
-import { GaleriePhoto } from "../../components/ui";
-import { LogoutButton } from "../../components/ui";
+import { GaleriePhoto, LogoutButton, UploadPhoto } from "../../components/ui";
 import { FREEMIUM } from "../../utils/constants";
 
 const MAX_FREE_PROMPTS = FREEMIUM.MAX_FREE_PROMPTS;
-
-const imgAvatar = "https://www.figma.com/api/mcp/asset/0926e5cc-1f5e-4862-a22b-22daa1cef4d7";
 
 // Default preferences structure
 const DEFAULT_PREFERENCES = {
@@ -187,16 +185,21 @@ export default function Profile() {
         {/* ── Hero profil ── */}
         <div className={styles.hero}>
           <div className={styles.avatarWrap}>
-            <div className={styles.avatar}>
-              <img
-                src={user?.profilePhoto && user.profilePhoto !== "default-avatar.png"
-                  ? user.profilePhoto
-                  : imgAvatar}
-                alt="Avatar"
-                className={styles.avatarImg}
-              />
-            </div>
-            <button className={styles.avatarEditBtn} title="Changer la photo">✏️</button>
+            <UploadPhoto
+              currentPhoto={user?.profilePhoto && user.profilePhoto !== "default-avatar.png" ? user.profilePhoto : ""}
+              name={user?.nom}
+              onUpload={async (file) => {
+                const formData = new FormData();
+                formData.append("photo", file);
+                try {
+                  await api.patch("/api/auth/profile/photo", formData, {
+                    headers: { "Content-Type": "multipart/form-data" },
+                  });
+                } catch (e) {
+                  console.error(e);
+                }
+              }}
+            />
           </div>
           <div className={styles.heroInfo}>
             <h1 className={styles.heroName}>{user?.nom || "Utilisateur"}</h1>
