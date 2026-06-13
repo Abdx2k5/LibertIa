@@ -3,7 +3,7 @@ import styles from "./Dashboard.module.css";
 import { useAuthStore } from "../../store/authStore";
 import { useVoyage } from "../../hooks/useVoyage";
 import { FREEMIUM } from "../../utils/constants";
-import { ProgressBar, ShareButton, DeleteButton, StreamingOutput, ItineraireJourJour, VolCard, HotelCard, ActiviteCard, MicroAnimated, BudgetChart } from "../../components/ui";
+import { ProgressBar, ShareButton, DeleteButton, StreamingOutput, ItineraireJourJour, VolCard, HotelCard, ActiviteCard, MicroAnimated, BudgetChart, RechercheVoyages } from "../../components/ui";
 import ShareModal from "../../components/modals/ShareModal";
 import DeleteConfirmModal from "../../components/modals/DeleteConfirmModal";
 
@@ -181,6 +181,7 @@ export default function Dashboard() {
   const canGenerate = isPremium || (typeof promptsLeft === "number" && promptsLeft > 0);
 
   const loadVoyages = useCallback(() => { getMesVoyages(); }, [getMesVoyages]);
+  const handleRechercheVoyagesFilter = useCallback(() => {}, []);
   useEffect(() => { loadVoyages(); }, [loadVoyages]);
   useEffect(() => {
   localStorage.setItem("theme", dark ? "dark" : "light");
@@ -509,6 +510,10 @@ useEffect(() => {
                   </div>
                 </div>
               </div>
+
+              <section className={styles.rechercheVoyagesSection}>
+                <RechercheVoyages voyages={voyages} onFilter={handleRechercheVoyagesFilter} />
+              </section>
             </div>
           </div>
         </div>

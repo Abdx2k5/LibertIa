@@ -222,6 +222,12 @@
 .suggestWideImg     { width: 33%; height: 100%; object-fit: cover; flex-shrink: 0; }
 .suggestWideBody    { flex: 1; padding: 20px; display: flex; flex-direction: column; justify-content: center; }
 
+/* ── Voyage search ── */
+.rechercheVoyagesSection {
+  margin-top: 40px;
+  padding-bottom: 40px;
+}
+
 /* ── Modal ── */
 .modalOverlay {
   position: fixed; inset: 0;
