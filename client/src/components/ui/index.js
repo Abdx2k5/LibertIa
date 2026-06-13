@@ -28,3 +28,4 @@ export { default as StreamingOutput } from "./StreamingOutput";
 export { default as MicroAnimated } from "./MicroAnimated";
 export { default as UploadPhoto } from "./UploadPhoto";
 export { default as BudgetChart } from "./BudgetChart";
+export { default as ChatMessagerie } from "./ChatMessagerie";

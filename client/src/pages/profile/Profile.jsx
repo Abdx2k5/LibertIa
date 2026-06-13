@@ -3,7 +3,7 @@ import styles from "./Profile.module.css";
 import { useAuthStore } from "../../store/authStore";
 import api from "../../services/api";
 import authService from "../../services/Auth.service";
-import { GaleriePhoto, LogoutButton, UploadPhoto } from "../../components/ui";
+import { ChatMessagerie, GaleriePhoto, LogoutButton, UploadPhoto } from "../../components/ui";
 import { FREEMIUM } from "../../utils/constants";
 
 const MAX_FREE_PROMPTS = FREEMIUM.MAX_FREE_PROMPTS;
@@ -588,6 +588,12 @@ export default function Profile() {
             ]}
             colonnes={3}
           />
+        </div>
+
+        {/* ── Messagerie ── */}
+        <div className={styles.section}>
+          <h2 className={styles.sectionTitle}>Messagerie</h2>
+          <ChatMessagerie boxId="boite-voyage-japon" currentUser={user} />
         </div>
 
         {/* ── Zone danger ──*/}
