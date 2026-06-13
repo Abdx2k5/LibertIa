@@ -1,4 +1,5 @@
 import { useState, useEffect, useCallback } from "react";
+import { useNavigate } from "react-router-dom";
 import styles from "./Dashboard.module.css";
 import { useAuthStore } from "../../store/authStore";
 import { useVoyage } from "../../hooks/useVoyage";
@@ -147,6 +148,7 @@ export default function Dashboard() {
   const [dark, setDark] = useState(() => {
   return localStorage.getItem("theme") === "dark";
 });
+  const navigate = useNavigate();
   const { user } = useAuthStore();
   const { getMesVoyages, voyages } = useVoyage();
 
@@ -442,7 +444,13 @@ useEffect(() => {
                   )}
                 </div>
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', alignItems: 'flex-end' }}>
-                  <button className={styles.historyBtn}>{v.btnLabel || "Voir"}</button>
+                  <button
+                    className={styles.historyBtn}
+                    disabled={!(v._id || v.id)}
+                    onClick={() => navigate(`/voyage/${v._id || v.id}`)}
+                  >
+                    {v.btnLabel || "Voir"}
+                  </button>
                   {v._id || v.id ? (
                     <div style={{ display: 'flex', gap: '6px' }}>
                       <ShareButton 

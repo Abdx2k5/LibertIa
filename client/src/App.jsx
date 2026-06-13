@@ -18,6 +18,7 @@ import Community from "./pages/community/Community";
 
 // Pages privées (à créer)
 import Dashboard  from "./pages/dashboard/Dashboard";
+import VoyageDetail from "./pages/dashboard/VoyageDetail";
 import Profile    from "./pages/profile/Profile";
 import Settings   from "./pages/settings/Settings";
 import AdminPanel from "./pages/admin/AdminPanel";
@@ -44,6 +45,7 @@ export default function App() {
             <Route element={<PrivateRoute />}>
               <Route element={<DashboardLayout />}>
                 <Route path={ROUTES.DASHBOARD} element={<Dashboard />} />
+                <Route path={ROUTES.VOYAGE_DETAIL} element={<VoyageDetail />} />
                 <Route path={ROUTES.PROFILE}   element={<Profile />} />
                 <Route path={ROUTES.SETTINGS}  element={<Settings />} />
               </Route>
