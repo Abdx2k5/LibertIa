@@ -3,7 +3,7 @@ import { useParams, useNavigate, Link } from "react-router-dom";
 import styles from "./VoyageDetail.module.css";
 import { useVoyage } from "../../hooks/useVoyage";
 import voyageService from "../../services/voyage.service";
-import { Spinner, Button, Badge, ShareButton, DeleteButton } from "../../components/ui";
+import { Spinner, Button, Badge, ShareButton, DeleteButton, ExportPdfButton } from "../../components/ui";
 import ShareModal from "../../components/modals/ShareModal";
 import DeleteConfirmModal from "../../components/modals/DeleteConfirmModal";
 import { formatDate } from "../../utils/helpers";
@@ -76,6 +76,12 @@ export default function VoyageDetail() {
 
         <Link to={ROUTES.DASHBOARD} className={styles.backLink}>← Retour au tableau de bord</Link>
 
+        {/* ── En-tête d'impression (visible uniquement dans le PDF exporté) ── */}
+        <div className={styles.printHeader}>
+          <div className={styles.printHeaderBrand}>LibertIa — Itinéraire de voyage</div>
+          <div className={styles.printHeaderDate}>Exporté le {formatDate(new Date().toISOString())}</div>
+        </div>
+
         {/* ── Header ── */}
         <div className={styles.header}>
           <div>
@@ -96,6 +102,7 @@ export default function VoyageDetail() {
             </div>
           </div>
           <div className={styles.actions}>
+            <ExportPdfButton onExport={() => window.print()} variant="outline" />
             <ShareButton voyageId={voyage._id} onShare={() => setShareModalOpen(true)} variant="outline" />
             <DeleteButton voyageId={voyage._id} onDelete={() => setDeleteModalOpen(true)} variant="danger" />
           </div>
