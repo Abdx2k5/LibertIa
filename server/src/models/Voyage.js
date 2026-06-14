@@ -19,6 +19,15 @@ const voyageSchema = new mongoose.Schema({
         type: Boolean,
         default: false
     },
+    // T50 — Niveau de visibilité du voyage
+    //   prive  : visible uniquement par le propriétaire
+    //   amis   : visible par le propriétaire + ses followers
+    //   public : visible par tout le monde (fil communauté)
+    visibilite: {
+        type: String,
+        enum: ['prive', 'amis', 'public'],
+        default: 'prive'
+    },
     // Titre généré automatiquement (affichage liste)
     titre: {
         type: String,
@@ -60,6 +69,12 @@ const voyageSchema = new mongoose.Schema({
     likeCount: {
         type: Number,
         default: 0
+    },
+
+    // Compteur de commentaires optimisé (T59)
+    commentCount: {
+        type: Number,
+        default: 0
     }
 
 }, { timestamps: true });
@@ -67,6 +82,15 @@ const voyageSchema = new mongoose.Schema({
 //Met à jour likeCount avant sauvegarde
 voyageSchema.pre('save', function() {
     this.likeCount = this.likes.length;
+
+    // T50 — Garder `partage` synchronisé avec `visibilite` (rétrocompatibilité
+    // fil communauté + contrôle d'accès qui se basaient sur `partage`)
+    if (this.isModified('visibilite')) {
+        this.partage = this.visibilite !== 'prive';
+    } else if (this.isModified('partage')) {
+        if (this.partage && this.visibilite === 'prive') this.visibilite = 'public';
+        if (!this.partage) this.visibilite = 'prive';
+    }
 });
 
 // Ajouter un like
@@ -89,5 +113,8 @@ voyageSchema.index({ user: 1, createdAt: -1 });
 
 // Pour le fil d'actualité (voyages publics)
 voyageSchema.index({ partage: 1, createdAt: -1 });
+
+// T55 — Pour le fil communauté filtré par visibilité
+voyageSchema.index({ visibilite: 1, createdAt: -1 });
 
 module.exports = mongoose.model('Voyage', voyageSchema);

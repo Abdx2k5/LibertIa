@@ -4,6 +4,9 @@ const path = require('path');
 const ROOT = path.join(__dirname, '..', '..', '..');
 const User = require('../models/User');
 const Voyage = require('../models/Voyage');
+const Comment = require('../models/Comment');
+const Dossier = require('../models/Dossier');
+const { estVoyageVisiblePour } = require('../utils/visibilite');
 
 // ─────────────────────────────────────────────
 //  CONFIG Groq
@@ -122,6 +125,22 @@ function getDateIn(jours) {
     d.setDate(d.getDate() + jours);
     return d.toISOString().split('T')[0];
 }
+
+// ─────────────────────────────────────────────
+//  HELPER — Extraire un nombre depuis "120€", "85.50 €", etc.
+// ─────────────────────────────────────────────
+function parseNumber(value) {
+    if (typeof value === 'number') return value;
+    if (!value) return 0;
+    const match = String(value).replace(/\s/g, '').match(/\d+([.,]\d+)?/);
+    if (!match) return 0;
+    return parseFloat(match[0].replace(',', '.'));
+}
+
+// ─────────────────────────────────────────────
+//  HELPER T50 — Niveaux de visibilité autorisés
+// ─────────────────────────────────────────────
+const VISIBILITES = ['prive', 'amis', 'public'];
 
 // ─────────────────────────────────────────────
 //  HELPER — Extraire infos du prompt
@@ -349,7 +368,7 @@ const getVoyage = async (req, res) => {
     try {
         const voyage = await Voyage.findById(req.params.id);
         if (!voyage) return res.status(404).json({ message: 'Voyage non trouvé' });
-        if (!voyage.partage && voyage.user._id.toString() !== req.user._id.toString()) {
+        if (!(await estVoyageVisiblePour(voyage, req.user))) {
             return res.status(403).json({ success: false, message: 'Non autorisé' });
         }
         res.json(voyage);
@@ -366,6 +385,10 @@ const supprimerVoyage = async (req, res) => {
         if (voyage.user.toString() !== req.user._id.toString()) {
             return res.status(403).json({ success: false, message: 'Non autorisé' });
         }
+        await Promise.all([
+            Comment.deleteMany({ voyage: voyage._id }),
+            Dossier.deleteOne({ voyage: voyage._id })
+        ]);
         await voyage.deleteOne();
         res.json({ success: true, message: 'Voyage supprimé' });
     } catch (err) {
@@ -416,4 +439,185 @@ const retirerLike = async (req, res) => {
     }
 };
 
-module.exports = { genererVoyage, getMesVoyages, getVoyage, supprimerVoyage, togglePartage, ajouterLike, retirerLike };
+// @GET /api/voyages/:id/budget
+const getBudget = async (req, res) => {
+    try {
+        const voyage = await Voyage.findById(req.params.id);
+        if (!voyage) return res.status(404).json({ success: false, message: 'Voyage non trouvé' });
+        if (voyage.user.toString() !== req.user._id.toString()) {
+            return res.status(403).json({ success: false, message: 'Non autorisé' });
+        }
+        res.json({
+            success: true,
+            budget: voyage.budget,
+            budget_detail: voyage.itineraire?.budget_detail || null
+        });
+    } catch (err) {
+        res.status(500).json({ success: false, message: err.message });
+    }
+};
+
+// @PATCH /api/voyages/:id/budget
+const updateBudget = async (req, res) => {
+    try {
+        const voyage = await Voyage.findById(req.params.id);
+        if (!voyage) return res.status(404).json({ success: false, message: 'Voyage non trouvé' });
+        if (voyage.user.toString() !== req.user._id.toString()) {
+            return res.status(403).json({ success: false, message: 'Non autorisé' });
+        }
+
+        const { total, currency, budget_detail } = req.body;
+
+        if (total !== undefined) voyage.budget.total = total;
+        if (currency !== undefined) voyage.budget.currency = currency;
+
+        if (budget_detail && typeof budget_detail === 'object') {
+            voyage.itineraire.budget_detail = {
+                ...(voyage.itineraire.budget_detail || {}),
+                ...budget_detail
+            };
+            voyage.markModified('itineraire');
+        }
+
+        await voyage.save();
+        res.json({
+            success: true,
+            budget: voyage.budget,
+            budget_detail: voyage.itineraire?.budget_detail || null
+        });
+    } catch (err) {
+        res.status(500).json({ success: false, message: err.message });
+    }
+};
+
+// @POST /api/voyages/:id/budget/recalculer
+const recalculerBudget = async (req, res) => {
+    try {
+        const voyage = await Voyage.findById(req.params.id);
+        if (!voyage) return res.status(404).json({ success: false, message: 'Voyage non trouvé' });
+        if (voyage.user.toString() !== req.user._id.toString()) {
+            return res.status(403).json({ success: false, message: 'Non autorisé' });
+        }
+
+        const itineraire = voyage.itineraire || {};
+        const nuits = Math.max(1, Math.round((new Date(voyage.dates.end) - new Date(voyage.dates.start)) / 86400000));
+
+        const transport = parseNumber(itineraire.vol_recommande?.prix);
+        const hotel = parseNumber(itineraire.hebergement_recommande?.prix_nuit) * nuits;
+        const repas = parseNumber(itineraire.budget_detail?.repas);
+        const activites = parseNumber(itineraire.budget_detail?.activites);
+        const total = transport + hotel + repas + activites;
+
+        itineraire.budget_detail = { ...itineraire.budget_detail, transport, hotel, repas, activites, total };
+        voyage.itineraire = itineraire;
+        voyage.budget.total = total;
+        voyage.markModified('itineraire');
+
+        await voyage.save();
+        res.json({
+            success: true,
+            budget: voyage.budget,
+            budget_detail: itineraire.budget_detail
+        });
+    } catch (err) {
+        res.status(500).json({ success: false, message: err.message });
+    }
+};
+
+// @GET /api/voyages/:id/conseils
+const getConseils = async (req, res) => {
+    try {
+        const voyage = await Voyage.findById(req.params.id);
+        if (!voyage) return res.status(404).json({ success: false, message: 'Voyage non trouvé' });
+        if (!(await estVoyageVisiblePour(voyage, req.user))) {
+            return res.status(403).json({ success: false, message: 'Non autorisé' });
+        }
+        res.json({ success: true, conseils: voyage.itineraire?.conseils || [] });
+    } catch (err) {
+        res.status(500).json({ success: false, message: err.message });
+    }
+};
+
+// @POST /api/voyages/:id/conseils/regenerer
+const regenererConseils = async (req, res) => {
+    try {
+        const voyage = await Voyage.findById(req.params.id);
+        if (!voyage) return res.status(404).json({ success: false, message: 'Voyage non trouvé' });
+        if (voyage.user.toString() !== req.user._id.toString()) {
+            return res.status(403).json({ success: false, message: 'Non autorisé' });
+        }
+
+        const systemPrompt = `Tu es LibertIa, un expert en voyage. Réponds UNIQUEMENT en JSON valide, sans texte avant ou après.`;
+        const userPrompt = `Donne 5 conseils pratiques et utiles pour un voyage à ${voyage.destination}.
+JSON attendu :
+{
+  "conseils": ["conseil 1", "conseil 2", "conseil 3", "conseil 4", "conseil 5"]
+}`;
+
+        const responseText = await appelIA(systemPrompt, userPrompt, { temperature: 0.6, max_tokens: 500 });
+
+        let conseils;
+        try {
+            const jsonMatch = responseText.match(/\{[\s\S]*\}/);
+            const parsed = JSON.parse(jsonMatch[0]);
+            if (!Array.isArray(parsed.conseils)) throw new Error('Format invalide');
+            conseils = parsed.conseils;
+        } catch {
+            return res.status(502).json({ success: false, message: 'Réponse IA invalide, réessayez' });
+        }
+
+        voyage.itineraire = { ...voyage.itineraire, conseils };
+        voyage.markModified('itineraire');
+        await voyage.save();
+
+        res.json({ success: true, conseils });
+    } catch (err) {
+        res.status(500).json({ success: false, message: err.message });
+    }
+};
+
+// @GET /api/voyages/:id/privacite
+const getPrivacite = async (req, res) => {
+    try {
+        const voyage = await Voyage.findById(req.params.id);
+        if (!voyage) return res.status(404).json({ success: false, message: 'Voyage non trouvé' });
+        if (voyage.user.toString() !== req.user._id.toString()) {
+            return res.status(403).json({ success: false, message: 'Non autorisé' });
+        }
+        res.json({ success: true, visibilite: voyage.visibilite, partage: voyage.partage });
+    } catch (err) {
+        res.status(500).json({ success: false, message: err.message });
+    }
+};
+
+// @PATCH /api/voyages/:id/privacite
+const updatePrivacite = async (req, res) => {
+    try {
+        const voyage = await Voyage.findById(req.params.id);
+        if (!voyage) return res.status(404).json({ success: false, message: 'Voyage non trouvé' });
+        if (voyage.user.toString() !== req.user._id.toString()) {
+            return res.status(403).json({ success: false, message: 'Non autorisé' });
+        }
+
+        const { visibilite } = req.body;
+        if (!VISIBILITES.includes(visibilite)) {
+            return res.status(400).json({
+                success: false,
+                message: `visibilite doit être l'une de : ${VISIBILITES.join(', ')}`
+            });
+        }
+
+        voyage.visibilite = visibilite;
+        await voyage.save();
+
+        res.json({ success: true, visibilite: voyage.visibilite, partage: voyage.partage });
+    } catch (err) {
+        res.status(500).json({ success: false, message: err.message });
+    }
+};
+
+module.exports = {
+    genererVoyage, getMesVoyages, getVoyage, supprimerVoyage, togglePartage, ajouterLike, retirerLike,
+    getBudget, updateBudget, recalculerBudget, getConseils, regenererConseils,
+    getPrivacite, updatePrivacite
+};

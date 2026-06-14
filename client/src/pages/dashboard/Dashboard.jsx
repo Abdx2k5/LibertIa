@@ -3,8 +3,8 @@ import { useNavigate } from "react-router-dom";
 import styles from "./Dashboard.module.css";
 import { useAuthStore } from "../../store/authStore";
 import { useVoyage } from "../../hooks/useVoyage";
-import { ROUTES } from "../../utils/constants";
-import { ProgressBar, ShareButton, DeleteButton, StreamingOutput, ItineraireJourJour, VolCard, HotelCard, ActiviteCard, MicroAnimated } from "../../components/ui";
+import { FREEMIUM , ROUTES} from "../../utils/constants";
+import { ProgressBar, ShareButton, DeleteButton, StreamingOutput, ItineraireJourJour, VolCard, HotelCard, ActiviteCard, MicroAnimated, BudgetChart, RechercheVoyages } from "../../components/ui";
 import ShareModal from "../../components/modals/ShareModal";
 import DeleteConfirmModal from "../../components/modals/DeleteConfirmModal";
 
@@ -137,11 +137,19 @@ const MOCK_ACTIVITES = [
   }
 ];
 
+const MOCK_BUDGET = {
+  total: 1500,
+  vols: 780,
+  hotel: 650,
+  activites: 70,
+};
+
 export default function Dashboard() {
   const navigate = useNavigate();
   const [dark, setDark] = useState(() => {
   return localStorage.getItem("theme") === "dark";
 });
+  const navigate = useNavigate();
   const { user } = useAuthStore();
   const { getMesVoyages, voyages } = useVoyage();
 
@@ -176,6 +184,7 @@ export default function Dashboard() {
   const canGenerate = isPremium || (typeof promptsLeft === "number" && promptsLeft > 0);
 
   const loadVoyages = useCallback(() => { getMesVoyages(); }, [getMesVoyages]);
+  const handleRechercheVoyagesFilter = useCallback(() => {}, []);
   useEffect(() => { loadVoyages(); }, [loadVoyages]);
   useEffect(() => {
   localStorage.setItem("theme", dark ? "dark" : "light");
@@ -334,6 +343,10 @@ useEffect(() => {
               <StreamingOutput prompt={streamPrompt} key={streamId} />
             </div>
 
+            <div style={{ marginTop: 24 }}>
+              <BudgetChart budget={MOCK_BUDGET} />
+            </div>
+
             {/* Results grid with title and subsections */}
             <div style={{ animation: `${styles.fadeIn} 0.4s ease` }}>
               <h2 style={{ fontSize: 28, fontWeight: 700, color: '#f3f4f6', marginBottom: 8, position: 'relative', paddingBottom: 12 }}>
@@ -432,7 +445,13 @@ useEffect(() => {
                   )}
                 </div>
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', alignItems: 'flex-end' }}>
-                  <button className={styles.historyBtn}>{v.btnLabel || "Voir"}</button>
+                  <button
+                    className={styles.historyBtn}
+                    disabled={!(v._id || v.id)}
+                    onClick={() => navigate(`/voyage/${v._id || v.id}`)}
+                  >
+                    {v.btnLabel || "Voir"}
+                  </button>
                   {v._id || v.id ? (
                     <div style={{ display: 'flex', gap: '6px' }}>
                       <ShareButton 
@@ -500,6 +519,10 @@ useEffect(() => {
                   </div>
                 </div>
               </div>
+
+              <section className={styles.rechercheVoyagesSection}>
+                <RechercheVoyages voyages={voyages} onFilter={handleRechercheVoyagesFilter} />
+              </section>
             </div>
           </div>
         </div>

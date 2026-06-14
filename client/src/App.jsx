@@ -20,6 +20,7 @@ import Groups   from "./pages/community/Groups";
 // Pages privées (à créer)
 import Dashboard    from "./pages/dashboard/Dashboard";
 import Profile      from "./pages/profile/Profile";
+import VoyageDetail from "./pages/dashboard/VoyageDetail";
 import Settings     from "./pages/settings/Settings";
 import Subscription from "./pages/subscription/Subscription";
 import AgencyDetail from "./pages/agency/AgencyDetail";
@@ -53,6 +54,7 @@ export default function App() {
             <Route element={<PrivateRoute />}>
               <Route element={<DashboardLayout />}>
                 <Route path={ROUTES.DASHBOARD}    element={<Dashboard />} />
+                <Route path={ROUTES.VOYAGE_DETAIL} element={<VoyageDetail />} />
                 <Route path={ROUTES.PROFILE}      element={<Profile />} />
                 <Route path={ROUTES.SETTINGS}     element={<Settings />} />
                 <Route path={ROUTES.SUBSCRIPTION} element={<Subscription />} />
