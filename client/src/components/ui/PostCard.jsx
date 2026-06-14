@@ -1,5 +1,8 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import styles from "./PostCard.module.css";
+import LikeButton from "./LikeButton";
+import CommentSection from "./CommentSection";
+import ReportModal from "../modals/ReportModal";
 
 function formatCount(value) {
   if (value == null) return "0";
@@ -27,20 +30,8 @@ function initialsFromName(name = "") {
 }
 
 export default function PostCard({ post }) {
-  const [liked, setLiked] = useState(false);
-  const [likedPulse, setLikedPulse] = useState(false);
-
-  useEffect(() => {
-    if (!likedPulse) return undefined;
-
-    const timer = window.setTimeout(() => setLikedPulse(false), 180);
-    return () => window.clearTimeout(timer);
-  }, [likedPulse]);
-
-  const handleLike = () => {
-    setLiked((current) => !current);
-    setLikedPulse(true);
-  };
+  const [showComments, setShowComments] = useState(false);
+  const [reportOpen, setReportOpen] = useState(false);
 
   const authorName = post?.auteur?.nom || "Voyageur Libertia";
   const authorBadge = post?.auteur?.badge;
@@ -76,7 +67,18 @@ export default function PostCard({ post }) {
           </div>
         </div>
 
-        <span className={styles.time}>{post?.temps}</span>
+        <div className={styles.headerRight}>
+          <span className={styles.time}>{post?.temps}</span>
+          <button
+            type="button"
+            className={styles.reportButton}
+            onClick={() => setReportOpen(true)}
+            aria-label="Signaler cette publication"
+            title="Signaler"
+          >
+            ⚐
+          </button>
+        </div>
       </header>
 
       <div className={styles.body}>
@@ -124,17 +126,14 @@ export default function PostCard({ post }) {
 
       <footer className={styles.footer}>
         <div className={styles.actions}>
+          <LikeButton count={post?.likes || 0} />
+
           <button
             type="button"
-            className={`${styles.actionButton} ${liked ? styles.actionButtonLiked : ""} ${likedPulse ? styles.actionButtonPulse : ""}`}
-            onClick={handleLike}
-            aria-pressed={liked}
+            className={`${styles.actionButton} ${showComments ? styles.actionButtonActive : ""}`}
+            onClick={() => setShowComments((v) => !v)}
+            aria-expanded={showComments}
           >
-            <span className={styles.actionIcon}>❤️</span>
-            <span>{formatCount((post?.likes || 0) + (liked ? 1 : 0))}</span>
-          </button>
-
-          <button type="button" className={styles.actionButton}>
             <span className={styles.actionIcon}>💬</span>
             <span>{formatCount(post?.commentaires)}</span>
           </button>
@@ -150,11 +149,22 @@ export default function PostCard({ post }) {
         </button>
       </footer>
 
+      {showComments ? (
+        <CommentSection comments={post?.commentairesListe || []} />
+      ) : null}
+
       {isGroup ? (
         <button type="button" className={styles.groupCta}>
           Rejoindre le groupe
         </button>
       ) : null}
+
+      <ReportModal
+        isOpen={reportOpen}
+        onClose={() => setReportOpen(false)}
+        targetType="publication"
+        onSubmit={(payload) => console.log("Signalement:", post?.id, payload)}
+      />
     </article>
   );
 }

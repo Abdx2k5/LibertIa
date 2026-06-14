@@ -1,6 +1,7 @@
 import { useNavigate } from "react-router-dom";
 import styles from "./Community.module.css";
 import PostCard from "../../components/ui/PostCard";
+import FollowButton from "../../components/ui/FollowButton";
 import { ROUTES } from "../../utils/constants";
 
 import avatar1 from "../../assets/images/community/avatar-1.png";
@@ -242,9 +243,7 @@ export default function Community() {
                       <p className={styles.userInfo}>{user.info}</p>
                     </div>
                   </div>
-                  <button type="button" className={styles.followButton}>
-                    Suivre
-                  </button>
+                  <FollowButton size="sm" />
                 </div>
               ))}
             </div>

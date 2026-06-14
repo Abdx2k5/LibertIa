@@ -2,10 +2,10 @@ import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import styles from "./Profile.module.css";
 import { useAuthStore } from "../../store/authStore";
-import api from "../../services/api";
-import authService from "../../services/Auth.service";
-import { ChatMessagerie, GaleriePhoto, LogoutButton, UploadPhoto } from "../../components/ui";
+import authService from "../../services/auth.service";
+import { GaleriePhoto, LogoutButton } from "../../components/ui";
 import { FREEMIUM, ROUTES } from "../../utils/constants";
+import imgAvatar from "../../assets/images/community/avatar.png";
 
 const MAX_FREE_PROMPTS = FREEMIUM.MAX_FREE_PROMPTS;
 

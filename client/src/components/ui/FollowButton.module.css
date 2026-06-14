@@ -1,0 +1,88 @@
+.button {
+  position: relative;
+  border-radius: 999px;
+  font-weight: 700;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  white-space: nowrap;
+  transition: background 0.18s ease, border-color 0.18s ease, color 0.18s ease, transform 0.18s ease;
+}
+
+.button:active {
+  transform: scale(0.97);
+}
+
+.fullWidth {
+  width: 100%;
+}
+
+.sm {
+  font-size: 12px;
+  padding: 7px 14px;
+}
+
+.md {
+  font-size: 13px;
+  padding: 9px 18px;
+}
+
+/* ── pas encore suivi ── */
+.idle {
+  border: none;
+  color: #ffffff;
+  background: linear-gradient(135deg, #aa3bff, #7c3aed);
+  box-shadow: 0 8px 18px rgba(170, 59, 255, 0.25);
+}
+
+.idle:hover {
+  filter: brightness(1.08);
+}
+
+.plus {
+  font-size: 15px;
+  line-height: 1;
+}
+
+/* ── déjà abonné ── */
+.following {
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  background: rgba(255, 255, 255, 0.04);
+  color: #f3f4f6;
+}
+
+.following:hover {
+  border-color: rgba(239, 68, 68, 0.4);
+  background: rgba(239, 68, 68, 0.1);
+  color: #f87171;
+}
+
+.check {
+  color: #5eead4;
+}
+
+.following:hover .check {
+  color: #f87171;
+}
+
+/* swap des libellés au survol */
+.labelDefault,
+.labelHover {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.labelHover {
+  display: none;
+}
+
+.following:hover .labelDefault {
+  display: none;
+}
+
+.following:hover .labelHover {
+  display: inline-flex;
+}

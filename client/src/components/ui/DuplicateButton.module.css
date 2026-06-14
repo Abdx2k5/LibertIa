@@ -1,0 +1,86 @@
+.button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  border-radius: 999px;
+  font-weight: 700;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: background 0.18s ease, border-color 0.18s ease, color 0.18s ease, transform 0.18s ease;
+}
+
+.button:active {
+  transform: scale(0.97);
+}
+
+.button:disabled {
+  cursor: default;
+}
+
+.fullWidth {
+  width: 100%;
+}
+
+.sm {
+  font-size: 12px;
+  padding: 7px 14px;
+}
+
+.md {
+  font-size: 13px;
+  padding: 9px 16px;
+}
+
+/* ── variantes ── */
+.outline {
+  border: 1px solid rgba(170, 59, 255, 0.3);
+  background: transparent;
+  color: #f3f4f6;
+}
+
+.outline:hover {
+  background: rgba(170, 59, 255, 0.1);
+  border-color: rgba(170, 59, 255, 0.5);
+}
+
+.ghost {
+  border: none;
+  background: transparent;
+  color: #d8b4fe;
+}
+
+.ghost:hover {
+  background: rgba(170, 59, 255, 0.1);
+}
+
+.primary {
+  border: none;
+  color: #ffffff;
+  background: linear-gradient(135deg, #aa3bff, #7c3aed);
+}
+
+.primary:hover {
+  filter: brightness(1.08);
+}
+
+/* ── état terminé ── */
+.done {
+  border-color: rgba(16, 185, 129, 0.4) !important;
+  background: rgba(16, 185, 129, 0.12) !important;
+  color: #34d399 !important;
+}
+
+/* ── spinner ── */
+.spinner {
+  width: 13px;
+  height: 13px;
+  border-radius: 999px;
+  border: 2px solid rgba(255, 255, 255, 0.25);
+  border-top-color: #d8b4fe;
+  animation: spin 0.7s linear infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}

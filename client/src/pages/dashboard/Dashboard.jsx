@@ -149,7 +149,6 @@ export default function Dashboard() {
   const [dark, setDark] = useState(() => {
   return localStorage.getItem("theme") === "dark";
 });
-  const navigate = useNavigate();
   const { user } = useAuthStore();
   const { getMesVoyages, voyages } = useVoyage();
 

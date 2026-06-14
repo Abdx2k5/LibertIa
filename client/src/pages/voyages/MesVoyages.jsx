@@ -2,9 +2,7 @@ import { useEffect, useState, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import styles from "./MesVoyages.module.css";
 import { useVoyage } from "../../hooks/useVoyage";
-import { Badge, Button, ShareButton, DeleteButton } from "../../components/ui";
-import ShareModal from "../../components/modals/ShareModal";
-import DeleteConfirmModal from "../../components/modals/DeleteConfirmModal";
+import { Button, VisibilityToggle, VoyageActionsMenu } from "../../components/ui";
 import { ROUTES } from "../../utils/constants";
 
 // ── Voyages de démonstration (affichés si l'utilisateur n'a encore rien généré) ──
@@ -54,9 +52,6 @@ export default function MesVoyages() {
   const { voyages, loading, error, getMesVoyages } = useVoyage();
 
   const [expandedId, setExpandedId] = useState(null);
-  const [shareModalOpen, setShareModalOpen] = useState(false);
-  const [deleteModalOpen, setDeleteModalOpen] = useState(false);
-  const [selectedVoyage, setSelectedVoyage] = useState(null);
 
   const loadVoyages = useCallback(() => { getMesVoyages(); }, [getMesVoyages]);
   useEffect(() => { loadVoyages(); }, [loadVoyages]);
@@ -68,25 +63,20 @@ export default function MesVoyages() {
     setExpandedId((prev) => (prev === id ? null : id));
   };
 
-  const findVoyage = (id) => displayVoyages.find((v) => (v._id || v.id) === id);
-
-  const handleShareClick = (id) => {
-    setSelectedVoyage(findVoyage(id));
-    setShareModalOpen(true);
+  // ── Actions voyage (T45/T49/T51) — branchées en local/mock ──
+  const handleDelete = async (id) => {
+    // TODO: brancher sur DELETE /api/voyages/:id puis rafraîchir la liste
+    console.log("Suppression du voyage :", id);
   };
 
-  const handleDeleteClick = (id) => {
-    setSelectedVoyage(findVoyage(id));
-    setDeleteModalOpen(true);
+  const handleDuplicate = async (id) => {
+    // TODO: brancher sur POST /api/voyages/:id/duplicate puis rafraîchir
+    console.log("Duplication du voyage :", id);
   };
 
-  const handleConfirmDelete = async () => {
-    if (selectedVoyage) {
-      // TODO: brancher sur DELETE /api/voyages/:id puis rafraîchir la liste
-      console.log("Suppression du voyage :", selectedVoyage);
-      setDeleteModalOpen(false);
-      setSelectedVoyage(null);
-    }
+  const handleVisibility = (id, isPublic) => {
+    // TODO: brancher sur PATCH /api/voyages/:id { partage: isPublic }
+    console.log("Visibilité du voyage :", id, isPublic ? "public" : "privé");
   };
 
   return (
@@ -134,7 +124,11 @@ export default function MesVoyages() {
                       <h3 className={styles.cardTitle}>{v.titre || v.destination}</h3>
                       <p className={styles.cardDestination}>📍 {v.destination}</p>
                     </div>
-                    {v.partage && <Badge variant="cyan">Partagé</Badge>}
+                    <VisibilityToggle
+                      variant="segmented"
+                      isPublic={!!v.partage}
+                      onChange={(isPublic) => handleVisibility(id, isPublic)}
+                    />
                   </div>
 
                   <div className={styles.cardMeta}>
@@ -149,8 +143,15 @@ export default function MesVoyages() {
                     <Button variant="outline" size="sm" onClick={() => toggleExpand(id)}>
                       {isExpanded ? "Masquer l'itinéraire" : "Voir l'itinéraire"}
                     </Button>
-                    <ShareButton voyageId={id} onShare={handleShareClick} variant="outline" size="sm" />
-                    <DeleteButton voyageId={id} onDelete={handleDeleteClick} variant="danger" size="sm" />
+                    <div className={styles.actionsMenu}>
+                      <VoyageActionsMenu
+                        voyage={{ id, titre: v.titre || v.destination, isPublic: !!v.partage }}
+                        showVisibility={false}
+                        onDelete={handleDelete}
+                        onDuplicate={handleDuplicate}
+                        onVisibility={handleVisibility}
+                      />
+                    </div>
                   </div>
 
                   {isExpanded && (
@@ -177,27 +178,6 @@ export default function MesVoyages() {
           </div>
         )}
       </div>
-
-      {/* ── Modal de partage ── */}
-      {selectedVoyage && (
-        <ShareModal
-          isOpen={shareModalOpen}
-          onClose={() => { setShareModalOpen(false); setSelectedVoyage(null); }}
-          voyageTitle={selectedVoyage.titre || selectedVoyage.destination || "Mon voyage"}
-          voyageId={selectedVoyage._id || selectedVoyage.id}
-        />
-      )}
-
-      {/* ── Modal de suppression ── */}
-      {selectedVoyage && (
-        <DeleteConfirmModal
-          isOpen={deleteModalOpen}
-          onClose={() => { setDeleteModalOpen(false); setSelectedVoyage(null); }}
-          onConfirm={handleConfirmDelete}
-          voyageTitle={selectedVoyage.titre || selectedVoyage.destination || "Mon voyage"}
-          loading={false}
-        />
-      )}
     </div>
   );
 }

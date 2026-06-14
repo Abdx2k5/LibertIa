@@ -63,8 +63,10 @@
 }
 
 .cardActions {
-  display: flex; flex-wrap: wrap; gap: 8px;
+  display: flex; align-items: center; flex-wrap: wrap; gap: 8px;
 }
+
+.actionsMenu { margin-left: auto; }
 
 .itinerary {
   display: flex; flex-direction: column; gap: 12px;
