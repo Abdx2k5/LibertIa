@@ -52,7 +52,14 @@ const AI_EXAMPLES = [
   "Aventure au Maroc, 7 jours",
 ];
 
-const navItems = ["Accueil", "Vols", "Hébergements", "Activités", "Communauté"];
+const navItems = [
+  { label: "Accueil",     to: "/" },
+  { label: "Vols" },
+  { label: "Hébergements" },
+  { label: "Activités" },
+  { label: "Communauté",  to: "/community" },
+  { label: "Tarifs",      to: "/tarifs" },
+];
 
 const howItWorks = [
   { icon: imgIconAI,        title: "1. Exprimez votre voyage", text: "Parlez ou écrivez vos envies. Pas besoin de formulaires complexes." },
@@ -165,7 +172,13 @@ export default function Landing() {
           {/* Links desktop */}
           <div className={styles.navLinks}>
             {navItems.map((item) => (
-              <button key={item} className={styles.navLink}>{item}</button>
+              <button
+                key={item.label}
+                className={styles.navLink}
+                onClick={item.to ? () => navigate(item.to) : undefined}
+              >
+                {item.label}
+              </button>
             ))}
           </div>
 
@@ -202,8 +215,12 @@ export default function Landing() {
         {/* ── MENU MOBILE ── */}
         <div className={`${styles.mobileMenu} ${menuOpen ? styles.mobileMenuOpen : ""}`}>
           {navItems.map((item) => (
-            <button key={item} className={styles.mobileNavLink} onClick={() => setMenuOpen(false)}>
-              {item}
+            <button
+              key={item.label}
+              className={styles.mobileNavLink}
+              onClick={() => { setMenuOpen(false); if (item.to) navigate(item.to); }}
+            >
+              {item.label}
             </button>
           ))}
           <div className={styles.mobileActions}>

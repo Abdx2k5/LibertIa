@@ -1,8 +1,9 @@
 import { useState, useEffect, useCallback } from "react";
+import { useNavigate } from "react-router-dom";
 import styles from "./Dashboard.module.css";
 import { useAuthStore } from "../../store/authStore";
 import { useVoyage } from "../../hooks/useVoyage";
-import { FREEMIUM } from "../../utils/constants";
+import { ROUTES } from "../../utils/constants";
 import { ProgressBar, ShareButton, DeleteButton, StreamingOutput, ItineraireJourJour, VolCard, HotelCard, ActiviteCard, MicroAnimated } from "../../components/ui";
 import ShareModal from "../../components/modals/ShareModal";
 import DeleteConfirmModal from "../../components/modals/DeleteConfirmModal";
@@ -137,6 +138,7 @@ const MOCK_ACTIVITES = [
 ];
 
 export default function Dashboard() {
+  const navigate = useNavigate();
   const [dark, setDark] = useState(() => {
   return localStorage.getItem("theme") === "dark";
 });
@@ -450,7 +452,7 @@ useEffect(() => {
                 </div>
               </div>
             ))}
-            <button className={styles.seeAllBtn}>Voir tout l'historique</button>
+            <button className={styles.seeAllBtn} onClick={() => navigate(ROUTES.MY_TRIPS)}>Voir tout l'historique</button>
           </div>
 
           {/* Colonne droite — Suggestions */}
@@ -513,7 +515,7 @@ useEffect(() => {
               Vous avez utilisé vos {MAX_FREE_PROMPTS} prompts gratuits ce mois-ci.
               Passez à Premium pour des itinéraires illimités.
             </p>
-            <button className={styles.modalBtnPrimary}>Passer à Premium</button>
+            <button className={styles.modalBtnPrimary} onClick={() => navigate(ROUTES.SUBSCRIPTION)}>Passer à Premium</button>
             <button className={styles.modalBtnSecondary} onClick={() => setShowLimitModal(false)}>
               Continuer gratuitement
             </button>

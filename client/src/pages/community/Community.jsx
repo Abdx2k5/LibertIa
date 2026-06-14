@@ -1,5 +1,7 @@
+import { useNavigate } from "react-router-dom";
 import styles from "./Community.module.css";
 import PostCard from "../../components/ui/PostCard";
+import { ROUTES } from "../../utils/constants";
 
 import avatar1 from "../../assets/images/community/avatar-1.png";
 import avatar2 from "../../assets/images/community/avatar-2.png";
@@ -142,6 +144,7 @@ const upcomingEvents = [
 ];
 
 export default function Community() {
+  const navigate = useNavigate();
   const activeTab = "Pour vous";
 
   return (
@@ -178,7 +181,7 @@ export default function Community() {
               </div>
             </div>
 
-            <button type="button" className={styles.heroButton}>
+            <button type="button" className={styles.heroButton} onClick={() => navigate(ROUTES.GROUPS)}>
               Rejoindre un voyage de groupe
             </button>
           </header>
@@ -263,7 +266,7 @@ export default function Community() {
             <h2 className={styles.sidebarTitle}>Groupes populaires</h2>
             <div className={styles.groupList}>
               {popularGroups.map((group) => (
-                <div key={group.nom} className={styles.groupRow}>
+                <div key={group.nom} className={styles.groupRow} onClick={() => navigate(ROUTES.GROUPS)}>
                   <div>
                     <p className={styles.groupName}>{group.nom}</p>
                     <p className={styles.groupInfo}>{group.membres}</p>
@@ -272,6 +275,9 @@ export default function Community() {
                 </div>
               ))}
             </div>
+            <button type="button" className={styles.followButton} style={{ width: "100%", marginTop: 12 }} onClick={() => navigate(ROUTES.GROUPS)}>
+              Découvrir tous les groupes
+            </button>
           </section>
 
           <section className={styles.sidebarCard}>

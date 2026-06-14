@@ -1,8 +1,9 @@
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import styles from "./Subscription.module.css";
 import { useAuthStore } from "../../store/authStore";
 import { Badge, Button, Modal } from "../../components/ui";
-import { FREEMIUM } from "../../utils/constants";
+import { FREEMIUM, ROUTES } from "../../utils/constants";
 
 const PREMIUM_FEATURES = [
   "Itinéraires illimités générés par l'IA",
@@ -25,6 +26,7 @@ const PLANS = {
 };
 
 export default function Subscription() {
+  const navigate = useNavigate();
   const { user, updateUser } = useAuthStore();
   const isPremium = user?.abonnement === "premium";
   const promptsUsed = user?.promptsUtilises || 0;
@@ -91,7 +93,10 @@ export default function Subscription() {
           <div className={styles.section}>
             <h2 className={styles.sectionTitle}>Passer à Premium</h2>
             <p className={styles.sectionSub}>
-              Débloquez des itinéraires illimités et profitez de tous les avantages Libertia.
+              Débloquez des itinéraires illimités et profitez de tous les avantages Libertia.{" "}
+              <button type="button" className={styles.linkBtn} onClick={() => navigate(ROUTES.PRICING)}>
+                Voir la comparaison détaillée des tarifs →
+              </button>
             </p>
 
             {/* Toggle mensuel / annuel */}

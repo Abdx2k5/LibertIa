@@ -15,6 +15,7 @@ import Landing  from "./pages/landing/Landing";
 import Login    from "./pages/auth/Login";
 import Register from "./pages/auth/Register";
 import Community from "./pages/community/Community";
+import Groups   from "./pages/community/Groups";
 
 // Pages privées (à créer)
 import Dashboard    from "./pages/dashboard/Dashboard";
@@ -22,8 +23,12 @@ import Profile      from "./pages/profile/Profile";
 import Settings     from "./pages/settings/Settings";
 import Subscription from "./pages/subscription/Subscription";
 import AgencyDetail from "./pages/agency/AgencyDetail";
+import MesVoyages   from "./pages/voyages/MesVoyages";
 import AdminPanel   from "./pages/admin/AdminPanel";
 import NotFound     from "./pages/NotFound";
+
+// Pages publiques (marketing)
+import Pricing      from "./pages/pricing/Pricing";
 
 import { ROUTES } from "./utils/constants";
 
@@ -40,6 +45,8 @@ export default function App() {
               <Route path={ROUTES.LOGIN}    element={<Login />} />
               <Route path={ROUTES.REGISTER} element={<Register />} />
               <Route path={ROUTES.COMMUNITY} element={<Community />} />
+              <Route path={ROUTES.GROUPS}    element={<Groups />} />
+              <Route path={ROUTES.PRICING}   element={<Pricing />} />
             </Route>
 
             {/* ── Pages privées (user connecté) ──────────── */}
@@ -50,6 +57,7 @@ export default function App() {
                 <Route path={ROUTES.SETTINGS}     element={<Settings />} />
                 <Route path={ROUTES.SUBSCRIPTION} element={<Subscription />} />
                 <Route path={ROUTES.AGENCY_DETAIL} element={<AgencyDetail />} />
+                <Route path={ROUTES.MY_TRIPS} element={<MesVoyages />} />
               </Route>
             </Route>
 

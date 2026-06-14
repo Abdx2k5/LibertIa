@@ -8,6 +8,9 @@ export const ROUTES = {
   SETTINGS:     "/settings",
   SUBSCRIPTION: "/abonnement",
   AGENCY_DETAIL: "/agence/:id",
+  PRICING:      "/tarifs",
+  MY_TRIPS:     "/mes-voyages",
+  GROUPS:       "/groupes",
   ADMIN:        "/admin",
   NOT_FOUND:    "*",
 };
