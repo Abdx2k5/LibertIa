@@ -1,6 +1,7 @@
 const Voyage = require('../models/Voyage');
 const Comment = require('../models/Comment');
 const User = require('../models/User');
+const Groupe = require('../models/Groupe');
 const { estVoyageVisiblePour } = require('../utils/visibilite');
 
 // ─────────────────────────────────────────────
@@ -10,6 +11,28 @@ function getPagination(req, { defaultLimit = 10, maxLimit = 20 } = {}) {
     const page = Math.max(1, parseInt(req.query.page) || 1);
     const limit = Math.min(maxLimit, Math.max(1, parseInt(req.query.limit) || defaultLimit));
     return { page, limit, skip: (page - 1) * limit };
+}
+
+// ─────────────────────────────────────────────
+//  HELPER — Échapper les caractères spéciaux regex (T68)
+// ─────────────────────────────────────────────
+function echapperRegex(texte) {
+    return texte.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+}
+
+// ─────────────────────────────────────────────
+//  HELPER — Filtre des voyages visibles par l'utilisateur (T68)
+//  (public, ses propres voyages, ou voyages "amis" des comptes suivis)
+// ─────────────────────────────────────────────
+async function construireFiltreVisibilite(user) {
+    const moi = await User.findById(user._id).select('following');
+    return {
+        $or: [
+            { visibilite: 'public' },
+            { user: user._id },
+            { visibilite: 'amis', user: { $in: moi?.following || [] } }
+        ]
+    };
 }
 
 const FEED_SELECT = 'titre destination dates budget likes likeCount commentCount visibilite user createdAt itineraire.duree_jours itineraire.budget_estime';
@@ -162,4 +185,230 @@ const supprimerCommentaire = async (req, res) => {
     }
 };
 
-module.exports = { getFeed, getCommentaires, ajouterCommentaire, supprimerCommentaire };
+// ─────────────────────────────────────────────
+//  @POST /api/community/groupes
+//  Crée un groupe (le créateur devient automatiquement membre)
+// ─────────────────────────────────────────────
+const creerGroupe = async (req, res) => {
+    try {
+        const nom = (req.body.nom || '').trim();
+        if (!nom) {
+            return res.status(400).json({ success: false, message: 'Le nom du groupe est requis' });
+        }
+        if (nom.length > 100) {
+            return res.status(400).json({ success: false, message: 'Le nom du groupe dépasse 100 caractères' });
+        }
+
+        const description = (req.body.description || '').trim();
+        if (description.length > 1000) {
+            return res.status(400).json({ success: false, message: 'La description dépasse 1000 caractères' });
+        }
+
+        const tags = Array.isArray(req.body.tags)
+            ? req.body.tags.map(t => String(t).trim().toLowerCase()).filter(Boolean)
+            : [];
+
+        const groupe = await Groupe.create({
+            nom,
+            description,
+            image: req.body.image || '',
+            destination: (req.body.destination || '').trim(),
+            tags,
+            createur: req.user._id,
+            membres: [req.user._id]
+        });
+        await groupe.populate('createur', 'nom profilePhoto');
+
+        res.status(201).json({ success: true, data: groupe });
+    } catch (err) {
+        res.status(500).json({ success: false, message: err.message });
+    }
+};
+
+// ─────────────────────────────────────────────
+//  @GET /api/community/groupes
+//  Liste paginée de tous les groupes
+// ─────────────────────────────────────────────
+const getGroupes = async (req, res) => {
+    try {
+        const { page, limit, skip } = getPagination(req);
+
+        const [groupes, total] = await Promise.all([
+            Groupe.find()
+                .sort({ createdAt: -1 })
+                .skip(skip)
+                .limit(limit)
+                .populate('createur', 'nom profilePhoto'),
+            Groupe.countDocuments()
+        ]);
+
+        const data = groupes.map(g => {
+            const groupe = g.toObject();
+            groupe.membreCount = groupe.membres.length;
+            delete groupe.membres;
+            return groupe;
+        });
+
+        res.json({
+            success: true,
+            data,
+            page,
+            totalPages: Math.ceil(total / limit),
+            total
+        });
+    } catch (err) {
+        res.status(500).json({ success: false, message: err.message });
+    }
+};
+
+// ─────────────────────────────────────────────
+//  @GET /api/community/groupes/:id
+//  Détails d'un groupe + membres populés
+// ─────────────────────────────────────────────
+const getGroupe = async (req, res) => {
+    try {
+        const groupe = await Groupe.findById(req.params.id)
+            .populate('createur', 'nom profilePhoto')
+            .populate('membres', 'nom profilePhoto');
+
+        if (!groupe) return res.status(404).json({ success: false, message: 'Groupe non trouvé' });
+
+        res.json({ success: true, data: groupe });
+    } catch (err) {
+        res.status(500).json({ success: false, message: err.message });
+    }
+};
+
+// ─────────────────────────────────────────────
+//  @POST /api/community/groupes/:id/rejoindre
+// ─────────────────────────────────────────────
+const rejoindreGroupe = async (req, res) => {
+    try {
+        const groupe = await Groupe.findById(req.params.id);
+        if (!groupe) return res.status(404).json({ success: false, message: 'Groupe non trouvé' });
+
+        const dejaMembre = groupe.membres.some(id => id.toString() === req.user._id.toString());
+        if (dejaMembre) {
+            return res.status(400).json({ success: false, message: 'Vous êtes déjà membre de ce groupe' });
+        }
+
+        groupe.membres.push(req.user._id);
+        await groupe.save();
+
+        res.json({ success: true, data: { membreCount: groupe.membres.length } });
+    } catch (err) {
+        res.status(500).json({ success: false, message: err.message });
+    }
+};
+
+// ─────────────────────────────────────────────
+//  @POST /api/community/groupes/:id/quitter
+// ─────────────────────────────────────────────
+const quitterGroupe = async (req, res) => {
+    try {
+        const groupe = await Groupe.findById(req.params.id);
+        if (!groupe) return res.status(404).json({ success: false, message: 'Groupe non trouvé' });
+
+        const estMembre = groupe.membres.some(id => id.toString() === req.user._id.toString());
+        if (!estMembre) {
+            return res.status(400).json({ success: false, message: 'Vous n\'êtes pas membre de ce groupe' });
+        }
+        if (groupe.createur.toString() === req.user._id.toString()) {
+            return res.status(400).json({ success: false, message: 'Le créateur ne peut pas quitter son propre groupe' });
+        }
+
+        groupe.membres = groupe.membres.filter(id => id.toString() !== req.user._id.toString());
+        await groupe.save();
+
+        res.json({ success: true, data: { membreCount: groupe.membres.length } });
+    } catch (err) {
+        res.status(500).json({ success: false, message: err.message });
+    }
+};
+
+// ─────────────────────────────────────────────
+//  @GET /api/community/recherche?q=...&type=posts|groupes|users|all
+//  Recherche transversale (regex insensible à la casse), limitée à 10
+//  résultats par type
+// ─────────────────────────────────────────────
+const RECHERCHE_LIMIT = 10;
+const RECHERCHE_TYPES = ['posts', 'groupes', 'users', 'all'];
+
+const recherche = async (req, res) => {
+    try {
+        const q = (req.query.q || '').trim();
+        const type = req.query.type || 'all';
+
+        if (!q) {
+            return res.status(400).json({ success: false, message: 'Le paramètre de recherche "q" est requis' });
+        }
+        if (!RECHERCHE_TYPES.includes(type)) {
+            return res.status(400).json({ success: false, message: 'Type de recherche invalide' });
+        }
+
+        const regex = new RegExp(echapperRegex(q), 'i');
+        const data = {};
+        const taches = [];
+
+        if (type === 'posts' || type === 'all') {
+            taches.push((async () => {
+                const filtreVisibilite = await construireFiltreVisibilite(req.user);
+                data.posts = await Voyage.find({
+                    $and: [
+                        filtreVisibilite,
+                        { $or: [{ titre: regex }, { destination: regex }, { prompt: regex }] }
+                    ]
+                })
+                    .select('titre destination dates visibilite user createdAt')
+                    .sort({ createdAt: -1 })
+                    .limit(RECHERCHE_LIMIT)
+                    .populate('user', 'nom profilePhoto');
+            })());
+        }
+
+        if (type === 'groupes' || type === 'all') {
+            taches.push((async () => {
+                const groupes = await Groupe.find({
+                    $or: [{ nom: regex }, { destination: regex }, { tags: regex }]
+                })
+                    .sort({ createdAt: -1 })
+                    .limit(RECHERCHE_LIMIT)
+                    .populate('createur', 'nom profilePhoto');
+
+                data.groupes = groupes.map(g => {
+                    const groupe = g.toObject();
+                    groupe.membreCount = groupe.membres.length;
+                    delete groupe.membres;
+                    return groupe;
+                });
+            })());
+        }
+
+        if (type === 'users' || type === 'all') {
+            taches.push((async () => {
+                data.users = await User.find({ nom: regex })
+                    .select('nom profilePhoto')
+                    .limit(RECHERCHE_LIMIT);
+            })());
+        }
+
+        await Promise.all(taches);
+
+        res.json({ success: true, data });
+    } catch (err) {
+        res.status(500).json({ success: false, message: err.message });
+    }
+};
+
+module.exports = {
+    getFeed,
+    getCommentaires,
+    ajouterCommentaire,
+    supprimerCommentaire,
+    creerGroupe,
+    getGroupes,
+    getGroupe,
+    rejoindreGroupe,
+    quitterGroupe,
+    recherche
+};
