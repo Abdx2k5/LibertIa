@@ -69,6 +69,12 @@ const voyageSchema = new mongoose.Schema({
     likeCount: {
         type: Number,
         default: 0
+    },
+
+    // Compteur de commentaires optimisé (T59)
+    commentCount: {
+        type: Number,
+        default: 0
     }
 
 }, { timestamps: true });
@@ -107,5 +113,8 @@ voyageSchema.index({ user: 1, createdAt: -1 });
 
 // Pour le fil d'actualité (voyages publics)
 voyageSchema.index({ partage: 1, createdAt: -1 });
+
+// T55 — Pour le fil communauté filtré par visibilité
+voyageSchema.index({ visibilite: 1, createdAt: -1 });
 
 module.exports = mongoose.model('Voyage', voyageSchema);
