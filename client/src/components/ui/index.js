@@ -18,6 +18,7 @@ export { default as LogoutButton   } from "./LogoutButton";
 export { default as ProgressBar    } from "./ProgressBar";
 export { default as ShareButton    } from "./ShareButton";
 export { default as DeleteButton   } from "./DeleteButton";
+export { default as ExportPdfButton } from "./ExportPdfButton";
 export { default as ItineraireJourJour } from "./ItineraireJourJour";
 export { default as VolCard } from "./VolCard";
 export { default as HotelCard } from "./HotelCard";
