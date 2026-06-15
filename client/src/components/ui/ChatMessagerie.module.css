@@ -180,6 +180,14 @@
   color: #6b7280;
 }
 
+/* ── T84 — Indicateur "X est en train d'écrire..." ── */
+.typingIndicator {
+  margin: 0;
+  font-size: 12px;
+  color: #6b7280;
+  font-style: italic;
+}
+
 .inputBar {
   display: flex;
   align-items: center;

@@ -1,5 +1,7 @@
 const express = require('express');
 const cors = require('cors');
+const http = require('http');
+const { Server } = require('socket.io');
 require('dotenv').config();
 
 const connectDB = require('./config/db');
@@ -8,6 +10,8 @@ const voyageRoutes = require('./routes/voyageRoutes');
 const compagnonRoutes = require('./routes/compagnonRoutes');
 const communityRoutes = require('./routes/communityRoutes');
 const dossierRoutes = require('./routes/dossierRoutes');
+const boiteRoutes = require('./routes/boiteRoutes');
+const { initBoiteSocket } = require('./sockets/boiteSocket');
 
 const app = express();
 
@@ -41,13 +45,26 @@ app.use('/api/voyages', voyageRoutes);
 app.use('/api/compagnon', compagnonRoutes);
 app.use('/api/community', communityRoutes);
 app.use('/api/dossiers', dossierRoutes);
+app.use('/api/boites', boiteRoutes);
 
 app.get('/', (_req, res) => {
     res.json({ message: '🐦 Libertia API is running', version: '1.0.0' });
 });
 
 const PORT = process.env.PORT || 5000;
-app.listen(PORT, () => {
+
+// T84 — serveur HTTP partagé entre Express et Socket.IO
+const server = http.createServer(app);
+const io = new Server(server, {
+    cors: {
+        origin: "http://localhost:5173",
+        credentials: true
+    }
+});
+
+initBoiteSocket(io);
+
+server.listen(PORT, () => {
     console.log(` Serveur Libertia démarré sur le port ${PORT}`);
 });
 
