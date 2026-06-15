@@ -1,6 +1,7 @@
 const Boite = require('../models/Boite');
 const Message = require('../models/Message');
 const User = require('../models/User');
+const { creerNotification } = require('./notificationController');
 
 // ─────────────────────────────────────────────
 //  @POST /api/boites
@@ -99,6 +100,15 @@ const inviterMembre = async (req, res) => {
 
         boite.membres.push(utilisateur._id);
         await boite.save();
+
+        // T71 — notifie l'utilisateur invité
+        await creerNotification({
+            destinataire: utilisateur._id,
+            expediteur: req.user._id,
+            type: 'invitation_boite',
+            contenu: `${req.user.nom} vous a invité dans la boîte "${boite.nom}"`,
+            lien: `/profile/boites/${boite._id}`
+        });
 
         const boiteMaj = await Boite.findById(boite._id)
             .populate('membres', 'nom email profilePhoto')

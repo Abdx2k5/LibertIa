@@ -8,6 +8,7 @@ const Comment = require('../models/Comment');
 const Dossier = require('../models/Dossier');
 const { estVoyageVisiblePour } = require('../utils/visibilite');
 const { geocoderDestination } = require('../utils/geocoding');
+const { creerNotification } = require('./notificationController');
 
 // ─────────────────────────────────────────────
 //  CONFIG Groq
@@ -468,6 +469,16 @@ const ajouterLike = async (req, res) => {
             return res.status(400).json({ success: false, message: 'Vous ne pouvez pas liker votre propre voyage' });
         }
         await voyage.ajouterLike(req.user._id);
+
+        // T71 — notifie le propriétaire du voyage
+        await creerNotification({
+            destinataire: voyage.user,
+            expediteur: req.user._id,
+            type: 'like',
+            contenu: `${req.user.nom} a aimé votre voyage "${voyage.titre}"`,
+            lien: `/voyage/${voyage._id}`
+        });
+
         res.json({ success: true, likeCount: voyage.likeCount });
     } catch (err) {
         res.status(500).json({ success: false, message: err.message });
