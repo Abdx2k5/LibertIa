@@ -4,7 +4,7 @@ import styles from "./Dashboard.module.css";
 import { useAuthStore } from "../../store/authStore";
 import { useVoyage } from "../../hooks/useVoyage";
 import { FREEMIUM , ROUTES} from "../../utils/constants";
-import { ProgressBar, ShareButton, DeleteButton, StreamingOutput, ItineraireJourJour, VolCard, HotelCard, ActiviteCard, MicroAnimated, BudgetChart, RechercheVoyages, NotificationBell } from "../../components/ui";
+import { ProgressBar, ShareButton, DeleteButton, StreamingOutput, ItineraireJourJour, VolCard, HotelCard, ActiviteCard, MicroAnimated, BudgetChart, RechercheVoyages, NotificationBell, PaymentModal } from "../../components/ui";
 import ShareModal from "../../components/modals/ShareModal";
 import DeleteConfirmModal from "../../components/modals/DeleteConfirmModal";
 
@@ -156,6 +156,7 @@ export default function Dashboard() {
   const [selectedVol, setSelectedVol] = useState(null);
   const [selectedHotel, setSelectedHotel] = useState(null);
   const [addedActivites, setAddedActivites] = useState([]);
+  const [paymentModalOpen, setPaymentModalOpen] = useState(false);
 
   // ── Lit sessionStorage une seule fois (fix cascading renders) ──
   const [prompt, setPrompt] = useState(() => {
@@ -242,6 +243,14 @@ useEffect(() => {
       // After deletion, refresh voyages list:
       // await getMesVoyages();
     }
+  };
+
+  // ── T102 — Paiement confirmé : ferme la modal et réinitialise la sélection ──
+  const handlePaymentSuccess = () => {
+    setPaymentModalOpen(false);
+    setSelectedVol(null);
+    setSelectedHotel(null);
+    setAddedActivites([]);
   };
 
   return (
@@ -412,7 +421,7 @@ useEffect(() => {
                 Total : {selectedVol.prix + selectedHotel.prixTotal}€
               </div>
             </div>
-            <button className={styles.confirmBtn}>Confirmer la réservation →</button>
+            <button className={styles.confirmBtn} onClick={() => setPaymentModalOpen(true)}>Confirmer la réservation →</button>
           </div>
         )}
 
@@ -570,6 +579,16 @@ useEffect(() => {
           onConfirm={handleConfirmDelete}
           voyageTitle={selectedVoyage.title || selectedVoyage.prompt || "Mon voyage"}
           loading={false}
+        />
+      )}
+
+      {/* ── PAYMENT MODAL (T102) ── */}
+      {selectedVol && selectedHotel && (
+        <PaymentModal
+          isOpen={paymentModalOpen}
+          amount={selectedVol.prix + selectedHotel.prixTotal}
+          onSuccess={handlePaymentSuccess}
+          onCancel={() => setPaymentModalOpen(false)}
         />
       )}
 
