@@ -12,6 +12,7 @@ export const ROUTES = {
   PRICING:      "/tarifs",
   MY_TRIPS:     "/mes-voyages",
   GROUPS:       "/groupes",
+  FORUMS:       "/forums",
   ADMIN:        "/admin",
   DESIGN_SYSTEM: "/design-system",
   NOT_FOUND:    "*",

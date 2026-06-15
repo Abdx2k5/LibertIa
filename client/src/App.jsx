@@ -16,6 +16,7 @@ import Login    from "./pages/auth/Login";
 import Register from "./pages/auth/Register";
 import Community from "./pages/community/Community";
 import Groups   from "./pages/community/Groups";
+import Forums   from "./pages/community/Forums";
 
 // Pages privées (à créer)
 import Dashboard    from "./pages/dashboard/Dashboard";
@@ -50,6 +51,7 @@ export default function App() {
               <Route path={ROUTES.REGISTER} element={<Register />} />
               <Route path={ROUTES.COMMUNITY} element={<Community />} />
               <Route path={ROUTES.GROUPS}    element={<Groups />} />
+              <Route path={ROUTES.FORUMS}    element={<Forums />} />
               <Route path={ROUTES.PRICING}   element={<Pricing />} />
               <Route path={ROUTES.DESIGN_SYSTEM} element={<DesignSystem />} />
             </Route>

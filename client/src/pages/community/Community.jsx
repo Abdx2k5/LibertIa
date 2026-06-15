@@ -280,6 +280,16 @@ export default function Community() {
           </section>
 
           <section className={styles.sidebarCard}>
+            <h2 className={styles.sidebarTitle}>Forums de discussion</h2>
+            <p className={styles.groupInfo} style={{ marginBottom: 12 }}>
+              Posez vos questions et échangez avec la communauté de voyageurs.
+            </p>
+            <button type="button" className={styles.followButton} style={{ width: "100%" }} onClick={() => navigate(ROUTES.FORUMS)}>
+              Ouvrir les forums
+            </button>
+          </section>
+
+          <section className={styles.sidebarCard}>
             <h2 className={styles.sidebarTitle}>Événements à venir</h2>
             <div className={styles.eventList}>
               {upcomingEvents.map((event) => (
