@@ -1,0 +1,269 @@
+/* =============================================================
+   FICHIER  : src/components/ui/UploadMultiplePhotos.module.css
+   TÂCHE    : T77 — Upload multiple photos avec compression
+   ============================================================= */
+
+.wrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+/* ── Zone de dépôt ── */
+.dropzone {
+  border: 2px dashed rgba(170, 59, 255, 0.3);
+  background: #1e1f27;
+  border-radius: 12px;
+  padding: 32px 20px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  text-align: center;
+  cursor: pointer;
+  transition: border-color 0.2s ease, background 0.2s ease;
+}
+
+.dropzone:hover,
+.dropzoneActive {
+  border-color: #aa3bff;
+  background: rgba(170, 59, 255, 0.05);
+}
+
+.dropzone:focus-visible {
+  outline: 2px solid #aa3bff;
+  outline-offset: 2px;
+}
+
+.dropzoneIcon {
+  color: #aa3bff;
+  display: flex;
+  margin-bottom: 4px;
+}
+
+.dropzoneText {
+  color: #f3f4f6;
+  font-size: 14px;
+  font-weight: 600;
+  margin: 0;
+}
+
+.dropzoneHint {
+  color: #6b7280;
+  font-size: 12px;
+  margin: 0;
+}
+
+.hiddenInput {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+.notice {
+  margin: 0;
+  font-size: 12px;
+  color: #6b7280;
+}
+
+/* ── Fichiers rejetés ── */
+.rejectionList {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.rejectionItem {
+  font-size: 12px;
+  color: #f87171;
+  background: rgba(248, 113, 113, 0.08);
+  border: 1px solid rgba(248, 113, 113, 0.2);
+  border-radius: 8px;
+  padding: 6px 10px;
+}
+
+/* ── Grille de prévisualisation ── */
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+  gap: 12px;
+}
+
+.thumb {
+  position: relative;
+  background: #1e1f27;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 12px;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+.thumbImg {
+  width: 100%;
+  aspect-ratio: 1 / 1;
+  object-fit: cover;
+  display: block;
+  background: rgba(255, 255, 255, 0.04);
+}
+
+.thumbPlaceholder {
+  width: 100%;
+  aspect-ratio: 1 / 1;
+  background: rgba(255, 255, 255, 0.04);
+}
+
+.removeBtn {
+  position: absolute;
+  top: 6px;
+  right: 6px;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  border: none;
+  background: rgba(0, 0, 0, 0.55);
+  color: #f3f4f6;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  z-index: 2;
+  padding: 0;
+  transition: background 0.2s ease;
+}
+
+.removeBtn:hover {
+  background: rgba(239, 68, 68, 0.8);
+}
+
+.thumbInfo {
+  padding: 6px 8px 4px;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.thumbName {
+  font-size: 11px;
+  color: #f3f4f6;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.thumbSize {
+  font-size: 10px;
+  color: #6b7280;
+}
+
+/* ── Barre de progression par fichier (3px) ── */
+.progressTrack {
+  height: 3px;
+  width: 100%;
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.progressFill {
+  height: 100%;
+  width: 0%;
+  background: #aa3bff;
+  transition: width 0.3s ease;
+}
+
+/* ── Statuts (compression / succès / erreur) ── */
+.thumbStatus {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 6px 8px;
+  font-size: 11px;
+  color: #6b7280;
+}
+
+.thumbSuccess {
+  color: #4ade80;
+}
+
+.thumbError {
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 4px;
+}
+
+.thumbErrorMsg {
+  display: flex;
+  align-items: flex-start;
+  gap: 4px;
+  color: #f87171;
+  line-height: 1.3;
+}
+
+.retryBtn {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  background: rgba(170, 59, 255, 0.1);
+  border: 1px solid rgba(170, 59, 255, 0.3);
+  color: #aa3bff;
+  border-radius: 6px;
+  padding: 3px 8px;
+  font-size: 11px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s ease, border-color 0.2s ease;
+}
+
+.retryBtn:hover {
+  background: rgba(170, 59, 255, 0.2);
+  border-color: #aa3bff;
+}
+
+/* ── Spinner de compression ── */
+.spinner {
+  display: inline-block;
+  width: 11px;
+  height: 11px;
+  border-radius: 50%;
+  border: 2px solid rgba(170, 59, 255, 0.2);
+  border-top-color: #aa3bff;
+  animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+/* ── Bouton de téléversement ── */
+.uploadBtn {
+  align-self: flex-start;
+  background: #aa3bff;
+  color: #ffffff;
+  border: none;
+  border-radius: 12px;
+  padding: 11px 24px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  font-family: 'Inter', sans-serif;
+  transition: background 0.2s ease, opacity 0.2s ease;
+}
+
+.uploadBtn:hover:not(:disabled) {
+  background: #9433e6;
+}
+
+.uploadBtn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}

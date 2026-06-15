@@ -4,7 +4,7 @@ import styles from "./Profile.module.css";
 import { useAuthStore } from "../../store/authStore";
 import authService from "../../services/auth.service";
 import dossierService from "../../services/dossier.service";
-import { GaleriePhoto, CarteMapbox, LogoutButton } from "../../components/ui";
+import { GaleriePhoto, CarteMapbox, LogoutButton, Modal, UploadMultiplePhotos } from "../../components/ui";
 import { FREEMIUM, ROUTES } from "../../utils/constants";
 import imgAvatar from "../../assets/images/community/avatar.png";
 
@@ -22,6 +22,14 @@ const GalleryIcon = () => (
 const MapIcon = () => (
   <svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden="true">
     <path d="M9 20l-5.447-2.724A1 1 0 0 1 3 16.382V5.618a1 1 0 0 1 1.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0 0 21 18.382V7.618a1 1 0 0 0-.553-.894L15 4m0 13V4m0 0L9 7" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+  </svg>
+);
+
+// ── Icône inline (T77) ──
+const UploadIcon = () => (
+  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+    <path d="M12 16V4m0 0L7 9m5-5 5 5" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+    <path d="M4 16v2a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-2" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
   </svg>
 );
 
@@ -90,6 +98,12 @@ export default function Profile() {
   const [souvenirsCarte, setSouvenirsCarte] = useState([]);
   const [souvenirsLoading, setSouvenirsLoading] = useState(false);
 
+  // T77 — Modal de téléversement de souvenirs (photos multiples)
+  const [showUploadModal, setShowUploadModal] = useState(false);
+  const [dossiers, setDossiers] = useState([]);
+  const [selectedDossierId, setSelectedDossierId] = useState("");
+  const [dossiersLoading, setDossiersLoading] = useState(false);
+
   const promptsUsed = user?.promptsUtilises || 0;
   const promptsLeft = FREEMIUM.MAX_FREE_PROMPTS - promptsUsed;
   const avatarSrc = user?.profilePhoto && user.profilePhoto !== "default-avatar.png"
@@ -130,6 +144,44 @@ export default function Profile() {
       actif = false;
     };
   }, [activeSection]);
+
+  // T77 — Charge la liste des carnets (dossiers) à l'ouverture de la modale
+  // de téléversement, pour permettre de choisir le carnet cible
+  useEffect(() => {
+    if (!showUploadModal) return;
+    let actif = true;
+    setDossiersLoading(true);
+    dossierService
+      .getMesDossiers()
+      .then((data) => {
+        if (!actif) return;
+        const liste = Array.isArray(data?.dossiers) ? data.dossiers : [];
+        setDossiers(liste);
+        setSelectedDossierId((prev) => prev || (liste[0]?._id || ""));
+      })
+      .catch(() => {
+        if (actif) setDossiers([]);
+      })
+      .finally(() => {
+        if (actif) setDossiersLoading(false);
+      });
+    return () => {
+      actif = false;
+    };
+  }, [showUploadModal]);
+
+  // T77 — Appelé une fois le lot de photos envoyé : ferme la modale et
+  // rafraîchit la carte des souvenirs avec les nouvelles données
+  const handleUploadComplete = (uploadedPhotos) => {
+    if (!uploadedPhotos || uploadedPhotos.length === 0) return;
+    setShowUploadModal(false);
+    setSouvenirsLoading(true);
+    dossierService
+      .getCarteSouvenirs()
+      .then((data) => setSouvenirsCarte(Array.isArray(data?.data) ? data.data : []))
+      .catch(() => {})
+      .finally(() => setSouvenirsLoading(false));
+  };
 
   // Validation functions
   const validateField = (name, value) => {
@@ -742,26 +794,38 @@ export default function Profile() {
                 <div className={styles.sectionHeader}>
                   <h2 className={styles.sectionTitle}>Mes souvenirs personnels</h2>
 
-                  {/* T85 — bascule Galerie / Carte */}
-                  <div className={styles.souvenirsToggle} role="group" aria-label="Mode d'affichage des souvenirs">
+                  <div className={styles.sectionHeaderActions}>
+                    {/* T77 — ouvre la modale de téléversement de photos */}
                     <button
                       type="button"
-                      className={`${styles.souvenirsBtn} ${souvenirsVue === "galerie" ? styles.souvenirsBtnActive : ""}`}
-                      onClick={() => setSouvenirsVue("galerie")}
-                      aria-pressed={souvenirsVue === "galerie"}
+                      className={styles.btnUpload}
+                      onClick={() => setShowUploadModal(true)}
                     >
-                      <GalleryIcon />
-                      Galerie
+                      <UploadIcon />
+                      Téléverser des souvenirs
                     </button>
-                    <button
-                      type="button"
-                      className={`${styles.souvenirsBtn} ${souvenirsVue === "carte" ? styles.souvenirsBtnActive : ""}`}
-                      onClick={() => setSouvenirsVue("carte")}
-                      aria-pressed={souvenirsVue === "carte"}
-                    >
-                      <MapIcon />
-                      Carte
-                    </button>
+
+                    {/* T85 — bascule Galerie / Carte */}
+                    <div className={styles.souvenirsToggle} role="group" aria-label="Mode d'affichage des souvenirs">
+                      <button
+                        type="button"
+                        className={`${styles.souvenirsBtn} ${souvenirsVue === "galerie" ? styles.souvenirsBtnActive : ""}`}
+                        onClick={() => setSouvenirsVue("galerie")}
+                        aria-pressed={souvenirsVue === "galerie"}
+                      >
+                        <GalleryIcon />
+                        Galerie
+                      </button>
+                      <button
+                        type="button"
+                        className={`${styles.souvenirsBtn} ${souvenirsVue === "carte" ? styles.souvenirsBtnActive : ""}`}
+                        onClick={() => setSouvenirsVue("carte")}
+                        aria-pressed={souvenirsVue === "carte"}
+                      >
+                        <MapIcon />
+                        Carte
+                      </button>
+                    </div>
                   </div>
                 </div>
 
@@ -777,6 +841,48 @@ export default function Profile() {
                 ) : (
                   <GaleriePhoto photos={MOCK_PHOTOS} colonnes={3} />
                 )}
+
+                {/* T77 — Modale de téléversement de photos multiples */}
+                <Modal
+                  isOpen={showUploadModal}
+                  onClose={() => setShowUploadModal(false)}
+                  title="Téléverser des souvenirs"
+                  size="lg"
+                >
+                  {dossiersLoading ? (
+                    <p className={styles.souvenirsCarteLoading}>Chargement de vos carnets...</p>
+                  ) : dossiers.length === 0 ? (
+                    <p className={styles.bioPlaceholder}>
+                      Créez un voyage pour commencer à ajouter des souvenirs.
+                    </p>
+                  ) : (
+                    <>
+                      {dossiers.length > 1 && (
+                        <div className={styles.fieldGroup} style={{ marginBottom: 16 }}>
+                          <label className={styles.label} htmlFor="dossierSelect">Carnet de voyage</label>
+                          <select
+                            id="dossierSelect"
+                            className={styles.selectInput}
+                            value={selectedDossierId}
+                            onChange={(e) => setSelectedDossierId(e.target.value)}
+                          >
+                            {dossiers.map((d) => (
+                              <option key={d._id} value={d._id}>
+                                {d.titre || d.voyage?.titre || d.voyage?.destination || "Carnet"}
+                              </option>
+                            ))}
+                          </select>
+                        </div>
+                      )}
+
+                      <UploadMultiplePhotos
+                        key={selectedDossierId}
+                        folderId={selectedDossierId}
+                        onUploadComplete={handleUploadComplete}
+                      />
+                    </>
+                  )}
+                </Modal>
               </div>
             )}
 
