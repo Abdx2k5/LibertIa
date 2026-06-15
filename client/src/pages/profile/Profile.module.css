@@ -148,10 +148,42 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 12px;
   margin-bottom: 20px;
 }
 
 .sectionHeader .sectionTitle { margin: 0; }
+
+/* ── T77 — Actions de l'en-tête de section (bouton + bascule) ── */
+.sectionHeaderActions {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+/* ── T77 — Bouton d'ouverture de la modale de téléversement ── */
+.btnUpload {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: rgba(170, 59, 255, 0.1);
+  border: 1px solid rgba(170, 59, 255, 0.3);
+  color: #aa3bff;
+  border-radius: 8px;
+  padding: 8px 16px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  font-family: 'Inter', sans-serif;
+  transition: background 0.2s ease, border-color 0.2s ease;
+}
+
+.btnUpload:hover {
+  background: rgba(170, 59, 255, 0.2);
+  border-color: #aa3bff;
+}
 
 /* ── T85 — Bascule Galerie / Carte (souvenirs) ── */
 .souvenirsToggle {
