@@ -28,6 +28,15 @@ const FILTERS = [
   { id: "groupe", label: "👥 Groupe" },
 ];
 
+// T18 — exemples de prompts cliquables pour amorcer la saisie
+const PROMPT_EXAMPLES = [
+  "Un week-end romantique à Rome avec 600€",
+  "10 jours au Japon en avril, budget 2000€",
+  "Road trip côtier au Portugal en van",
+  "Plage et farniente à Bali pour 2 semaines",
+  "City break culturel à Vienne, 4 jours",
+];
+
 const DEMO_HISTORY = [
   { id: 1, date: "10 juin 2024", title: "Recherche Tokyo 🇯🇵", subtitle: "Vol + Hôtel proposés • Budget respecté", badge: { label: "Budget 1500€", color: "#4ade80", bg: "rgba(34,197,94,0.1)", border: "rgba(34,197,94,0.2)" }, btnLabel: "Voir les résultats" },
   { id: 2, date: "5 juin 2024",  title: "Hôtel Paris 🇫🇷",    subtitle: "3 hôtels trouvés dans votre budget",   badge: { label: "Dépassement +50€", color: "#f97316", bg: "rgba(249,115,22,0.1)", border: "rgba(249,115,22,0.2)" }, btnLabel: "Réserver à nouveau" },
@@ -312,6 +321,21 @@ export default function Dashboard() {
               </button>
             </div>
           </form>
+
+          {/* ── T18 — Exemples cliquables ── */}
+          <div className={styles.examples}>
+            <span className={styles.examplesLabel}>💡 Essayez :</span>
+            {PROMPT_EXAMPLES.map((ex) => (
+              <button
+                key={ex}
+                type="button"
+                className={styles.exampleChip}
+                onClick={() => setPrompt(ex)}
+              >
+                {ex}
+              </button>
+            ))}
+          </div>
 
           {/* ── Compteur prompts ── */}
           {/* Vient directement de user.promptsRestants (backend) */}

@@ -14,6 +14,8 @@ import DashboardLayout from "./components/layout/DashboardLayout";
 import Landing  from "./pages/landing/Landing";
 import Login    from "./pages/auth/Login";
 import Register from "./pages/auth/Register";
+import ForgotPassword from "./pages/auth/ForgotPassword";
+import ResetPassword  from "./pages/auth/ResetPassword";
 import Community from "./pages/community/Community";
 import Groups   from "./pages/community/Groups";
 import Forums   from "./pages/community/Forums";
@@ -51,6 +53,8 @@ export default function App() {
               <Route path={ROUTES.HOME}     element={<Landing />} />
               <Route path={ROUTES.LOGIN}    element={<Login />} />
               <Route path={ROUTES.REGISTER} element={<Register />} />
+              <Route path={ROUTES.FORGOT_PASSWORD} element={<ForgotPassword />} />
+              <Route path={ROUTES.RESET_PASSWORD}  element={<ResetPassword />} />
               <Route path={ROUTES.COMMUNITY} element={<Community />} />
               <Route path={ROUTES.GROUPS}    element={<Groups />} />
               <Route path={ROUTES.FORUMS}    element={<Forums />} />

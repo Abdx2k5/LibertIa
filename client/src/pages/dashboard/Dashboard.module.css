@@ -121,6 +121,27 @@
 .sendBtn:disabled { opacity: 0.6; cursor: not-allowed; }
 .btnImg { width: 24px; height: 24px; }
 
+/* ── T18 — Exemples de prompts ── */
+.examples {
+  display: flex; flex-wrap: wrap; align-items: center; justify-content: center;
+  gap: 8px; max-width: 760px; margin: -10px auto 0;
+}
+.examplesLabel { font-size: 13px; font-weight: 600; color: #a1a1aa; }
+.exampleChip {
+  background: rgba(255,255,255,0.04);
+  border: 1px solid rgba(255,255,255,0.1);
+  border-radius: 999px; padding: 7px 14px;
+  font-size: 13px; color: #d4d4d8;
+  cursor: pointer; font-family: 'Inter', sans-serif;
+  transition: all 0.15s;
+}
+.exampleChip:hover {
+  background: rgba(0,255,255,0.08);
+  border-color: rgba(0,255,255,0.4);
+  color: #00ffff;
+  transform: translateY(-1px);
+}
+
 /* ── Prompt counter ── */
 .promptCounter { display: flex; align-items: center; gap: 8px; font-size: 13px; color: #a1a1aa; }
 .promptNum     { color: #00ffff; font-weight: 600; }
