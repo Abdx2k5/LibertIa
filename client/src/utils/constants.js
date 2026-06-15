@@ -13,6 +13,7 @@ export const ROUTES = {
   MY_TRIPS:     "/mes-voyages",
   GROUPS:       "/groupes",
   ADMIN:        "/admin",
+  DESIGN_SYSTEM: "/design-system",
   NOT_FOUND:    "*",
 };
 
