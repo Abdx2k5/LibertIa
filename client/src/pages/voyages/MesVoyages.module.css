@@ -25,6 +25,56 @@
   border-radius: 10px; padding: 12px 16px; margin-bottom: 20px;
 }
 
+/* ── T44 — Bascule Liste / Carte ── */
+.viewToggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px;
+  margin-bottom: 20px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.viewBtn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  border: none;
+  background: transparent;
+  color: #9ca3af;
+  font-size: 13px;
+  font-weight: 700;
+  padding: 7px 16px;
+  border-radius: 999px;
+  cursor: pointer;
+  transition: color 0.18s ease, background 0.18s ease;
+}
+
+.viewBtn:hover {
+  color: #f3f4f6;
+}
+
+.viewBtnActive {
+  color: #ffffff;
+  background: linear-gradient(135deg, #aa3bff, #7c3aed);
+  box-shadow: 0 6px 14px rgba(170, 59, 255, 0.28);
+}
+
+/* ── T44 — Carte interactive des voyages ── */
+.carteWrap {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.carteLoading {
+  margin: 0;
+  font-size: 13px;
+  color: #6b7280;
+}
+
 .errorText { font-size: 13px; color: #f87171; margin-bottom: 16px; }
 
 .emptyState {

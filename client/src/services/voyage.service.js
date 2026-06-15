@@ -123,6 +123,12 @@ const voyageService = {
     return response.data;
   },
 
+  // GET /api/voyages/carte — T44 : voyages géolocalisés pour la carte interactive
+  getCarte: async () => {
+    const response = await api.get("/api/voyages/carte");
+    return response.data;
+  },
+
   // DELETE /api/voyages/:id
   deleteVoyage: async (id) => {
     const response = await api.delete(`/api/voyages/${id}`);

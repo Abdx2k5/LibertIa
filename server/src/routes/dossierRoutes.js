@@ -3,6 +3,7 @@ const router = express.Router();
 const {
     getMesDossiers,
     getDossier,
+    getCarteSouvenirs,
     updateDossier,
     ajouterPhoto,
     supprimerPhoto
@@ -10,6 +11,8 @@ const {
 const { proteger } = require('../middlewares/authMiddleware');
 
 router.get('/mes-dossiers', proteger, getMesDossiers);
+// T85 — route littérale "/carte" déclarée avant "/voyage/:voyageId"
+router.get('/carte', proteger, getCarteSouvenirs);
 router.get('/voyage/:voyageId', proteger, getDossier);
 router.patch('/:id', proteger, updateDossier);
 router.post('/:id/photos', proteger, ajouterPhoto);

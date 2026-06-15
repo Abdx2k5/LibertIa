@@ -42,14 +42,20 @@ const voyageSchema = new mongoose.Schema({
     
     // Dates pour calculer la durée
     dates: {
-        start: { 
-            type: Date, 
-            required: true 
+        start: {
+            type: Date,
+            required: true
         },
-        end: { 
-            type: Date, 
-            required: true 
+        end: {
+            type: Date,
+            required: true
         }
+    },
+    // T44/T85 — Coordonnées géographiques de la destination
+    // (géocodées automatiquement via Nominatim/OpenStreetMap)
+    coordonnees: {
+        lat: { type: Number, default: null },
+        lng: { type: Number, default: null }
     },
     // Budget pour suivi
     budget: {

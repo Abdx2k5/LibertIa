@@ -7,6 +7,7 @@ const Voyage = require('../models/Voyage');
 const Comment = require('../models/Comment');
 const Dossier = require('../models/Dossier');
 const { estVoyageVisiblePour } = require('../utils/visibilite');
+const { geocoderDestination } = require('../utils/geocoding');
 
 // ─────────────────────────────────────────────
 //  CONFIG Groq
@@ -243,11 +244,12 @@ const genererVoyage = async (req, res) => {
         const origine = infos.origine || 'CMN';
         console.log(`📍 ${destination} | ${checkin} → ${checkout}`);
 
-        console.log('🔄 RAG + Scraping en parallèle...');
+        console.log('🔄 RAG + Scraping + Géocodage en parallèle...');
         const scrapingTimeout = new Promise(r => setTimeout(() => r(null), 120000));
-        const [ragContexte, scraping] = await Promise.all([
+        const [ragContexte, scraping, coordonnees] = await Promise.all([
             getRAGContexte(prompt, destination),
-            Promise.race([scraperDestination(destination, checkin, checkout, origine), scrapingTimeout])
+            Promise.race([scraperDestination(destination, checkin, checkout, origine), scrapingTimeout]),
+            geocoderDestination(destination)
         ]);
 
         const donneesScraping = formaterDonneesScraping(scraping);
@@ -328,6 +330,7 @@ Structure JSON requise :
                 start: new Date(checkin),
                 end: new Date(checkout)
             },
+            coordonnees: coordonnees || { lat: null, lng: null },
             scraping_utilise: !!scraping
         });
 
@@ -360,6 +363,50 @@ const getMesVoyages = async (req, res) => {
         res.json(voyages);
     } catch (err) {
         res.status(500).json({ message: err.message });
+    }
+};
+
+// ─────────────────────────────────────────────
+//  @GET /api/voyages/carte
+//  T44 — Données pour la carte interactive des voyages
+//  de l'utilisateur connecté. Géocode à la volée (et persiste)
+//  les anciens voyages qui n'ont pas encore de coordonnées.
+// ─────────────────────────────────────────────
+const getCarteVoyages = async (req, res) => {
+    try {
+        const voyages = await Voyage.find({ user: req.user._id }).sort({ createdAt: -1 });
+
+        const data = [];
+        for (const voyage of voyages) {
+            let { lat, lng } = voyage.coordonnees || {};
+
+            if (lat == null || lng == null) {
+                const coords = await geocoderDestination(voyage.destination);
+                if (coords) {
+                    voyage.coordonnees = coords;
+                    await voyage.save();
+                    lat = coords.lat;
+                    lng = coords.lng;
+                }
+            }
+
+            // Voyage sans localisation connue — on l'ignore sur la carte
+            if (lat == null || lng == null) continue;
+
+            data.push({
+                id: voyage._id,
+                titre: voyage.titre,
+                destination: voyage.destination,
+                dates: voyage.dates,
+                partage: voyage.partage,
+                budget: voyage.budget,
+                coordonnees: { lat, lng }
+            });
+        }
+
+        res.json({ success: true, data });
+    } catch (err) {
+        res.status(500).json({ success: false, message: err.message });
     }
 };
 
@@ -617,7 +664,7 @@ const updatePrivacite = async (req, res) => {
 };
 
 module.exports = {
-    genererVoyage, getMesVoyages, getVoyage, supprimerVoyage, togglePartage, ajouterLike, retirerLike,
+    genererVoyage, getMesVoyages, getVoyage, getCarteVoyages, supprimerVoyage, togglePartage, ajouterLike, retirerLike,
     getBudget, updateBudget, recalculerBudget, getConseils, regenererConseils,
     getPrivacite, updatePrivacite
 };

@@ -37,3 +37,4 @@ export { default as FollowButton } from "./FollowButton";
 export { default as VisibilityToggle } from "./VisibilityToggle";
 export { default as DuplicateButton } from "./DuplicateButton";
 export { default as VoyageActionsMenu } from "./VoyageActionsMenu";
+export { default as CarteMapbox } from "./CarteMapbox";
