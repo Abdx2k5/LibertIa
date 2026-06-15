@@ -39,3 +39,4 @@ export { default as DuplicateButton } from "./DuplicateButton";
 export { default as VoyageActionsMenu } from "./VoyageActionsMenu";
 export { default as CarteMapbox } from "./CarteMapbox";
 export { default as UploadMultiplePhotos } from "./UploadMultiplePhotos";
+export { default as NotificationBell } from "./NotificationBell";

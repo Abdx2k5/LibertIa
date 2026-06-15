@@ -3,6 +3,7 @@ const Comment = require('../models/Comment');
 const User = require('../models/User');
 const Groupe = require('../models/Groupe');
 const { estVoyageVisiblePour } = require('../utils/visibilite');
+const { creerNotification } = require('./notificationController');
 
 // ─────────────────────────────────────────────
 //  HELPER — Pagination (page/limit depuis req.query)
@@ -149,6 +150,15 @@ const ajouterCommentaire = async (req, res) => {
         await commentaire.populate('user', 'nom profilePhoto');
 
         await Voyage.updateOne({ _id: voyage._id }, { $inc: { commentCount: 1 } });
+
+        // T71 — notifie le propriétaire du voyage
+        await creerNotification({
+            destinataire: voyage.user,
+            expediteur: req.user._id,
+            type: 'commentaire',
+            contenu: `${req.user.nom} a commenté votre voyage "${voyage.titre}"`,
+            lien: `/voyage/${voyage._id}`
+        });
 
         res.status(201).json({ success: true, commentaire, commentCount: voyage.commentCount + 1 });
     } catch (err) {

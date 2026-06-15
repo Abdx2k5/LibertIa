@@ -11,7 +11,9 @@ const compagnonRoutes = require('./routes/compagnonRoutes');
 const communityRoutes = require('./routes/communityRoutes');
 const dossierRoutes = require('./routes/dossierRoutes');
 const boiteRoutes = require('./routes/boiteRoutes');
+const notificationRoutes = require('./routes/notificationRoutes');
 const { initBoiteSocket } = require('./sockets/boiteSocket');
+const { initNotificationSocket } = require('./sockets/notificationSocket');
 
 const app = express();
 
@@ -46,6 +48,7 @@ app.use('/api/compagnon', compagnonRoutes);
 app.use('/api/community', communityRoutes);
 app.use('/api/dossiers', dossierRoutes);
 app.use('/api/boites', boiteRoutes);
+app.use('/api/notifications', notificationRoutes);
 
 app.get('/', (_req, res) => {
     res.json({ message: '🐦 Libertia API is running', version: '1.0.0' });
@@ -63,6 +66,7 @@ const io = new Server(server, {
 });
 
 initBoiteSocket(io);
+initNotificationSocket(io);
 
 server.listen(PORT, () => {
     console.log(` Serveur Libertia démarré sur le port ${PORT}`);
