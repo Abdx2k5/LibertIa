@@ -42,3 +42,4 @@ export { default as UploadMultiplePhotos } from "./UploadMultiplePhotos";
 export { default as NotificationBell } from "./NotificationBell";
 export { default as PaymentForm } from "./PaymentForm";
 export { default as PaymentModal } from "./PaymentModal";
+export { default as AvisSection } from "./AvisSection";
