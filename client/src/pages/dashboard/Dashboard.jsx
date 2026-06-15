@@ -2,6 +2,7 @@ import { useState, useEffect, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import styles from "./Dashboard.module.css";
 import { useAuthStore } from "../../store/authStore";
+import { useUiStore } from "../../store/uiStore";
 import { useVoyage } from "../../hooks/useVoyage";
 import { FREEMIUM , ROUTES} from "../../utils/constants";
 import { ProgressBar, ShareButton, DeleteButton, StreamingOutput, ItineraireJourJour, VolCard, HotelCard, ActiviteCard, MicroAnimated, BudgetChart, RechercheVoyages, NotificationBell, PaymentModal } from "../../components/ui";
@@ -146,9 +147,7 @@ const MOCK_BUDGET = {
 
 export default function Dashboard() {
   const navigate = useNavigate();
-  const [dark, setDark] = useState(() => {
-  return localStorage.getItem("theme") === "dark";
-});
+  const { theme, toggleTheme } = useUiStore();
   const { user } = useAuthStore();
   const { getMesVoyages, voyages } = useVoyage();
 
@@ -186,13 +185,6 @@ export default function Dashboard() {
   const loadVoyages = useCallback(() => { getMesVoyages(); }, [getMesVoyages]);
   const handleRechercheVoyagesFilter = useCallback(() => {}, []);
   useEffect(() => { loadVoyages(); }, [loadVoyages]);
-  useEffect(() => {
-  localStorage.setItem("theme", dark ? "dark" : "light");
-}, [dark]);
-
-useEffect(() => {
-  localStorage.setItem("theme", dark ? "dark" : "light");
-}, [dark]);
   const handleSubmit = (e) => {
     e.preventDefault();
     if (!prompt.trim()) return;
@@ -254,7 +246,7 @@ useEffect(() => {
   };
 
   return (
-    <div className={`${styles.page} ${dark ? styles.dark : ""}`}>
+    <div className={`${styles.page} ${theme === "dark" ? styles.dark : ""}`}>
 
       {/* ── NAVBAR ── */}
       <nav className={styles.navbar}>
@@ -268,7 +260,7 @@ useEffect(() => {
           ))}
         </div>
         <div className={styles.navRight}>
-          <button className={styles.navIconBtn} onClick={() => setDark(!dark)}><img src={imgMoon} alt="" className={styles.navIconImg} /></button>
+          <button className={styles.navIconBtn} onClick={toggleTheme}><img src={imgMoon} alt="" className={styles.navIconImg} /></button>
           <button className={styles.navIconBtn}><img src={imgGlobe} alt="" className={styles.navIconImg} />FR</button>
           <NotificationBell />
           <div className={styles.navAvatar}>
