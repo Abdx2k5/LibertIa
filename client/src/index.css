@@ -23,18 +23,52 @@ body {
   width: 100%;
   overflow-x: hidden;
 }
-:root {
-  --text: #6b6375;
-  --text-h: #08060d;
-  --bg: #fff;
-  --border: #e5e4e7;
-  --code-bg: #f4f3ec;
+/* ─────────────────────────────────────────────────────────────
+   T130 — Variables de thème (clair / sombre)
+   Pilotées par l'attribut [data-theme] posé sur <html>
+   (voir main.jsx + store/uiStore.js).
+   ───────────────────────────────────────────────────────────── */
+[data-theme="dark"] {
+  --bg: #16171d;
+  --bg-secondary: #1e1f27;
+  --border: rgba(255,255,255,0.08);
+  --text: #f3f4f6;
+  --text-muted: #6b7280;
   --accent: #aa3bff;
-  --accent-bg: rgba(170, 59, 255, 0.1);
-  --accent-border: rgba(170, 59, 255, 0.5);
-  --social-bg: rgba(244, 243, 236, 0.5);
-  --shadow:
-    rgba(0, 0, 0, 0.1) 0 10px 15px -3px, rgba(0, 0, 0, 0.05) 0 4px 6px -2px;
+  --accent-secondary: #A78BFA;
+  --accent-green: #4ade80;
+  --shadow: 0 4px 24px rgba(0,0,0,0.3);
+}
+[data-theme="light"] {
+  --bg: #F7F6FB;
+  --bg-secondary: #FFFFFF;
+  --border: rgba(23,23,29,0.08);
+  --text: #16171D;
+  --text-muted: #6B7280;
+  --accent: #9333EA;
+  --accent-secondary: #7C3AED;
+  --accent-green: #16A34A;
+  --shadow: 0 4px 24px rgba(23,23,29,0.06);
+}
+:root {
+  /* fallback before JS runs = dark, same as [data-theme="dark"] */
+  --bg: #16171d;
+  --bg-secondary: #1e1f27;
+  --border: rgba(255,255,255,0.08);
+  --text: #f3f4f6;
+  --text-muted: #6b7280;
+  --accent: #aa3bff;
+  --accent-secondary: #A78BFA;
+  --accent-green: #4ade80;
+  --shadow: 0 4px 24px rgba(0,0,0,0.3);
+
+  /* anciennes variables conservées pour la typographie globale
+     (h1, h2, code, .counter ci-dessous) — non pilotées par [data-theme] */
+  --text-h: #f3f4f6;
+  --code-bg: #1f2028;
+  --accent-bg: rgba(192, 132, 252, 0.15);
+  --accent-border: rgba(192, 132, 252, 0.5);
+  --social-bg: rgba(47, 48, 58, 0.5);
 
   --sans: system-ui, 'Segoe UI', Roboto, sans-serif;
   --heading: system-ui, 'Segoe UI', Roboto, sans-serif;
@@ -55,24 +89,8 @@ body {
   }
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --text: #9ca3af;
-    --text-h: #f3f4f6;
-    --bg: #16171d;
-    --border: #2e303a;
-    --code-bg: #1f2028;
-    --accent: #c084fc;
-    --accent-bg: rgba(192, 132, 252, 0.15);
-    --accent-border: rgba(192, 132, 252, 0.5);
-    --social-bg: rgba(47, 48, 58, 0.5);
-    --shadow:
-      rgba(0, 0, 0, 0.4) 0 10px 15px -3px, rgba(0, 0, 0, 0.25) 0 4px 6px -2px;
-  }
-
-  #social .button-icon {
-    filter: invert(1) brightness(2);
-  }
+#social .button-icon {
+  filter: invert(1) brightness(2);
 }
 
 
