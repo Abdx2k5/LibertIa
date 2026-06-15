@@ -153,6 +153,54 @@
 
 .sectionHeader .sectionTitle { margin: 0; }
 
+/* ── T85 — Bascule Galerie / Carte (souvenirs) ── */
+.souvenirsToggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.souvenirsBtn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  border: none;
+  background: transparent;
+  color: #9ca3af;
+  font-size: 13px;
+  font-weight: 700;
+  padding: 7px 16px;
+  border-radius: 999px;
+  cursor: pointer;
+  transition: color 0.18s ease, background 0.18s ease;
+}
+
+.souvenirsBtn:hover {
+  color: #f3f4f6;
+}
+
+.souvenirsBtnActive {
+  color: #ffffff;
+  background: linear-gradient(135deg, #aa3bff, #7c3aed);
+  box-shadow: 0 6px 14px rgba(170, 59, 255, 0.28);
+}
+
+.souvenirsCarteWrap {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.souvenirsCarteLoading {
+  margin: 0;
+  font-size: 13px;
+  color: #6b7280;
+}
+
 .btnEdit {
   background: none;
   border: 1px solid rgba(139,92,246,0.3);

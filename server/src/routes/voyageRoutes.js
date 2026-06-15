@@ -4,6 +4,7 @@ const {
     genererVoyage,
     getMesVoyages,
     getVoyage,
+    getCarteVoyages,
     supprimerVoyage,
     togglePartage,
     ajouterLike,
@@ -20,6 +21,9 @@ const { proteger } = require('../middlewares/authMiddleware');
 
 router.post('/generer', proteger, genererVoyage);
 router.get('/mes-voyages', proteger, getMesVoyages);
+// T44 — route littérale "/carte" déclarée AVANT "/:id" pour éviter
+// qu'elle ne soit interceptée comme un paramètre :id
+router.get('/carte', proteger, getCarteVoyages);
 router.get('/:id', proteger, getVoyage);
 router.delete('/:id', proteger, supprimerVoyage);
 router.patch('/:id/partage', proteger, togglePartage);

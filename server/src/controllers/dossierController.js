@@ -1,6 +1,7 @@
 const Dossier = require('../models/Dossier');
 const Voyage = require('../models/Voyage');
 const { estVoyageVisiblePour } = require('../utils/visibilite');
+const { geocoderDestination } = require('../utils/geocoding');
 
 // Taille max d'une photo encodée en base64 (~4 Mo)
 const MAX_PHOTO_SIZE = 4 * 1024 * 1024;
@@ -16,6 +17,59 @@ const getMesDossiers = async (req, res) => {
             .populate('voyage', 'titre destination dates');
 
         res.json({ success: true, dossiers });
+    } catch (err) {
+        res.status(500).json({ success: false, message: err.message });
+    }
+};
+
+// ─────────────────────────────────────────────
+//  @GET /api/dossiers/carte
+//  T85 — Données pour la carte des souvenirs (photos géolocalisées).
+//  Chaque souvenir est localisé via les coordonnées du voyage parent
+//  (géocodées à la volée et persistées si manquantes).
+// ─────────────────────────────────────────────
+const getCarteSouvenirs = async (req, res) => {
+    try {
+        const dossiers = await Dossier.find({ user: req.user._id, 'photos.0': { $exists: true } })
+            .select('-photos.data')
+            .populate('voyage', 'titre destination coordonnees');
+
+        const data = [];
+        for (const dossier of dossiers) {
+            const voyage = dossier.voyage;
+            if (!voyage) continue;
+
+            let { lat, lng } = voyage.coordonnees || {};
+
+            if (lat == null || lng == null) {
+                const coords = await geocoderDestination(voyage.destination);
+                if (coords) {
+                    await Voyage.updateOne({ _id: voyage._id }, { coordonnees: coords });
+                    lat = coords.lat;
+                    lng = coords.lng;
+                }
+            }
+
+            // Voyage sans localisation connue — ses souvenirs n'apparaissent pas sur la carte
+            if (lat == null || lng == null) continue;
+
+            for (const photo of dossier.photos) {
+                data.push({
+                    id: photo._id,
+                    dossierId: dossier._id,
+                    caption: photo.caption,
+                    date: photo.date,
+                    voyage: {
+                        id: voyage._id,
+                        titre: voyage.titre,
+                        destination: voyage.destination
+                    },
+                    coordonnees: { lat, lng }
+                });
+            }
+        }
+
+        res.json({ success: true, data });
     } catch (err) {
         res.status(500).json({ success: false, message: err.message });
     }
@@ -119,4 +173,4 @@ const supprimerPhoto = async (req, res) => {
     }
 };
 
-module.exports = { getMesDossiers, getDossier, updateDossier, ajouterPhoto, supprimerPhoto };
+module.exports = { getMesDossiers, getDossier, getCarteSouvenirs, updateDossier, ajouterPhoto, supprimerPhoto };

@@ -108,6 +108,22 @@ export function useVoyage() {
     }
   }, []);
 
+  // ── T44 — Voyages géolocalisés pour la carte interactive ──
+  const [carteVoyages, setCarteVoyages] = useState([]);
+  const [carteLoading, setCarteLoading] = useState(false);
+
+  const getCarteVoyages = useCallback(async () => {
+    setCarteLoading(true);
+    try {
+      const data = await voyageService.getCarte();
+      setCarteVoyages(Array.isArray(data?.data) ? data.data : []);
+    } catch {
+      setCarteVoyages([]);
+    } finally {
+      setCarteLoading(false);
+    }
+  }, []);
+
   return {
     // existing
     voyage, voyages, loading, error,
@@ -116,5 +132,7 @@ export function useVoyage() {
     // stream
     streaming, streamTokens, streamStatus,
     genererStream, annulerStream,
+    // T44 — carte
+    carteVoyages, carteLoading, getCarteVoyages,
   };
 }

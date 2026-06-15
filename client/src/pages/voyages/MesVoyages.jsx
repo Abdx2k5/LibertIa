@@ -2,8 +2,21 @@ import { useEffect, useState, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import styles from "./MesVoyages.module.css";
 import { useVoyage } from "../../hooks/useVoyage";
-import { Button, VisibilityToggle, VoyageActionsMenu } from "../../components/ui";
+import { Button, VisibilityToggle, VoyageActionsMenu, CarteMapbox } from "../../components/ui";
 import { ROUTES } from "../../utils/constants";
+
+// ── Icônes inline (T44) ──
+const ListIcon = () => (
+  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+    <path d="M8 6h13M8 12h13M8 18h13M3 6h.01M3 12h.01M3 18h.01" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+  </svg>
+);
+
+const MapIcon = () => (
+  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+    <path d="M9 20l-5.447-2.724A1 1 0 0 1 3 16.382V5.618a1 1 0 0 1 1.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0 0 21 18.382V7.618a1 1 0 0 0-.553-.894L15 4m0 13V4m0 0L9 7" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+  </svg>
+);
 
 // ── Voyages de démonstration (affichés si l'utilisateur n'a encore rien généré) ──
 const MOCK_VOYAGES = [
@@ -15,6 +28,7 @@ const MOCK_VOYAGES = [
     budget: { total: 1850, currency: "EUR" },
     partage: true,
     likeCount: 12,
+    coordonnees: { lat: 35.6762, lng: 139.6503 },
     itineraire: {
       jours: [
         { jour: 1, matin: { activite: "Visite du temple Senso-ji", lieu: "Asakusa" }, apres_midi: { activite: "Shibuya Crossing", lieu: "Shibuya" }, soir: { activite: "Dîner izakaya", lieu: "Shinjuku" } },
@@ -30,6 +44,7 @@ const MOCK_VOYAGES = [
     budget: { total: 620, currency: "EUR" },
     partage: false,
     likeCount: 0,
+    coordonnees: { lat: 31.6295, lng: -7.9811 },
     itineraire: {
       jours: [
         { jour: 1, matin: { activite: "Place Jemaa el-Fna", lieu: "Médina" }, apres_midi: { activite: "Jardin Majorelle", lieu: "Guéliz" }, soir: { activite: "Dîner sur les toits", lieu: "Médina" } },
@@ -49,15 +64,25 @@ function formatDate(d) {
 
 export default function MesVoyages() {
   const navigate = useNavigate();
-  const { voyages, loading, error, getMesVoyages } = useVoyage();
+  const {
+    voyages, loading, error, getMesVoyages,
+    carteVoyages, carteLoading, getCarteVoyages,
+  } = useVoyage();
 
   const [expandedId, setExpandedId] = useState(null);
+  // T44 — bascule entre la vue liste et la carte interactive
+  const [vue, setVue] = useState("liste");
 
   const loadVoyages = useCallback(() => { getMesVoyages(); }, [getMesVoyages]);
   useEffect(() => { loadVoyages(); }, [loadVoyages]);
 
   const displayVoyages = voyages.length > 0 ? voyages : MOCK_VOYAGES;
   const isDemo = voyages.length === 0;
+
+  // T44 — charge les voyages géolocalisés à l'ouverture de la vue carte
+  useEffect(() => {
+    if (vue === "carte" && !isDemo) getCarteVoyages();
+  }, [vue, isDemo, getCarteVoyages]);
 
   const toggleExpand = (id) => {
     setExpandedId((prev) => (prev === id ? null : id));
@@ -79,6 +104,22 @@ export default function MesVoyages() {
     console.log("Visibilité du voyage :", id, isPublic ? "public" : "privé");
   };
 
+  // T44 — points géolocalisés pour la carte interactive
+  const carteSource = isDemo ? MOCK_VOYAGES : carteVoyages;
+  const points = carteSource
+    .filter((v) => v.coordonnees?.lat != null && v.coordonnees?.lng != null)
+    .map((v) => {
+      const id = v._id || v.id;
+      return {
+        id,
+        lat: v.coordonnees.lat,
+        lng: v.coordonnees.lng,
+        title: v.titre || v.destination,
+        subtitle: v.destination,
+        onClick: isDemo ? undefined : () => navigate(ROUTES.VOYAGE_DETAIL.replace(":id", id)),
+      };
+    });
+
   return (
     <div className={styles.page}>
       <div className={styles.main}>
@@ -93,6 +134,28 @@ export default function MesVoyages() {
           </Button>
         </div>
 
+        {/* T44 — bascule Liste / Carte */}
+        <div className={styles.viewToggle} role="group" aria-label="Mode d'affichage">
+          <button
+            type="button"
+            className={`${styles.viewBtn} ${vue === "liste" ? styles.viewBtnActive : ""}`}
+            onClick={() => setVue("liste")}
+            aria-pressed={vue === "liste"}
+          >
+            <ListIcon />
+            Liste
+          </button>
+          <button
+            type="button"
+            className={`${styles.viewBtn} ${vue === "carte" ? styles.viewBtnActive : ""}`}
+            onClick={() => setVue("carte")}
+            aria-pressed={vue === "carte"}
+          >
+            <MapIcon />
+            Carte
+          </button>
+        </div>
+
         {isDemo && (
           <div className={styles.demoBanner}>
             Aucun voyage généré pour l'instant — voici un aperçu avec des exemples.
@@ -101,7 +164,16 @@ export default function MesVoyages() {
 
         {error && <div className={styles.errorText}>{error}</div>}
 
-        {loading && displayVoyages.length === 0 ? (
+        {vue === "carte" ? (
+          <div className={styles.carteWrap}>
+            {carteLoading && !isDemo && <p className={styles.carteLoading}>Chargement de la carte...</p>}
+            <CarteMapbox
+              points={points}
+              height={480}
+              emptyMessage="Aucun voyage géolocalisé pour le moment."
+            />
+          </div>
+        ) : loading && displayVoyages.length === 0 ? (
           <div className={styles.emptyState}>Chargement de vos voyages...</div>
         ) : displayVoyages.length === 0 ? (
           <div className={styles.emptyState}>

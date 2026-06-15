@@ -3,11 +3,48 @@ import { useNavigate } from "react-router-dom";
 import styles from "./Profile.module.css";
 import { useAuthStore } from "../../store/authStore";
 import authService from "../../services/auth.service";
-import { GaleriePhoto, LogoutButton } from "../../components/ui";
+import dossierService from "../../services/dossier.service";
+import { GaleriePhoto, CarteMapbox, LogoutButton } from "../../components/ui";
 import { FREEMIUM, ROUTES } from "../../utils/constants";
 import imgAvatar from "../../assets/images/community/avatar.png";
 
 const MAX_FREE_PROMPTS = FREEMIUM.MAX_FREE_PROMPTS;
+
+// ── Icônes inline (T85) ──
+const GalleryIcon = () => (
+  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+    <rect x="3" y="3" width="18" height="18" rx="2" stroke="currentColor" strokeWidth="2" />
+    <circle cx="8.5" cy="8.5" r="1.5" stroke="currentColor" strokeWidth="2" />
+    <path d="M21 15l-5-5L5 21" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+  </svg>
+);
+
+const MapIcon = () => (
+  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+    <path d="M9 20l-5.447-2.724A1 1 0 0 1 3 16.382V5.618a1 1 0 0 1 1.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0 0 21 18.382V7.618a1 1 0 0 0-.553-.894L15 4m0 13V4m0 0L9 7" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+  </svg>
+);
+
+// T85 — Photos de démonstration affichées si l'utilisateur n'a pas
+// encore de souvenirs géolocalisés (carnets sans photos)
+const MOCK_PHOTOS = [
+  { id: "1", url: null, titre: "Temple Senso-ji", lieu: "Tokyo", date: "Mars 2024" },
+  { id: "2", url: null, titre: "Mont Fuji", lieu: "Fuji", date: "Mars 2024" },
+  { id: "3", url: null, titre: "Arashiyama Bamboo Grove", lieu: "Kyoto", date: "Avril 2024" },
+  { id: "4", url: null, titre: "Shibuya Crossing", lieu: "Tokyo", date: "Mars 2024" },
+  { id: "5", url: null, titre: "Fushimi Inari", lieu: "Kyoto", date: "Avril 2024" },
+  { id: "6", url: null, titre: "Nezu Shrine", lieu: "Tokyo", date: "Mars 2024" },
+  { id: "7", url: null, titre: "Gion District", lieu: "Kyoto", date: "Avril 2024" },
+  { id: "8", url: null, titre: "Hiroshima Peace Memorial", lieu: "Hiroshima", date: "Mai 2024" },
+];
+
+// Coordonnées approximatives des lieux des souvenirs de démonstration
+const MOCK_LIEUX_COORDS = {
+  Tokyo: { lat: 35.6762, lng: 139.6503 },
+  Fuji: { lat: 35.3606, lng: 138.7274 },
+  Kyoto: { lat: 35.0116, lng: 135.7681 },
+  Hiroshima: { lat: 34.3853, lng: 132.4553 },
+};
 
 // Default preferences structure
 const DEFAULT_PREFERENCES = {
@@ -48,6 +85,11 @@ export default function Profile() {
   const [errorMsg, setErrorMsg] = useState("");
   const [errors, setErrors] = useState({});
 
+  // T85 — Carte des souvenirs géolocalisés
+  const [souvenirsVue, setSouvenirsVue] = useState("galerie"); // "galerie" | "carte"
+  const [souvenirsCarte, setSouvenirsCarte] = useState([]);
+  const [souvenirsLoading, setSouvenirsLoading] = useState(false);
+
   const promptsUsed = user?.promptsUtilises || 0;
   const promptsLeft = FREEMIUM.MAX_FREE_PROMPTS - promptsUsed;
   const avatarSrc = user?.profilePhoto && user.profilePhoto !== "default-avatar.png"
@@ -67,6 +109,27 @@ export default function Profile() {
       });
     }
   }, [user]);
+
+  // T85 — Charge les souvenirs géolocalisés à l'ouverture de l'onglet
+  useEffect(() => {
+    if (activeSection !== "memories") return;
+    let actif = true;
+    setSouvenirsLoading(true);
+    dossierService
+      .getCarteSouvenirs()
+      .then((data) => {
+        if (actif) setSouvenirsCarte(Array.isArray(data?.data) ? data.data : []);
+      })
+      .catch(() => {
+        if (actif) setSouvenirsCarte([]);
+      })
+      .finally(() => {
+        if (actif) setSouvenirsLoading(false);
+      });
+    return () => {
+      actif = false;
+    };
+  }, [activeSection]);
 
   // Validation functions
   const validateField = (name, value) => {
@@ -194,6 +257,28 @@ export default function Profile() {
     setErrors({});
     setErrorMsg("");
   };
+
+  // T85 — points géolocalisés pour la carte des souvenirs
+  const souvenirsPoints = souvenirsCarte.length > 0
+    ? souvenirsCarte
+        .filter((s) => s.coordonnees?.lat != null && s.coordonnees?.lng != null)
+        .map((s) => ({
+          id: s.id,
+          lat: s.coordonnees.lat,
+          lng: s.coordonnees.lng,
+          title: s.caption || s.voyage?.titre || s.voyage?.destination,
+          subtitle: s.voyage?.destination,
+          onClick: s.voyage?.id ? () => navigate(ROUTES.VOYAGE_DETAIL.replace(":id", s.voyage.id)) : undefined,
+        }))
+    : MOCK_PHOTOS
+        .filter((p) => MOCK_LIEUX_COORDS[p.lieu])
+        .map((p) => ({
+          id: p.id,
+          lat: MOCK_LIEUX_COORDS[p.lieu].lat,
+          lng: MOCK_LIEUX_COORDS[p.lieu].lng,
+          title: p.titre,
+          subtitle: `${p.lieu} • ${p.date}`,
+        }));
 
   return (
     <div className={styles.page}>
@@ -654,20 +739,44 @@ export default function Profile() {
             {/* ── Mes souvenirs personnels ── */}
             {activeSection === "memories" && (
               <div className={`${styles.section} ${styles.fadeIn}`}>
-                <h2 className={styles.sectionTitle}>Mes souvenirs personnels</h2>
-                <GaleriePhoto
-                  photos={[
-                    { id: "1", url: null, titre: "Temple Senso-ji", lieu: "Tokyo", date: "Mars 2024" },
-                    { id: "2", url: null, titre: "Mont Fuji", lieu: "Fuji", date: "Mars 2024" },
-                    { id: "3", url: null, titre: "Arashiyama Bamboo Grove", lieu: "Kyoto", date: "Avril 2024" },
-                    { id: "4", url: null, titre: "Shibuya Crossing", lieu: "Tokyo", date: "Mars 2024" },
-                    { id: "5", url: null, titre: "Fushimi Inari", lieu: "Kyoto", date: "Avril 2024" },
-                    { id: "6", url: null, titre: "Nezu Shrine", lieu: "Tokyo", date: "Mars 2024" },
-                    { id: "7", url: null, titre: "Gion District", lieu: "Kyoto", date: "Avril 2024" },
-                    { id: "8", url: null, titre: "Hiroshima Peace Memorial", lieu: "Hiroshima", date: "Mai 2024" },
-                  ]}
-                  colonnes={3}
-                />
+                <div className={styles.sectionHeader}>
+                  <h2 className={styles.sectionTitle}>Mes souvenirs personnels</h2>
+
+                  {/* T85 — bascule Galerie / Carte */}
+                  <div className={styles.souvenirsToggle} role="group" aria-label="Mode d'affichage des souvenirs">
+                    <button
+                      type="button"
+                      className={`${styles.souvenirsBtn} ${souvenirsVue === "galerie" ? styles.souvenirsBtnActive : ""}`}
+                      onClick={() => setSouvenirsVue("galerie")}
+                      aria-pressed={souvenirsVue === "galerie"}
+                    >
+                      <GalleryIcon />
+                      Galerie
+                    </button>
+                    <button
+                      type="button"
+                      className={`${styles.souvenirsBtn} ${souvenirsVue === "carte" ? styles.souvenirsBtnActive : ""}`}
+                      onClick={() => setSouvenirsVue("carte")}
+                      aria-pressed={souvenirsVue === "carte"}
+                    >
+                      <MapIcon />
+                      Carte
+                    </button>
+                  </div>
+                </div>
+
+                {souvenirsVue === "carte" ? (
+                  <div className={styles.souvenirsCarteWrap}>
+                    {souvenirsLoading && <p className={styles.souvenirsCarteLoading}>Chargement de la carte...</p>}
+                    <CarteMapbox
+                      points={souvenirsPoints}
+                      height={420}
+                      emptyMessage="Aucun souvenir géolocalisé pour le moment."
+                    />
+                  </div>
+                ) : (
+                  <GaleriePhoto photos={MOCK_PHOTOS} colonnes={3} />
+                )}
               </div>
             )}
 
