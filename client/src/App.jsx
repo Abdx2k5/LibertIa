@@ -26,6 +26,8 @@ import Settings     from "./pages/settings/Settings";
 import Subscription from "./pages/subscription/Subscription";
 import AgencyDetail from "./pages/agency/AgencyDetail";
 import MesVoyages   from "./pages/voyages/MesVoyages";
+import MesSouvenirs from "./pages/souvenirs/MesSouvenirs";
+import BoitesCollaboratives from "./pages/collaboration/BoitesCollaboratives";
 import AdminPanel   from "./pages/admin/AdminPanel";
 import NotFound     from "./pages/NotFound";
 
@@ -66,6 +68,8 @@ export default function App() {
                 <Route path={ROUTES.SUBSCRIPTION} element={<Subscription />} />
                 <Route path={ROUTES.AGENCY_DETAIL} element={<AgencyDetail />} />
                 <Route path={ROUTES.MY_TRIPS} element={<MesVoyages />} />
+                <Route path={ROUTES.MEMORIES} element={<MesSouvenirs />} />
+                <Route path={ROUTES.COLLAB_BOXES} element={<BoitesCollaboratives />} />
               </Route>
             </Route>
 

@@ -8,6 +8,8 @@ const imgAvatar = "https://www.figma.com/api/mcp/asset/0926e5cc-1f5e-4862-a22b-2
 const NAV_ITEMS = [
   { label: "Assistant IA",  to: "/dashboard",    emoji: "🤖" },
   { label: "Mes Voyages",   to: "/mes-voyages",  emoji: "🗺️" },
+  { label: "Mes Souvenirs", to: "/souvenirs",    emoji: "📸" },
+  { label: "Boîtes collab.", to: "/boites",      emoji: "🤝" },
   { label: "Profil",        to: "/profile",      emoji: "👤" },
   { label: "Abonnement",    to: "/abonnement",   emoji: "✨" },
   { label: "Paramètres",    to: "/settings",     emoji: "⚙️" },
