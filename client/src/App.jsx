@@ -31,6 +31,9 @@ import NotFound     from "./pages/NotFound";
 // Pages publiques (marketing)
 import Pricing      from "./pages/pricing/Pricing";
 
+// Pages publiques (outils internes)
+import DesignSystem from "./pages/design-system/DesignSystem";
+
 import { ROUTES } from "./utils/constants";
 
 export default function App() {
@@ -48,6 +51,7 @@ export default function App() {
               <Route path={ROUTES.COMMUNITY} element={<Community />} />
               <Route path={ROUTES.GROUPS}    element={<Groups />} />
               <Route path={ROUTES.PRICING}   element={<Pricing />} />
+              <Route path={ROUTES.DESIGN_SYSTEM} element={<DesignSystem />} />
             </Route>
 
             {/* ── Pages privées (user connecté) ──────────── */}
