@@ -110,6 +110,24 @@
   font-size: 12px;
 }
 
+.avisLink {
+  align-self: flex-start;
+  border: none;
+  background: transparent;
+  color: #aa3bff;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  padding: 0;
+  text-decoration: underline;
+  margin-top: -4px;
+  transition: color 0.2s ease;
+}
+
+.avisLink:hover {
+  color: #c084fc;
+}
+
 .location {
   display: flex;
   align-items: center;
