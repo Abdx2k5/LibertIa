@@ -7,3 +7,4 @@ server/.env
 server/.env
 ai/chroma_db/
 .claude
+.github
