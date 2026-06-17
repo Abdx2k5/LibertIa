@@ -56,6 +56,7 @@ const register = async (req, res) => {
             nom: user.nom,
             email: user.email,
             abonnement: user.abonnement,
+            role: user.role,
             token: accessToken,
             refreshToken
         });
@@ -97,6 +98,7 @@ const login = async (req, res) => {
             nom: user.nom,
             email: user.email,
             abonnement: user.abonnement,
+            role: user.role,
             token: accessToken,
             refreshToken
         });

@@ -13,6 +13,7 @@ const dossierRoutes = require('./routes/dossierRoutes');
 const boiteRoutes = require('./routes/boiteRoutes');
 const notificationRoutes = require('./routes/notificationRoutes');
 const avisRoutes = require('./routes/avisRoutes');
+const agencyRoutes = require('./routes/agencyRoutes');
 const { initBoiteSocket } = require('./sockets/boiteSocket');
 const { initNotificationSocket } = require('./sockets/notificationSocket');
 
@@ -51,6 +52,7 @@ app.use('/api/dossiers', dossierRoutes);
 app.use('/api/boites', boiteRoutes);
 app.use('/api/notifications', notificationRoutes);
 app.use('/api/avis', avisRoutes);
+app.use('/api/agences', agencyRoutes);
 
 app.get('/', (_req, res) => {
     res.json({ message: '🐦 Libertia API is running', version: '1.0.0' });

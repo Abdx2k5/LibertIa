@@ -49,4 +49,12 @@ const proteger = async (req, res, next) => {
     }
 };
 
-module.exports = { proteger };
+// T99 — restreint l'accès aux administrateurs (à utiliser après `proteger`)
+const admin = (req, res, next) => {
+    if (req.user && req.user.role === 'admin') {
+        return next();
+    }
+    return res.status(403).json({ message: 'Accès réservé aux administrateurs' });
+};
+
+module.exports = { proteger, admin };
