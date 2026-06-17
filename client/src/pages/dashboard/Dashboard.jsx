@@ -28,6 +28,7 @@ const FILTERS = [
   { id: "groupe", label: "👥 Groupe" },
 ];
 
+
 // T18 — exemples de prompts cliquables pour amorcer la saisie
 const PROMPT_EXAMPLES = [
   "Un week-end romantique à Rome avec 600€",

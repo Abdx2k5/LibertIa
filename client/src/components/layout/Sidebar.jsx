@@ -10,6 +10,7 @@ const NAV_ITEMS = [
   { label: "Mes Voyages",   to: "/mes-voyages",  emoji: "🗺️" },
   { label: "Mes Souvenirs", to: "/souvenirs",    emoji: "📸" },
   { label: "Boîtes collab.", to: "/boites",      emoji: "🤝" },
+  { label: "Agences",       to: "/agences",      emoji: "🏢" },
   { label: "Profil",        to: "/profile",      emoji: "👤" },
   { label: "Abonnement",    to: "/abonnement",   emoji: "✨" },
   { label: "Paramètres",    to: "/settings",     emoji: "⚙️" },

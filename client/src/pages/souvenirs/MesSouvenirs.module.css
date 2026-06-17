@@ -51,6 +51,26 @@
 .statValue { font-size: 26px; font-weight: 800; color: #fff; }
 .statLabel { font-size: 13px; color: #9ca3af; }
 
+/* ── Dossiers (T73/T74) ── */
+.dossiersSection { display: flex; flex-direction: column; gap: 14px; }
+.dossiersHeader {
+  display: flex; align-items: center; justify-content: space-between; gap: 12px;
+}
+.dossiersTitle { margin: 0; font-size: 18px; font-weight: 700; color: #fff; }
+.dossierAddBtn {
+  border: 1px solid rgba(170, 59, 255, 0.4);
+  background: rgba(170, 59, 255, 0.12);
+  color: #e7d6ff; border-radius: 999px;
+  padding: 8px 16px; font-size: 13px; font-weight: 600;
+  cursor: pointer; font-family: inherit;
+  transition: background 0.18s ease;
+}
+.dossierAddBtn:hover { background: rgba(170, 59, 255, 0.2); }
+.dossiersEmpty { margin: 0; font-size: 13px; color: #9ca3af; }
+.dossiersGrid {
+  display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 14px;
+}
+
 /* ── Toolbar ── */
 .toolbar { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
 .search {

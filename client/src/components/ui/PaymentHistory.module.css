@@ -1,0 +1,108 @@
+.wrap {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.filters {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.filterPill {
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: rgba(255, 255, 255, 0.03);
+  border-radius: 999px;
+  padding: 6px 14px;
+  color: #a1a1aa;
+  font-size: 13px;
+  cursor: pointer;
+  font-family: inherit;
+  transition: all 0.2s ease;
+}
+
+.filterPillActive {
+  background: rgba(170, 59, 255, 0.15);
+  border-color: rgba(170, 59, 255, 0.35);
+  color: #f3f4f6;
+}
+
+.total {
+  font-size: 13px;
+  font-weight: 600;
+  color: #4ade80;
+}
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.th {
+  text-align: left;
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: #94a3b8;
+  font-weight: 600;
+  padding: 10px 12px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.tr {
+  transition: background 0.15s ease;
+}
+
+.tr:hover {
+  background: rgba(255, 255, 255, 0.03);
+}
+
+.td {
+  font-size: 14px;
+  color: #e7f0ff;
+  padding: 12px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.badge {
+  display: inline-block;
+  font-size: 12px;
+  font-weight: 600;
+  padding: 3px 10px;
+  border-radius: 999px;
+  text-transform: capitalize;
+  background: rgba(255, 255, 255, 0.08);
+  color: #cbd5e1;
+}
+
+.statutReussi {
+  background: rgba(74, 222, 128, 0.15);
+  color: #4ade80;
+}
+
+.statutRembourse {
+  background: rgba(251, 191, 36, 0.15);
+  color: #fbbf24;
+}
+
+.statutEchoue {
+  background: rgba(248, 113, 113, 0.15);
+  color: #f87171;
+}
+
+.empty {
+  padding: 24px;
+  border-radius: 12px;
+  border: 1px dashed rgba(255, 255, 255, 0.12);
+  color: #94a3b8;
+  text-align: center;
+}

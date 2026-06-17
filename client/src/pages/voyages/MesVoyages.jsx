@@ -2,7 +2,7 @@ import { useEffect, useState, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import styles from "./MesVoyages.module.css";
 import { useVoyage } from "../../hooks/useVoyage";
-import { Button, VisibilityToggle, VoyageActionsMenu, CarteMapbox } from "../../components/ui";
+import { Button, VisibilityToggle, VoyageActionsMenu, CarteMapbox, VoyageTimeline } from "../../components/ui";
 import { ROUTES } from "../../utils/constants";
 
 // ── Icônes inline (T44) ──
@@ -15,6 +15,15 @@ const ListIcon = () => (
 const MapIcon = () => (
   <svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden="true">
     <path d="M9 20l-5.447-2.724A1 1 0 0 1 3 16.382V5.618a1 1 0 0 1 1.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0 0 21 18.382V7.618a1 1 0 0 0-.553-.894L15 4m0 13V4m0 0L9 7" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+  </svg>
+);
+
+const TimelineIcon = () => (
+  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+    <path d="M12 3v18M12 7h7M12 12h5M12 17h7" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+    <circle cx="6" cy="7" r="2" stroke="currentColor" strokeWidth="2" />
+    <circle cx="8" cy="12" r="2" stroke="currentColor" strokeWidth="2" />
+    <circle cx="6" cy="17" r="2" stroke="currentColor" strokeWidth="2" />
   </svg>
 );
 
@@ -154,6 +163,15 @@ export default function MesVoyages() {
             <MapIcon />
             Carte
           </button>
+          <button
+            type="button"
+            className={`${styles.viewBtn} ${vue === "timeline" ? styles.viewBtnActive : ""}`}
+            onClick={() => setVue("timeline")}
+            aria-pressed={vue === "timeline"}
+          >
+            <TimelineIcon />
+            Timeline
+          </button>
         </div>
 
         {isDemo && (
@@ -164,7 +182,12 @@ export default function MesVoyages() {
 
         {error && <div className={styles.errorText}>{error}</div>}
 
-        {vue === "carte" ? (
+        {vue === "timeline" ? (
+          <VoyageTimeline
+            voyages={displayVoyages}
+            onSelect={isDemo ? undefined : (v) => navigate(ROUTES.VOYAGE_DETAIL.replace(":id", v._id || v.id))}
+          />
+        ) : vue === "carte" ? (
           <div className={styles.carteWrap}>
             {carteLoading && !isDemo && <p className={styles.carteLoading}>Chargement de la carte...</p>}
             <CarteMapbox

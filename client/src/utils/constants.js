@@ -10,6 +10,7 @@ export const ROUTES = {
   PROFILE:      "/profile",
   SETTINGS:     "/settings",
   SUBSCRIPTION: "/abonnement",
+  AGENCIES:     "/agences",
   AGENCY_DETAIL: "/agence/:id",
   PRICING:      "/tarifs",
   MY_TRIPS:     "/mes-voyages",

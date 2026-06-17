@@ -7,6 +7,18 @@ const dossierService = {
     return response.data;
   },
 
+  // POST /api/dossiers — T74 : création d'un dossier souvenir
+  creerDossier: async (payload) => {
+    const response = await api.post("/api/dossiers", payload);
+    return response.data;
+  },
+
+  // DELETE /api/dossiers/:id — T73 : suppression d'un dossier souvenir
+  supprimerDossier: async (id) => {
+    const response = await api.delete(`/api/dossiers/${id}`);
+    return response.data;
+  },
+
   // GET /api/dossiers/voyage/:voyageId
   getByVoyage: async (voyageId) => {
     const response = await api.get(`/api/dossiers/voyage/${voyageId}`);

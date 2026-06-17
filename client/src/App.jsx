@@ -27,6 +27,7 @@ import VoyageDetail from "./pages/dashboard/VoyageDetail";
 import Settings     from "./pages/settings/Settings";
 import Subscription from "./pages/subscription/Subscription";
 import AgencyDetail from "./pages/agency/AgencyDetail";
+import AgencyDirectory from "./pages/agency/AgencyDirectory";
 import MesVoyages   from "./pages/voyages/MesVoyages";
 import MesSouvenirs from "./pages/souvenirs/MesSouvenirs";
 import BoitesCollaboratives from "./pages/collaboration/BoitesCollaboratives";
@@ -70,6 +71,7 @@ export default function App() {
                 <Route path={ROUTES.PROFILE}      element={<Profile />} />
                 <Route path={ROUTES.SETTINGS}     element={<Settings />} />
                 <Route path={ROUTES.SUBSCRIPTION} element={<Subscription />} />
+                <Route path={ROUTES.AGENCIES} element={<AgencyDirectory />} />
                 <Route path={ROUTES.AGENCY_DETAIL} element={<AgencyDetail />} />
                 <Route path={ROUTES.MY_TRIPS} element={<MesVoyages />} />
                 <Route path={ROUTES.MEMORIES} element={<MesSouvenirs />} />

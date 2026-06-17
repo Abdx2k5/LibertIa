@@ -2,6 +2,12 @@
    ItineraireJourJour.module.css
    ============================================================ */
 
+.meteoRow {
+  display: flex;
+  justify-content: flex-end;
+  margin-bottom: 12px;
+}
+
 .wrapper {
   width: 100%;
   max-width: 1000px;

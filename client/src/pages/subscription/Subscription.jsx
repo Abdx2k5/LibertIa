@@ -2,7 +2,7 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import styles from "./Subscription.module.css";
 import { useAuthStore } from "../../store/authStore";
-import { Badge, Button, Modal } from "../../components/ui";
+import { Badge, Button, Modal, PaymentHistory } from "../../components/ui";
 import { FREEMIUM, ROUTES } from "../../utils/constants";
 
 const PREMIUM_FEATURES = [
@@ -193,6 +193,13 @@ export default function Subscription() {
             </div>
           </div>
         )}
+
+        {/* ── Historique de facturation (T110) ── */}
+        <div className={styles.section}>
+          <h2 className={styles.sectionTitle}>Historique de facturation</h2>
+          <p className={styles.sectionSub}>Retrouvez l'ensemble de vos paiements et leur statut.</p>
+          <PaymentHistory />
+        </div>
 
         {/* ── Modal de confirmation d'annulation ── */}
         <Modal

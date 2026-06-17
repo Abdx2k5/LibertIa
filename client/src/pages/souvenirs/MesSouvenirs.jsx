@@ -8,11 +8,14 @@
 // vues (cartes détaillées / galerie lightbox).
 // =============================================================
 
-import { useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import styles from "./MesSouvenirs.module.css";
 import useLocalStorage from "../../hooks/useLocalStorage";
 import { SOUVENIRS_SEED, SOUVENIR_CATEGORIES } from "../../mocks/souvenirsData";
 import GaleriePhoto from "../../components/ui/GaleriePhoto";
+import DossierCard from "../../components/ui/DossierCard";
+import DossierForm from "../../components/ui/DossierForm";
+import dossierService from "../../services/dossier.service";
 
 const EMPTY_FORM = {
   titre: "",
@@ -54,6 +57,40 @@ export default function MesSouvenirs() {
   const [form, setForm] = useState(EMPTY_FORM);
   const [detail, setDetail] = useState(null);
   const fileRef = useRef(null);
+
+  // ── Dossiers souvenirs (T73/T74) — câblés sur l'API ──
+  const [dossiers, setDossiers] = useState([]);
+  const [dossierFormOpen, setDossierFormOpen] = useState(false);
+
+  // Chargement des dossiers : échoue silencieusement si l'API n'est pas
+  // disponible (la page reste utilisable, le bouton « Nouveau dossier » aussi).
+  useEffect(() => {
+    let active = true;
+    dossierService
+      .getMesDossiers()
+      .then((data) => {
+        if (active) setDossiers(Array.isArray(data) ? data : data?.dossiers || []);
+      })
+      .catch(() => {
+        if (active) setDossiers([]);
+      });
+    return () => {
+      active = false;
+    };
+  }, []);
+
+  const handleDossierCreated = (dossier) => {
+    if (dossier) setDossiers((prev) => [dossier, ...prev]);
+  };
+
+  const handleDossierDelete = async (id) => {
+    try {
+      await dossierService.supprimerDossier(id);
+    } catch {
+      /* on retire localement même si l'API échoue */
+    }
+    setDossiers((prev) => prev.filter((d) => d.id !== id));
+  };
 
   // ── Albums + statistiques dérivés ──
   const albums = useMemo(() => {
@@ -177,6 +214,37 @@ export default function MesSouvenirs() {
             <span className={styles.statLabel}>Favoris</span>
           </div>
         </div>
+
+        {/* ── Dossiers souvenirs (T73/T74) ── */}
+        <section className={styles.dossiersSection}>
+          <div className={styles.dossiersHeader}>
+            <h2 className={styles.dossiersTitle}>Dossiers</h2>
+            <button
+              type="button"
+              className={styles.dossierAddBtn}
+              onClick={() => setDossierFormOpen(true)}
+            >
+              ＋ Nouveau dossier
+            </button>
+          </div>
+
+          {dossiers.length === 0 ? (
+            <p className={styles.dossiersEmpty}>
+              Aucun dossier pour l'instant. Créez-en un pour regrouper vos souvenirs.
+            </p>
+          ) : (
+            <div className={styles.dossiersGrid}>
+              {dossiers.map((dossier) => (
+                <DossierCard
+                  key={dossier.id}
+                  dossier={dossier}
+                  onOpen={() => {}}
+                  onDelete={handleDossierDelete}
+                />
+              ))}
+            </div>
+          )}
+        </section>
 
         {/* ── Barre d'outils ── */}
         <div className={styles.toolbar}>
@@ -388,6 +456,13 @@ export default function MesSouvenirs() {
           </form>
         </div>
       )}
+
+      {/* ── Modal création dossier (T74) ── */}
+      <DossierForm
+        isOpen={dossierFormOpen}
+        onClose={() => setDossierFormOpen(false)}
+        onCreated={handleDossierCreated}
+      />
 
       {/* ── Modal détail ── */}
       {detail && (

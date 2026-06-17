@@ -1,5 +1,6 @@
 import { useState } from "react";
 import styles from "./ItineraireJourJour.module.css";
+import MeteoJour from "./MeteoJour";
 
 export default function ItineraireJourJour({ voyage }) {
   const [selectedDayIndex, setSelectedDayIndex] = useState(0);
@@ -47,6 +48,11 @@ export default function ItineraireJourJour({ voyage }) {
             </button>
           ))}
         </div>
+      </div>
+
+      {/* T111 — Météo du jour sélectionné */}
+      <div className={styles.meteoRow}>
+        <MeteoJour meteo={selectedDay.meteo} date={selectedDay.date} />
       </div>
 
       {/* Activities for Selected Day */}

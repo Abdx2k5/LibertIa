@@ -1,0 +1,191 @@
+.card {
+  background: #1e1f27;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 12px;
+  overflow: hidden;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.searchBar {
+  position: relative;
+  display: flex;
+  align-items: center;
+  width: 100%;
+}
+
+.searchIcon {
+  position: absolute;
+  left: 14px;
+  display: inline-flex;
+  color: #94a3b8;
+  pointer-events: none;
+}
+
+.searchInput {
+  width: 100%;
+  background: #2a2b35;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 12px;
+  padding: 12px 44px 12px 42px;
+  color: #f3f4f6;
+  font-size: 14px;
+  outline: none;
+  font-family: inherit;
+}
+
+.searchInput::placeholder {
+  color: #6b7280;
+}
+
+.searchInput:focus {
+  border-color: rgba(170, 59, 255, 0.4);
+}
+
+.clearButton {
+  position: absolute;
+  right: 10px;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  border: none;
+  background: rgba(255, 255, 255, 0.06);
+  color: #d4d4d8;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+}
+
+.controlsRow {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.pillsScroll {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  overflow-x: auto;
+  flex: 1;
+  padding-bottom: 4px;
+}
+
+.pill {
+  flex: 0 0 auto;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: rgba(255, 255, 255, 0.03);
+  border-radius: 999px;
+  padding: 8px 14px;
+  color: #a1a1aa;
+  font-size: 13px;
+  cursor: pointer;
+  font-family: inherit;
+  transition: all 0.2s ease;
+}
+
+.pillActive {
+  background: rgba(170, 59, 255, 0.15);
+  border-color: rgba(170, 59, 255, 0.35);
+  color: #f3f4f6;
+}
+
+.sortWrap {
+  position: relative;
+  flex-shrink: 0;
+}
+
+.sortButton {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: #2a2b35;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 12px;
+  padding: 10px 12px;
+  color: #f3f4f6;
+  font-size: 13px;
+  cursor: pointer;
+  font-family: inherit;
+}
+
+.sortLabel {
+  color: #a1a1aa;
+}
+
+.sortMenu {
+  position: absolute;
+  right: 0;
+  top: calc(100% + 8px);
+  min-width: 180px;
+  background: #1e1f27;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 12px;
+  padding: 6px;
+  box-shadow: 0 18px 40px rgba(0, 0, 0, 0.35);
+  z-index: 2;
+}
+
+.sortItem {
+  width: 100%;
+  border: none;
+  background: transparent;
+  color: #d4d4d8;
+  text-align: left;
+  padding: 10px 12px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-family: inherit;
+  font-size: 13px;
+}
+
+.sortItem:hover,
+.sortItemActive {
+  background: rgba(170, 59, 255, 0.12);
+  color: #fff;
+}
+
+.typeRow {
+  display: flex;
+  gap: 8px;
+}
+
+.typePill {
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: rgba(255, 255, 255, 0.03);
+  border-radius: 8px;
+  padding: 6px 14px;
+  color: #a1a1aa;
+  font-size: 13px;
+  cursor: pointer;
+  font-family: inherit;
+  transition: all 0.2s ease;
+}
+
+.typePillActive {
+  background: rgba(6, 182, 212, 0.15);
+  border-color: rgba(6, 182, 212, 0.35);
+  color: #f3f4f6;
+}
+
+.summary {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  color: #94a3b8;
+  font-size: 12px;
+}
+
+@media (max-width: 900px) {
+  .controlsRow {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .sortWrap {
+    align-self: flex-end;
+  }
+}
