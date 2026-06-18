@@ -7,9 +7,9 @@
   width: 36px;
   height: 36px;
   border-radius: 999px;
-  border: 1px solid rgba(255, 255, 255, 0.08);
+  border: 1px solid var(--border);
   background: rgba(255, 255, 255, 0.02);
-  color: #f3f4f6;
+  color: var(--text);
   font-size: 20px;
   line-height: 1;
   cursor: pointer;
@@ -22,7 +22,7 @@
 .trigger:hover,
 .triggerActive {
   background: rgba(170, 59, 255, 0.1);
-  border-color: rgba(170, 59, 255, 0.4);
+  border-color: var(--accent-border);
 }
 
 .menu {
@@ -51,7 +51,7 @@
   text-align: left;
   border: none;
   background: transparent;
-  color: #f3f4f6;
+  color: var(--text);
   font-size: 14px;
   font-weight: 600;
   padding: 10px 12px;
@@ -81,7 +81,7 @@
   padding: 2px 9px;
   border-radius: 999px;
   color: #9ca3af;
-  background: rgba(255, 255, 255, 0.08);
+  background: var(--border);
 }
 
 .pillPublic {
@@ -92,11 +92,11 @@
 .divider {
   height: 1px;
   margin: 4px 6px;
-  background: rgba(255, 255, 255, 0.08);
+  background: var(--border);
 }
 
 .danger {
-  color: #f87171;
+  color: var(--error);
 }
 
 .danger:hover {

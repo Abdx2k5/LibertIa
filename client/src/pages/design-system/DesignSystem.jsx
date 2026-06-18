@@ -58,7 +58,7 @@ function CloseIcon() {
 
 function CheckCircleIcon() {
   return (
-    <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#4ade80" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+    <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="var(--accent-green)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
       <circle cx="12" cy="12" r="10" />
       <path d="M8 12l3 3 5-6" />
     </svg>
@@ -275,7 +275,7 @@ export default function DesignSystem() {
             </ComponentCard>
 
             <ComponentCard name="Spinner">
-              <Spinner size={32} color="#aa3bff" label="Chargement..." />
+              <Spinner size={32} color="var(--accent)" label="Chargement..." />
             </ComponentCard>
 
             <ComponentCard name="Pill">

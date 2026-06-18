@@ -20,7 +20,7 @@ export default function HotelCard({ hotel, onSelect, isSelected }) {
 
   const renderStars = (count) => {
     return Array.from({ length: 5 }).map((_, i) => (
-      <span key={i} style={{ color: i < count ? "#fbbf24" : "#4b5563" }}>
+      <span key={i} style={{ color: i < count ? "var(--warning)" : "#4b5563" }}>
         ★
       </span>
     ));

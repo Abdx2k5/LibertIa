@@ -127,7 +127,7 @@ function VisaIcon() {
 function MastercardIcon() {
   return (
     <svg width="32" height="20" viewBox="0 0 32 20" aria-hidden="true">
-      <rect width="32" height="20" rx="3" fill="#16171d" />
+      <rect width="32" height="20" rx="3" fill="var(--bg)" />
       <circle cx="13" cy="10" r="6" fill="#eb001b" />
       <circle cx="19" cy="10" r="6" fill="#f79e1b" fillOpacity="0.85" />
     </svg>

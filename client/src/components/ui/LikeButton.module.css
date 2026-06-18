@@ -1,8 +1,8 @@
 .button {
-  border: 1px solid rgba(255, 255, 255, 0.08);
+  border: 1px solid var(--border);
   background: rgba(255, 255, 255, 0.02);
   border-radius: 999px;
-  color: #f3f4f6;
+  color: var(--text);
   font-weight: 600;
   display: inline-flex;
   align-items: center;
@@ -12,7 +12,7 @@
 }
 
 .button:hover {
-  border-color: rgba(170, 59, 255, 0.4);
+  border-color: var(--accent-border);
   background: rgba(170, 59, 255, 0.08);
 }
 
@@ -78,7 +78,7 @@
 }
 
 .particle:nth-child(odd) {
-  background: #aa3bff;
+  background: var(--accent);
 }
 
 @keyframes pop {

@@ -1,13 +1,13 @@
 .card {
-  background: #1e1f27;
-  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: var(--bg-secondary);
+  border: 1px solid var(--border);
   border-radius: 12px;
-  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.3);
+  box-shadow: var(--card-shadow);
   padding: 18px;
   display: flex;
   flex-direction: column;
   gap: 16px;
-  color: #f3f4f6;
+  color: var(--text);
 }
 
 .header {
@@ -28,7 +28,7 @@
   width: 48px;
   height: 48px;
   border-radius: 999px;
-  background: linear-gradient(135deg, #aa3bff, #7c3aed);
+  background: linear-gradient(135deg, var(--accent), #7c3aed);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -67,7 +67,7 @@
   margin: 0;
   font-size: 15px;
   font-weight: 700;
-  color: #f3f4f6;
+  color: var(--text);
 }
 
 .badge {
@@ -86,13 +86,13 @@
 .badgeGuide {
   background: rgba(167, 139, 250, 0.1);
   border-color: rgba(167, 139, 250, 0.25);
-  color: #A78BFA;
+  color: var(--accent-secondary);
 }
 
 .authorDetails {
   margin: 0;
   font-size: 13px;
-  color: #6b7280;
+  color: var(--text-muted);
 }
 
 .headerRight {
@@ -104,7 +104,7 @@
 
 .time {
   font-size: 12px;
-  color: #6b7280;
+  color: var(--text-muted);
   flex-shrink: 0;
   text-align: right;
 }
@@ -112,7 +112,7 @@
 .reportButton {
   border: none;
   background: transparent;
-  color: #6b7280;
+  color: var(--text-muted);
   font-size: 15px;
   line-height: 1;
   cursor: pointer;
@@ -122,7 +122,7 @@
 }
 
 .reportButton:hover {
-  color: #f87171;
+  color: var(--error);
   background: rgba(239, 68, 68, 0.1);
 }
 
@@ -142,7 +142,7 @@
   margin: 0;
   font-size: 14px;
   line-height: 1.7;
-  color: #f3f4f6;
+  color: var(--text);
 }
 
 .articleLink {
@@ -150,7 +150,7 @@
   border: none;
   background: transparent;
   padding: 0;
-  color: #aa3bff;
+  color: var(--accent);
   font-size: 14px;
   font-weight: 700;
   cursor: pointer;
@@ -226,10 +226,10 @@
 }
 
 .actionButton {
-  border: 1px solid rgba(255, 255, 255, 0.08);
+  border: 1px solid var(--border);
   background: rgba(255, 255, 255, 0.02);
   border-radius: 999px;
-  color: #f3f4f6;
+  color: var(--text);
   font-size: 12px;
   font-weight: 600;
   padding: 8px 12px;
@@ -241,7 +241,7 @@
 }
 
 .actionButton:hover {
-  border-color: rgba(170, 59, 255, 0.4);
+  border-color: var(--accent-border);
   background: rgba(170, 59, 255, 0.08);
 }
 
@@ -262,7 +262,7 @@
 .saveButton {
   border: 1px solid rgba(170, 59, 255, 0.28);
   background: transparent;
-  color: #f3f4f6;
+  color: var(--text);
   border-radius: 999px;
   padding: 8px 14px;
   font-size: 12px;
@@ -277,7 +277,7 @@
 .groupCta {
   width: 100%;
   border: none;
-  background: linear-gradient(135deg, #aa3bff, #7c3aed);
+  background: linear-gradient(135deg, var(--accent), #7c3aed);
   color: #ffffff;
   border-radius: 10px;
   padding: 12px 16px;

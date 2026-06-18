@@ -4,8 +4,8 @@
 
 .page {
   min-height: 100vh;
-  background: linear-gradient(135deg, #0b1026 0%, #1a1a2e 100%);
-  font-family: 'Inter', sans-serif; color: #fff;
+  background: var(--bg);
+  font-family: 'Inter', sans-serif; color: var(--text);
 }
 
 .main { max-width: 800px; margin: 0 auto; padding: 40px 24px; }
@@ -24,13 +24,13 @@
   margin-bottom: -1px;
 }
 .tab:hover   { color: #fff; }
-.tabActive   { color: #a78bfa; border-bottom-color: #a78bfa; }
+.tabActive   { color: var(--accent-secondary); border-bottom-color: var(--accent-secondary); }
 
 /* ── Section card ── */
 .section {
   backdrop-filter: blur(6px);
   background-color: rgba(255,255,255,0.03);
-  border: 1px solid rgba(255,255,255,0.08);
+  border: 1px solid var(--border);
   border-radius: 16px; padding: 28px; margin-bottom: 16px;
 }
 
@@ -68,8 +68,8 @@
 .label { font-size: 14px; font-weight: 500; color: #e7f0ff; }
 
 .select {
-  width: 100%; background-color: #0f1724;
-  border: 1px solid rgba(255,255,255,0.08);
+  width: 100%; background-color: var(--bg-input);
+  border: 1px solid var(--border);
   border-radius: 6px; padding: 13px 17px;
   font-size: 15px; color: #e7f0ff; outline: none;
   font-family: 'Inter', sans-serif; cursor: pointer;
@@ -82,14 +82,14 @@
   border: 1px solid rgba(239,68,68,0.2);
   border-radius: 16px; padding: 28px;
 }
-.dangerTitle { font-size: 16px; font-weight: 600; color: #f87171; margin: 0 0 8px; }
+.dangerTitle { font-size: 16px; font-weight: 600; color: var(--error); margin: 0 0 8px; }
 .dangerText  { font-size: 14px; color: #94a3b8; margin: 0 0 20px; }
 
 .btnDanger {
   background: rgba(239,68,68,0.1);
   border: 1px solid rgba(239,68,68,0.3);
   border-radius: 6px; padding: 11px 24px;
-  font-size: 14px; color: #f87171; cursor: pointer;
+  font-size: 14px; color: var(--error); cursor: pointer;
   font-family: 'Inter', sans-serif; transition: all 0.2s;
 }
 .btnDanger:hover { background: rgba(239,68,68,0.2); }
@@ -98,7 +98,7 @@
 .saveWrap { display: flex; justify-content: flex-end; margin-top: 8px; }
 
 .btnSave {
-  background: linear-gradient(135deg, #A78BFA, #8b5cf6);
+  background: linear-gradient(135deg, var(--accent-secondary), #8b5cf6);
   border: none; border-radius: 6px;
   padding: 11px 32px; font-size: 14px; font-weight: 700;
   color: #ffffff; cursor: pointer;

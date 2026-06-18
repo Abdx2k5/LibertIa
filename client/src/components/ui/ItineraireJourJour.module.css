@@ -7,8 +7,8 @@
   max-width: 1000px;
   margin-top: 32px;
   padding: 24px;
-  background-color: #1e1f27;
-  border: 1px solid rgba(255, 255, 255, 0.08);
+  background-color: var(--bg-secondary);
+  border: 1px solid var(--border);
   border-radius: 12px;
 }
 
@@ -46,7 +46,7 @@
 
 .dayTab {
   padding: 12px 16px;
-  border: 1px solid rgba(255, 255, 255, 0.08);
+  border: 1px solid var(--border);
   border-radius: 8px;
   background-color: rgba(255, 255, 255, 0.03);
   cursor: pointer;
@@ -63,14 +63,14 @@
 }
 
 .dayTabActive {
-  border-color: #aa3bff;
-  background-color: rgba(170, 59, 255, 0.15);
+  border-color: var(--accent);
+  background-color: var(--accent-bg);
 }
 
 .dayNumber {
   font-size: 12px;
   font-weight: 600;
-  color: #aa3bff;
+  color: var(--accent);
   margin-bottom: 4px;
 }
 
@@ -114,8 +114,8 @@
   padding: 6px 10px;
   border-radius: 6px;
   background-color: rgba(170, 59, 255, 0.2);
-  border: 1px solid rgba(170, 59, 255, 0.4);
-  color: #aa3bff;
+  border: 1px solid var(--accent-border);
+  color: var(--accent);
   font-size: 12px;
   font-weight: 700;
   text-align: center;
@@ -148,7 +148,7 @@
 .durationPill {
   padding: 4px 10px;
   border-radius: 999px;
-  background-color: rgba(255, 255, 255, 0.08);
+  background-color: var(--border);
   color: #d4d4d8;
   font-size: 12px;
   font-weight: 500;
@@ -163,7 +163,7 @@
 }
 
 .priceFree {
-  color: #4ade80;
+  color: var(--accent-green);
 }
 
 .noActivities {

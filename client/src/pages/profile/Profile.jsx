@@ -373,7 +373,7 @@ export default function Profile() {
               </div>
             )}
             {successMsg && (
-              <p style={{ fontSize: 13, color: "#4ade80", marginBottom: 8 }}>
+              <p style={{ fontSize: 13, color: "var(--accent-green)", marginBottom: 8 }}>
                 Profil mis à jour avec succès !
               </p>
             )}

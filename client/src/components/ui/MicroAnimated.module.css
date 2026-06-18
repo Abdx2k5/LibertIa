@@ -2,7 +2,7 @@
   width: 52px;
   height: 52px;
   border-radius: 50%;
-  background: #1e1f27;
+  background: var(--bg-secondary);
   border: 1.5px solid rgba(170,59,255,0.3);
   cursor: pointer;
   position: relative;
@@ -17,12 +17,12 @@
 }
 
 .button:not(.disabled):not(.listening):not(.processing):hover {
-  border-color: #aa3bff;
+  border-color: var(--accent);
   transform: scale(1.05);
 }
 
 .button:focus-visible {
-  outline: 2px solid #aa3bff;
+  outline: 2px solid var(--accent);
   outline-offset: 2px;
 }
 
@@ -33,8 +33,8 @@
 }
 
 .listening {
-  background: rgba(170,59,255,0.15);
-  border-color: #aa3bff;
+  background: var(--accent-bg);
+  border-color: var(--accent);
 }
 
 .processing {
@@ -48,11 +48,11 @@
 }
 
 .listening .icon {
-  color: #aa3bff;
+  color: var(--accent);
 }
 
 .processing .icon {
-  color: #A78BFA;
+  color: var(--accent-secondary);
 }
 
 .rings {
@@ -85,7 +85,7 @@
   position: absolute;
   inset: -5px;
   border: 2px solid rgba(170,59,255,0.18);
-  border-top: 2px solid #aa3bff;
+  border-top: 2px solid var(--accent);
   border-radius: 50%;
   animation: spin 0.8s linear infinite;
   pointer-events: none;

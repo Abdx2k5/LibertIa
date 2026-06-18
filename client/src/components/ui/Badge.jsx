@@ -11,11 +11,11 @@
 // =============================================================
 
 const VARIANT_STYLES = {
-  success: { backgroundColor: "rgba(34,197,94,0.1)",   border: "1px solid rgba(34,197,94,0.2)",   color: "#4ade80"  },
+  success: { backgroundColor: "rgba(34,197,94,0.1)",   border: "1px solid rgba(34,197,94,0.2)",   color: "var(--accent-green)"  },
   warning: { backgroundColor: "rgba(249,115,22,0.1)",  border: "1px solid rgba(249,115,22,0.2)",  color: "#f97316"  },
   default: { backgroundColor: "rgba(255,255,255,0.05)",border: "1px solid rgba(255,255,255,0.1)", color: "#d4d4d8"  },
-  premium: { backgroundColor: "rgba(139,92,246,0.15)", border: "1px solid rgba(139,92,246,0.3)", color: "#a78bfa"  },
-  cyan:    { backgroundColor: "rgba(167,139,250,0.1)", border: "1px solid rgba(167,139,250,0.3)", color: "#A78BFA"  },
+  premium: { backgroundColor: "rgba(139,92,246,0.15)", border: "1px solid rgba(139,92,246,0.3)", color: "var(--accent-secondary)"  },
+  cyan:    { backgroundColor: "rgba(167,139,250,0.1)", border: "1px solid rgba(167,139,250,0.3)", color: "var(--accent-secondary)"  },
   gold:    { backgroundColor: "rgba(255,215,0,0.1)",   border: "1px solid rgba(255,215,0,0.2)",   color: "#ffd700"  },
 };
 

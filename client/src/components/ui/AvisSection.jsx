@@ -20,7 +20,7 @@ const STAR_PATH = "M12 2.5l2.95 6.04 6.66.97-4.82 4.7 1.14 6.63L12 17.77l-5.93 3
 function StarShape({ size = 20, filled }) {
   return (
     <svg width={size} height={size} viewBox="0 0 24 24" aria-hidden="true">
-      <path d={STAR_PATH} fill={filled ? "#fbbf24" : "none"} stroke="#fbbf24" strokeWidth="1.5" strokeLinejoin="round" />
+      <path d={STAR_PATH} fill={filled ? "var(--warning)" : "none"} stroke="var(--warning)" strokeWidth="1.5" strokeLinejoin="round" />
     </svg>
   );
 }
@@ -28,7 +28,7 @@ function StarShape({ size = 20, filled }) {
 function PickerStarShape({ size = 28, filled }) {
   return (
     <svg width={size} height={size} viewBox="0 0 24 24" aria-hidden="true">
-      <path d={STAR_PATH} fill={filled ? "#aa3bff" : "none"} stroke={filled ? "#aa3bff" : "#6b7280"} strokeWidth="1.5" strokeLinejoin="round" />
+      <path d={STAR_PATH} fill={filled ? "var(--accent)" : "none"} stroke={filled ? "var(--accent)" : "var(--text-muted)"} strokeWidth="1.5" strokeLinejoin="round" />
     </svg>
   );
 }

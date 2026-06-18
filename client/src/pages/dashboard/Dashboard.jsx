@@ -29,7 +29,7 @@ const FILTERS = [
 ];
 
 const DEMO_HISTORY = [
-  { id: 1, date: "10 juin 2024", title: "Recherche Tokyo 🇯🇵", subtitle: "Vol + Hôtel proposés • Budget respecté", badge: { label: "Budget 1500€", color: "#4ade80", bg: "rgba(34,197,94,0.1)", border: "rgba(34,197,94,0.2)" }, btnLabel: "Voir les résultats" },
+  { id: 1, date: "10 juin 2024", title: "Recherche Tokyo 🇯🇵", subtitle: "Vol + Hôtel proposés • Budget respecté", badge: { label: "Budget 1500€", color: "var(--accent-green)", bg: "rgba(34,197,94,0.1)", border: "rgba(34,197,94,0.2)" }, btnLabel: "Voir les résultats" },
   { id: 2, date: "5 juin 2024",  title: "Hôtel Paris 🇫🇷",    subtitle: "3 hôtels trouvés dans votre budget",   badge: { label: "Dépassement +50€", color: "#f97316", bg: "rgba(249,115,22,0.1)", border: "rgba(249,115,22,0.2)" }, btnLabel: "Réserver à nouveau" },
   { id: 3, date: "28 mai 2024", title: "Activités Barcelone 🇪🇸", subtitle: "12 activités recommandées", badge: { label: "Activités uniquement", color: "#d4d4d8", bg: "rgba(255,255,255,0.05)", border: "rgba(255,255,255,0.1)" }, btnLabel: "Voir" },
 ];
@@ -350,9 +350,9 @@ export default function Dashboard() {
 
             {/* Results grid with title and subsections */}
             <div style={{ animation: `${styles.fadeIn} 0.4s ease` }}>
-              <h2 style={{ fontSize: 28, fontWeight: 700, color: '#f3f4f6', marginBottom: 8, position: 'relative', paddingBottom: 12 }}>
+              <h2 style={{ fontSize: 28, fontWeight: 700, color: 'var(--text)', marginBottom: 8, position: 'relative', paddingBottom: 12 }}>
                 Résultats de votre recherche
-                <div style={{ position: 'absolute', bottom: 0, left: 0, width: 60, height: 3, background: '#aa3bff', borderRadius: 2 }} />
+                <div style={{ position: 'absolute', bottom: 0, left: 0, width: 60, height: 3, background: 'var(--accent)', borderRadius: 2 }} />
               </h2>
 
               {/* Flights subsection */}
@@ -399,13 +399,13 @@ export default function Dashboard() {
             <div style={{ display: 'flex', gap: 32, alignItems: 'center', flex: 1 }}>
               <div>
                 <div style={{ fontSize: 12, color: '#a1a1aa' }}>Vol</div>
-                <div style={{ fontSize: 15, fontWeight: 600, color: '#f3f4f6' }}>{selectedVol.compagnie} {selectedVol.numero}</div>
-                <div style={{ fontSize: 14, fontWeight: 500, color: '#aa3bff' }}>{selectedVol.prix}€</div>
+                <div style={{ fontSize: 15, fontWeight: 600, color: 'var(--text)' }}>{selectedVol.compagnie} {selectedVol.numero}</div>
+                <div style={{ fontSize: 14, fontWeight: 500, color: 'var(--accent)' }}>{selectedVol.prix}€</div>
               </div>
               <div>
                 <div style={{ fontSize: 12, color: '#a1a1aa' }}>Hôtel</div>
-                <div style={{ fontSize: 15, fontWeight: 600, color: '#f3f4f6' }}>{selectedHotel.nom}</div>
-                <div style={{ fontSize: 14, fontWeight: 500, color: '#aa3bff' }}>{selectedHotel.prixTotal}€</div>
+                <div style={{ fontSize: 15, fontWeight: 600, color: 'var(--text)' }}>{selectedHotel.nom}</div>
+                <div style={{ fontSize: 14, fontWeight: 500, color: 'var(--accent)' }}>{selectedHotel.prixTotal}€</div>
               </div>
             </div>
             <div style={{ textAlign: 'right' }}>

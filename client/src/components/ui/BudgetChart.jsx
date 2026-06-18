@@ -43,9 +43,9 @@ export default function BudgetChart({ budget = {} }) {
   }, []);
 
   const rows = [
-    { key: "vols", label: "Vols", value: vols, color: "#aa3bff" },
-    { key: "hotel", label: "Hôtel", value: hotel, color: "#A78BFA" },
-    { key: "activites", label: "Activités", value: activites, color: "#4ade80" },
+    { key: "vols", label: "Vols", value: vols, color: "var(--accent)" },
+    { key: "hotel", label: "Hôtel", value: hotel, color: "var(--accent-secondary)" },
+    { key: "activites", label: "Activités", value: activites, color: "var(--accent-green)" },
     { key: "reste", label: "Reste", value: resteAffiche, color: "#64748b" },
   ];
 

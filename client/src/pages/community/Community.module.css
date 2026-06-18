@@ -1,7 +1,7 @@
 .page {
   min-height: 100vh;
-  background: #16171d;
-  color: #f3f4f6;
+  background: var(--bg);
+  color: var(--text);
   padding: 32px 24px 56px;
 }
 
@@ -25,15 +25,15 @@
 .composerCard,
 .sidebarCard,
 .partnerCard {
-  background: #1e1f27;
-  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: var(--bg-secondary);
+  border: 1px solid var(--border);
   border-radius: 12px;
-  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.3);
+  box-shadow: var(--card-shadow);
 }
 
 .heroCard {
   padding: 28px;
-  background: linear-gradient(135deg, #1e1f27, #2a1f3d);
+  background: linear-gradient(135deg, var(--bg-secondary), #2a1f3d);
   display: flex;
   flex-direction: column;
   gap: 24px;
@@ -63,17 +63,17 @@
   font-size: clamp(30px, 4vw, 48px);
   line-height: 1.05;
   font-weight: 800;
-  color: #f3f4f6;
+  color: var(--text);
 }
 
 .heroTitle span {
-  color: #aa3bff;
+  color: var(--accent);
 }
 
 .heroSubtitle {
   margin: 0;
   max-width: 760px;
-  color: #6b7280;
+  color: var(--text-muted);
   font-size: 15px;
   line-height: 1.65;
 }
@@ -89,7 +89,7 @@
   padding: 14px 16px;
   border-radius: 12px;
   background: rgba(255, 255, 255, 0.03);
-  border: 1px solid rgba(255, 255, 255, 0.08);
+  border: 1px solid var(--border);
   display: flex;
   flex-direction: column;
   gap: 4px;
@@ -98,12 +98,12 @@
 .statValue {
   font-size: 18px;
   font-weight: 800;
-  color: #f3f4f6;
+  color: var(--text);
 }
 
 .statLabel {
   font-size: 12px;
-  color: #6b7280;
+  color: var(--text-muted);
 }
 
 .heroButton {
@@ -111,7 +111,7 @@
   border: none;
   border-radius: 999px;
   padding: 12px 18px;
-  background: linear-gradient(135deg, #aa3bff, #7c3aed);
+  background: linear-gradient(135deg, var(--accent), #7c3aed);
   color: #ffffff;
   font-size: 14px;
   font-weight: 700;
@@ -138,21 +138,21 @@
   border-radius: 999px;
   object-fit: cover;
   flex-shrink: 0;
-  border: 1px solid rgba(255, 255, 255, 0.08);
+  border: 1px solid var(--border);
 }
 
 .composerInput {
   width: 100%;
-  border: 1px solid rgba(255, 255, 255, 0.08);
+  border: 1px solid var(--border);
   background: rgba(255, 255, 255, 0.03);
-  color: #f3f4f6;
+  color: var(--text);
   border-radius: 12px;
   padding: 14px 16px;
   font-size: 14px;
 }
 
 .composerInput::placeholder {
-  color: #6b7280;
+  color: var(--text-muted);
 }
 
 .composerActions {
@@ -163,9 +163,9 @@
 }
 
 .composerActionButton {
-  border: 1px solid rgba(255, 255, 255, 0.08);
+  border: 1px solid var(--border);
   background: rgba(255, 255, 255, 0.02);
-  color: #f3f4f6;
+  color: var(--text);
   border-radius: 999px;
   padding: 9px 14px;
   font-size: 13px;
@@ -178,7 +178,7 @@
   border: none;
   border-radius: 999px;
   padding: 10px 18px;
-  background: #aa3bff;
+  background: var(--accent);
   color: #ffffff;
   font-size: 13px;
   font-weight: 700;
@@ -189,14 +189,14 @@
   display: flex;
   gap: 10px;
   flex-wrap: wrap;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  border-bottom: 1px solid var(--border);
   padding: 0 4px;
 }
 
 .filterTab {
   border: none;
   background: transparent;
-  color: #6b7280;
+  color: var(--text-muted);
   font-size: 14px;
   font-weight: 600;
   padding: 12px 0 14px;
@@ -206,8 +206,8 @@
 }
 
 .filterTabActive {
-  color: #f3f4f6;
-  border-bottom-color: #aa3bff;
+  color: var(--text);
+  border-bottom-color: var(--accent);
 }
 
 .feedList {
@@ -227,7 +227,7 @@
   margin: 0;
   font-size: 16px;
   font-weight: 800;
-  color: #f3f4f6;
+  color: var(--text);
 }
 
 .userList,
@@ -267,7 +267,7 @@
 .eventName,
 .partnerTitle {
   margin: 0;
-  color: #f3f4f6;
+  color: var(--text);
 }
 
 .userName {
@@ -283,7 +283,7 @@
   margin: 0;
   font-size: 13px;
   line-height: 1.5;
-  color: #6b7280;
+  color: var(--text-muted);
 }
 
 .followButton {
@@ -329,7 +329,7 @@
 }
 
 .groupArrow {
-  color: #aa3bff;
+  color: var(--accent);
   font-size: 22px;
   line-height: 1;
 }
@@ -354,7 +354,7 @@
 .partnerKicker {
   font-size: 12px;
   font-weight: 700;
-  color: #f3f4f6;
+  color: var(--text);
   text-transform: uppercase;
   letter-spacing: 0.04em;
 }

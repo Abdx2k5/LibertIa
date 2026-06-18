@@ -20,7 +20,7 @@
   align-items: flex-end;
   gap: 8px;
   background: rgba(255, 255, 255, 0.03);
-  border: 1px solid rgba(255, 255, 255, 0.08);
+  border: 1px solid var(--border);
   border-radius: 14px;
   padding: 6px 6px 6px 14px;
   transition: border-color 0.18s ease;
@@ -35,7 +35,7 @@
   resize: none;
   border: none;
   background: transparent;
-  color: #f3f4f6;
+  color: var(--text);
   font-size: 14px;
   line-height: 1.5;
   font-family: inherit;
@@ -45,7 +45,7 @@
 }
 
 .input::placeholder {
-  color: #6b7280;
+  color: var(--text-muted);
 }
 
 .send {
@@ -56,7 +56,7 @@
   font-size: 13px;
   font-weight: 700;
   color: #ffffff;
-  background: linear-gradient(135deg, #aa3bff, #7c3aed);
+  background: linear-gradient(135deg, var(--accent), #7c3aed);
   cursor: pointer;
   transition: filter 0.18s ease, opacity 0.18s ease;
 }
@@ -80,7 +80,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  background: linear-gradient(135deg, #aa3bff, #7c3aed);
+  background: linear-gradient(135deg, var(--accent), #7c3aed);
   color: #fff;
   font-size: 13px;
   font-weight: 700;
@@ -96,7 +96,7 @@
 .empty {
   margin: 0;
   font-size: 13px;
-  color: #6b7280;
+  color: var(--text-muted);
   text-align: center;
   padding: 8px 0;
 }
@@ -140,7 +140,7 @@
 .author {
   font-size: 13px;
   font-weight: 700;
-  color: #f3f4f6;
+  color: var(--text);
 }
 
 .ownTag {
@@ -171,7 +171,7 @@
 
 .time {
   font-size: 12px;
-  color: #6b7280;
+  color: var(--text-muted);
 }
 
 .replyBtn {

@@ -30,7 +30,7 @@ const s = {
   },
   box: {
     backgroundColor: "#0b1220",
-    border: "1px solid rgba(255,255,255,0.08)",
+    border: "1px solid var(--border)",
     borderRadius: 16,
     boxShadow: "0px 25px 50px -12px rgba(0,0,0,0.7)",
     position: "relative",

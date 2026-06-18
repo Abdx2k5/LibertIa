@@ -15,7 +15,7 @@
   display: flex; gap: 28px; align-items: center;
   backdrop-filter: blur(6px);
   background-color: rgba(255,255,255,0.03);
-  border: 1px solid rgba(255,255,255,0.08);
+  border: 1px solid var(--border);
   border-radius: 16px; padding: 32px; margin-bottom: 24px;
 }
 
@@ -44,7 +44,7 @@
 .section {
   backdrop-filter: blur(6px);
   background-color: rgba(255,255,255,0.03);
-  border: 1px solid rgba(255,255,255,0.08);
+  border: 1px solid var(--border);
   border-radius: 16px; padding: 28px; margin-bottom: 24px;
 }
 
@@ -81,7 +81,7 @@
 .serviceTitle { font-size: 14px; font-weight: 600; color: #fff; margin-bottom: 4px; }
 .serviceDesc { font-size: 13px; color: #a1a1aa; line-height: 1.4; }
 .servicePrice {
-  font-size: 13px; font-weight: 600; color: #A78BFA;
+  font-size: 13px; font-weight: 600; color: var(--accent-secondary);
   white-space: nowrap; padding-top: 2px;
 }
 

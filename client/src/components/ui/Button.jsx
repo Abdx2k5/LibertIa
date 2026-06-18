@@ -23,7 +23,7 @@
 
 const VARIANT_STYLES = {
   primary: {
-    background: "linear-gradient(135deg, #A78BFA 0%, #8b5cf6 100%)",
+    background: "linear-gradient(135deg, var(--accent-secondary) 0%, #8b5cf6 100%)",
     border: "none",
     color: "#ffffff",
     fontWeight: 700,
@@ -37,17 +37,17 @@ const VARIANT_STYLES = {
   ghost: {
     background: "transparent",
     border: "none",
-    color: "#A78BFA",
+    color: "var(--accent-secondary)",
     fontWeight: 500,
   },
   danger: {
     background: "rgba(239,68,68,0.1)",
     border: "1px solid rgba(239,68,68,0.3)",
-    color: "#f87171",
+    color: "var(--error)",
     fontWeight: 500,
   },
   cyan: {
-    background: "linear-gradient(90deg, #A78BFA, #8b5cf6)",
+    background: "linear-gradient(90deg, var(--accent-secondary), #8b5cf6)",
     border: "none",
     color: "#ffffff",
     fontWeight: 700,
