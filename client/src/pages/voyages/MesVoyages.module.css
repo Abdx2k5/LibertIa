@@ -125,7 +125,7 @@
 
 .dayBlock { display: flex; flex-direction: column; gap: 6px; }
 
-.dayLabel { font-size: 13px; font-weight: 700; color: #00ffff; }
+.dayLabel { font-size: 13px; font-weight: 700; color: #A78BFA; }
 
 .dayList {
   list-style: none; margin: 0; padding: 0;

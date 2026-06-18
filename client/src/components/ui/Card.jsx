@@ -25,8 +25,8 @@ const VARIANT_STYLES = {
   "glass-cyan": {
     backdropFilter: "blur(8px)",
     backgroundColor: "rgba(255,255,255,0.03)",
-    border: "1px solid rgba(0,255,255,0.2)",
-    boxShadow: "0px 8px 32px 0px rgba(0,255,255,0.1)",
+    border: "1px solid rgba(167,139,250,0.2)",
+    boxShadow: "0px 8px 32px 0px rgba(167,139,250,0.1)",
   },
   solid: {
     backdropFilter: "blur(8px)",

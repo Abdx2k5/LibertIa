@@ -37,7 +37,7 @@ const VARIANT_STYLES = {
   ghost: {
     background: "transparent",
     border: "none",
-    color: "#00ffff",
+    color: "#A78BFA",
     fontWeight: 500,
   },
   danger: {
@@ -47,9 +47,9 @@ const VARIANT_STYLES = {
     fontWeight: 500,
   },
   cyan: {
-    background: "linear-gradient(90deg, #00ffff, #8b5cf6)",
+    background: "linear-gradient(90deg, #A78BFA, #8b5cf6)",
     border: "none",
-    color: "#000000",
+    color: "#ffffff",
     fontWeight: 700,
   },
 };
