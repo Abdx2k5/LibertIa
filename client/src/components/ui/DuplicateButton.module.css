@@ -36,7 +36,7 @@
 .outline {
   border: 1px solid rgba(170, 59, 255, 0.3);
   background: transparent;
-  color: #f3f4f6;
+  color: var(--text);
 }
 
 .outline:hover {
@@ -57,7 +57,7 @@
 .primary {
   border: none;
   color: #ffffff;
-  background: linear-gradient(135deg, #aa3bff, #7c3aed);
+  background: linear-gradient(135deg, var(--accent), #7c3aed);
 }
 
 .primary:hover {

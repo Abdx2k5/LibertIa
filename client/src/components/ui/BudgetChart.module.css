@@ -1,6 +1,6 @@
 .card {
-  background: #1e1f27;
-  border: 1px solid rgba(255,255,255,0.08);
+  background: var(--bg-secondary);
+  border: 1px solid var(--border);
   border-radius: 12px;
   padding: 24px;
 }
@@ -43,9 +43,9 @@
   transition: --vol-end 0.8s ease, --hotel-end 0.8s ease, --activites-end 0.8s ease;
   background: conic-gradient(
     from -90deg,
-    #aa3bff 0deg var(--vol-end),
-    #A78BFA var(--vol-end) var(--hotel-end),
-    #4ade80 var(--hotel-end) var(--activites-end),
+    var(--accent) 0deg var(--vol-end),
+    var(--accent-secondary) var(--vol-end) var(--hotel-end),
+    var(--accent-green) var(--hotel-end) var(--activites-end),
     #64748b var(--activites-end) 360deg
   );
 }
@@ -58,7 +58,7 @@
   left: 50%;
   transform: translate(-50%, -50%);
   border-radius: 50%;
-  background: #1e1f27;
+  background: var(--bg-secondary);
 }
 
 .centerText {
@@ -123,7 +123,7 @@
 
 .rowLabel {
   font-size: 14px;
-  color: #f3f4f6;
+  color: var(--text);
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -145,7 +145,7 @@
 .rowAmount {
   font-size: 14px;
   font-weight: 600;
-  color: #f3f4f6;
+  color: var(--text);
   min-width: 74px;
   text-align: right;
 }
@@ -157,7 +157,7 @@
 }
 
 .pill {
-  border: 1px solid rgba(255,255,255,0.08);
+  border: 1px solid var(--border);
   border-radius: 10px;
   background: rgba(255,255,255,0.03);
   padding: 12px 14px;
@@ -172,7 +172,7 @@
 .pillValue {
   font-size: 18px;
   font-weight: 700;
-  color: #f3f4f6;
+  color: var(--text);
 }
 
 .pillSuccess {
@@ -181,7 +181,7 @@
 }
 
 .pillSuccess .pillValue {
-  color: #4ade80;
+  color: var(--accent-green);
 }
 
 .pillDanger {
@@ -190,7 +190,7 @@
 }
 
 .pillDanger .pillValue {
-  color: #f87171;
+  color: var(--error);
 }
 
 @media (max-width: 900px) {

@@ -10,9 +10,9 @@ export default function ItineraireJourJour({ voyage }) {
   const budget = voyage.budget || { total: 0, vols: 0, hotel: 0, activites: 0 };
   const reste = Math.max(0, budget.total - (budget.vols + budget.hotel + budget.activites));
   const segments = [
-    { label: "Vols", amount: budget.vols, color: "#aa3bff" },
-    { label: "Hôtel", amount: budget.hotel, color: "#A78BFA" },
-    { label: "Activités", amount: budget.activites, color: "#4ade80" },
+    { label: "Vols", amount: budget.vols, color: "var(--accent)" },
+    { label: "Hôtel", amount: budget.hotel, color: "var(--accent-secondary)" },
+    { label: "Activités", amount: budget.activites, color: "var(--accent-green)" },
     { label: "Reste", amount: reste, color: "#64748b" },
   ];
 

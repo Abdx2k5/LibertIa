@@ -75,7 +75,7 @@ export default function GaleriePhoto({ photos = [], colonnes = 3 }) {
                 photo.url
                   ? { backgroundImage: `url(${photo.url})` }
                   : {
-                      background: "linear-gradient(135deg, #2a2b35, #1e1f27)",
+                      background: "linear-gradient(135deg, var(--bg-tertiary), var(--bg-secondary))",
                     }
               }
             />
@@ -117,7 +117,7 @@ export default function GaleriePhoto({ photos = [], colonnes = 3 }) {
                         ? { backgroundImage: `url(${current.url})` }
                         : {
                             background:
-                              "linear-gradient(135deg, #2a2b35, #1e1f27)",
+                              "linear-gradient(135deg, var(--bg-tertiary), var(--bg-secondary))",
                           }
                     }
                   />

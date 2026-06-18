@@ -29,19 +29,19 @@
 }
 
 .message strong {
-  color: #A78BFA;
+  color: var(--accent-secondary);
   font-weight: 600;
 }
 
 .warning_text {
   font-size: 13px;
-  color: #f87171;
+  color: var(--error);
   font-weight: 500;
   margin: 0;
   padding: 10px 12px;
   background: rgba(248, 113, 113, 0.08);
   border-radius: 6px;
-  border-left: 3px solid #f87171;
+  border-left: 3px solid var(--error);
 }
 
 .footer {

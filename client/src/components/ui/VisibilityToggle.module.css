@@ -6,7 +6,7 @@
   gap: 16px;
   width: 100%;
   text-align: left;
-  border: 1px solid rgba(255, 255, 255, 0.08);
+  border: 1px solid var(--border);
   background: rgba(255, 255, 255, 0.02);
   border-radius: 14px;
   padding: 12px 16px;
@@ -15,7 +15,7 @@
 }
 
 .row:hover {
-  border-color: rgba(170, 59, 255, 0.4);
+  border-color: var(--accent-border);
 }
 
 .rowPublic {
@@ -45,12 +45,12 @@
 .label {
   font-size: 14px;
   font-weight: 700;
-  color: #f3f4f6;
+  color: var(--text);
 }
 
 .hint {
   font-size: 12px;
-  color: #6b7280;
+  color: var(--text-muted);
 }
 
 .track {
@@ -64,7 +64,7 @@
 }
 
 .rowPublic .track {
-  background: linear-gradient(135deg, #aa3bff, #7c3aed);
+  background: linear-gradient(135deg, var(--accent), #7c3aed);
 }
 
 .thumb {
@@ -90,7 +90,7 @@
   gap: 4px;
   border-radius: 999px;
   background: rgba(255, 255, 255, 0.04);
-  border: 1px solid rgba(255, 255, 255, 0.08);
+  border: 1px solid var(--border);
 }
 
 .segment {
@@ -106,12 +106,12 @@
 }
 
 .segment:hover {
-  color: #f3f4f6;
+  color: var(--text);
 }
 
 .segmentActive {
   color: #ffffff;
-  background: linear-gradient(135deg, #aa3bff, #7c3aed);
+  background: linear-gradient(135deg, var(--accent), #7c3aed);
   box-shadow: 0 6px 14px rgba(170, 59, 255, 0.28);
 }
 

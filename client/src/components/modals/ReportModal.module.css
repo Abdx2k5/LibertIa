@@ -23,7 +23,7 @@
   gap: 12px;
   width: 100%;
   text-align: left;
-  border: 1px solid rgba(255, 255, 255, 0.08);
+  border: 1px solid var(--border);
   background: rgba(255, 255, 255, 0.02);
   border-radius: 12px;
   padding: 12px 14px;
@@ -35,7 +35,7 @@
 }
 
 .reason:hover {
-  border-color: rgba(170, 59, 255, 0.4);
+  border-color: var(--accent-border);
   background: rgba(170, 59, 255, 0.06);
 }
 
@@ -64,7 +64,7 @@
 }
 
 .reasonActive .radio {
-  border-color: #aa3bff;
+  border-color: var(--accent);
 }
 
 .reasonActive .radio::after {
@@ -72,7 +72,7 @@
   position: absolute;
   inset: 3px;
   border-radius: 999px;
-  background: #aa3bff;
+  background: var(--accent);
 }
 
 .detailsLabel {
@@ -88,11 +88,11 @@
 .textarea {
   resize: vertical;
   min-height: 76px;
-  border: 1px solid rgba(255, 255, 255, 0.08);
+  border: 1px solid var(--border);
   background: rgba(255, 255, 255, 0.03);
   border-radius: 12px;
   padding: 12px 14px;
-  color: #f3f4f6;
+  color: var(--text);
   font-size: 14px;
   font-family: inherit;
   line-height: 1.5;
@@ -105,14 +105,14 @@
 }
 
 .textarea::placeholder {
-  color: #6b7280;
+  color: var(--text-muted);
 }
 
 .counter {
   align-self: flex-end;
   font-size: 11px;
   font-weight: 500;
-  color: #6b7280;
+  color: var(--text-muted);
 }
 
 .footer {

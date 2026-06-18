@@ -1,16 +1,16 @@
 .card {
-  background: #1e1f27;
-  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: var(--bg-secondary);
+  border: 1px solid var(--border);
   border-radius: 12px;
   padding: 12px;
   display: flex;
   gap: 12px;
-  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.3);
+  box-shadow: var(--card-shadow);
   transition: all 0.3s ease;
 }
 
 .card:hover {
-  border-color: rgba(170, 59, 255, 0.4);
+  border-color: var(--accent-border);
   transform: translateY(-2px);
 }
 
@@ -18,7 +18,7 @@
   width: 48px;
   height: 48px;
   border-radius: 8px;
-  background: linear-gradient(135deg, #1e1f27 0%, #2a2b35 100%);
+  background: linear-gradient(135deg, var(--bg-secondary) 0%, var(--bg-tertiary) 100%);
   flex-shrink: 0;
 }
 
@@ -36,7 +36,7 @@
 }
 
 .titre {
-  color: #f3f4f6;
+  color: var(--text);
   font-size: 14px;
   font-weight: 700;
   margin: 0;
@@ -49,7 +49,7 @@
   gap: 8px;
   margin-top: 4px;
   font-size: 12px;
-  color: #6b7280;
+  color: var(--text-muted);
 }
 
 .note {
@@ -66,8 +66,8 @@
 
 .categoriePill {
   display: inline-block;
-  background: rgba(170, 59, 255, 0.15);
-  color: #aa3bff;
+  background: var(--accent-bg);
+  color: var(--accent);
   padding: 4px 10px;
   border-radius: 12px;
   font-size: 11px;
@@ -83,7 +83,7 @@
 }
 
 .prix {
-  color: #4ade80;
+  color: var(--accent-green);
   font-weight: 700;
   font-size: 14px;
   min-width: 35px;
@@ -96,7 +96,7 @@
   border-radius: 6px;
   border: 1px solid rgba(74, 222, 128, 0.3);
   background: rgba(74, 222, 128, 0.1);
-  color: #4ade80;
+  color: var(--accent-green);
   font-weight: 700;
   font-size: 14px;
   cursor: pointer;
@@ -115,5 +115,5 @@
 
 .addBtn.added {
   background: rgba(74, 222, 128, 0.25);
-  border-color: #4ade80;
+  border-color: var(--accent-green);
 }

@@ -17,8 +17,8 @@
   border-radius: 12px;
   overflow: hidden;
   cursor: pointer;
-  background: #1e1f27;
-  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: var(--bg-secondary);
+  border: 1px solid var(--border);
 }
 
 .photoImg {
@@ -64,7 +64,7 @@
   margin: 0;
   font-size: 14px;
   font-weight: 700;
-  color: #f3f4f6;
+  color: var(--text);
 }
 
 .overlayMeta {
@@ -75,7 +75,7 @@
 
 .fullscreenIcon {
   font-size: 24px;
-  color: #f3f4f6;
+  color: var(--text);
   position: absolute;
   bottom: 16px;
   right: 16px;
@@ -162,7 +162,7 @@
   margin: 0;
   font-size: 18px;
   font-weight: 700;
-  color: #f3f4f6;
+  color: var(--text);
 }
 
 .lightboxMeta {
@@ -179,7 +179,7 @@
   z-index: 10;
   background: transparent;
   border: none;
-  color: #f3f4f6;
+  color: var(--text);
   font-size: 28px;
   cursor: pointer;
   padding: 0;
@@ -192,7 +192,7 @@
 }
 
 .closeBtn:hover {
-  color: #aa3bff;
+  color: var(--accent);
 }
 
 /* ── COUNTER (top-center) ── */
@@ -203,7 +203,7 @@
   transform: translateX(-50%);
   z-index: 10;
   background: rgba(0, 0, 0, 0.5);
-  color: #f3f4f6;
+  color: var(--text);
   padding: 8px 16px;
   border-radius: 20px;
   font-size: 14px;
@@ -215,9 +215,9 @@
   position: absolute;
   top: 50%;
   transform: translateY(-50%);
-  background: rgba(255, 255, 255, 0.08);
+  background: var(--border);
   border: 1px solid rgba(255, 255, 255, 0.2);
-  color: #f3f4f6;
+  color: var(--text);
   font-size: 24px;
   width: 48px;
   height: 48px;
@@ -232,8 +232,8 @@
 
 .navBtn:hover {
   background: rgba(170, 59, 255, 0.2);
-  border-color: rgba(170, 59, 255, 0.4);
-  color: #aa3bff;
+  border-color: var(--accent-border);
+  color: var(--accent);
 }
 
 .prevBtn {

@@ -4,9 +4,9 @@
 
 .page {
   min-height: 100vh;
-  background: linear-gradient(135deg, #0b1026 0%, #1a1a2e 100%);
+  background: var(--bg);
   font-family: 'Inter', sans-serif;
-  color: #fff;
+  color: var(--text);
 }
 
 /* ── Navbar ── */
@@ -46,7 +46,7 @@
   border-left: 1px solid rgba(255,255,255,0.1);
   padding-left: 17px; margin-left: 16px;
 }
-.navBadgeText { font-size: 13px; font-weight: 600; color: #A78BFA; }
+.navBadgeText { font-size: 13px; font-weight: 600; color: var(--accent-secondary); }
 
 /* ── Main ── */
 .main { max-width: 1200px; margin: 0 auto; padding: 0 24px; }
@@ -56,7 +56,7 @@
 
 .heroTitle {
   font-size: 36px; font-weight: 800;
-  background: linear-gradient(90deg, #A78BFA, #8b5cf6);
+  background: linear-gradient(90deg, var(--accent-secondary), #8b5cf6);
   -webkit-background-clip: text; -webkit-text-fill-color: transparent;
   background-clip: text; text-align: center; margin: 0;
 }
@@ -96,9 +96,9 @@
 
 .filterPillActive {
   background-color: rgba(167,139,250,0.1);
-  border: 1px solid #A78BFA;
+  border: 1px solid var(--accent-secondary);
   border-radius: 12px; padding: 5px 11px;
-  font-size: 12px; font-weight: 500; color: #A78BFA;
+  font-size: 12px; font-weight: 500; color: var(--accent-secondary);
   cursor: pointer; font-family: 'Inter', sans-serif;
 }
 
@@ -113,7 +113,7 @@
 
 .sendBtn {
   width: 56px; height: 56px; border-radius: 28px;
-  background-color: #A78BFA; border: none;
+  background-color: var(--accent-secondary); border: none;
   display: flex; align-items: center; justify-content: center;
   cursor: pointer; flex-shrink: 0; transition: background 0.2s;
 }
@@ -123,9 +123,9 @@
 
 /* ── Prompt counter ── */
 .promptCounter { display: flex; align-items: center; gap: 8px; font-size: 13px; color: #a1a1aa; }
-.promptNum     { color: #A78BFA; font-weight: 600; }
+.promptNum     { color: var(--accent-secondary); font-weight: 600; }
 .promptWarn    { color: #f97316; font-size: 12px; }
-.errorText     { text-align: center; color: #f87171; padding: 20px 0; font-size: 14px; }
+.errorText     { text-align: center; color: var(--error); padding: 20px 0; font-size: 14px; }
 .loadingText   { text-align: center; color: #a1a1aa; padding: 40px 0; }
 
 /* ── Dashboard grid ── */
@@ -141,7 +141,7 @@
 .historyCard {
   backdrop-filter: blur(6px);
   background-color: rgba(255,255,255,0.03);
-  border: 1px solid rgba(255,255,255,0.08);
+  border: 1px solid var(--border);
   border-radius: 16px; padding: 21px;
   display: flex; justify-content: space-between;
   align-items: center; margin-bottom: 16px;
@@ -150,7 +150,7 @@
 .historyCard:hover  { border-color: rgba(255,255,255,0.15); }
 .historyDate        { display: flex; align-items: center; gap: 6px; margin-bottom: 8px; }
 .historyDateIcon    { width: 13px; height: 13px; }
-.historyDateText    { font-size: 13px; color: #a78bfa; }
+.historyDateText    { font-size: 13px; color: var(--accent-secondary); }
 .historyTitle       { font-size: 18px; font-weight: 700; color: #fff; margin-bottom: 4px; }
 .historySubtitle    { font-size: 14px; color: #a1a1aa; margin-bottom: 8px; }
 
@@ -179,7 +179,7 @@
 .suggestCard {
   backdrop-filter: blur(6px);
   background-color: rgba(255,255,255,0.03);
-  border: 1px solid rgba(255,255,255,0.08);
+  border: 1px solid var(--border);
   border-radius: 16px; overflow: hidden; transition: border-color 0.2s;
 }
 .suggestCard:hover      { border-color: rgba(167,139,250,0.2); }
@@ -199,10 +199,10 @@
 .suggestDesc        { font-size: 14px; color: #a1a1aa; line-height: 1.5; margin: 0 0 16px; }
 .suggestFooter      { display: flex; justify-content: space-between; align-items: flex-end; }
 .suggestPriceLabel  { font-size: 12px; color: #a1a1aa; margin-bottom: 4px; }
-.suggestPrice       { font-size: 18px; font-weight: 600; color: #A78BFA; }
+.suggestPrice       { font-size: 18px; font-weight: 600; color: var(--accent-secondary); }
 
 .exploreBtn {
-  background: linear-gradient(90deg, #A78BFA, #8b5cf6);
+  background: linear-gradient(90deg, var(--accent-secondary), #8b5cf6);
   border: none; border-radius: 8px;
   padding: 8px 16px; font-size: 14px; font-weight: 700;
   color: #fff; cursor: pointer;
@@ -213,7 +213,7 @@
 .suggestWide {
   backdrop-filter: blur(6px);
   background-color: rgba(255,255,255,0.03);
-  border: 1px solid rgba(255,255,255,0.08);
+  border: 1px solid var(--border);
   border-radius: 16px; overflow: hidden;
   grid-column: 1 / -1; display: flex; height: 246px;
   transition: border-color 0.2s;
@@ -237,7 +237,7 @@
   z-index: 1000;
 }
 .modal {
-  background-color: #0f1724;
+  background-color: var(--bg-input);
   border: 1px solid rgba(167,139,250,0.2);
   border-radius: 16px; padding: 40px;
   width: 440px; text-align: center;
@@ -249,7 +249,7 @@
 
 .modalBtnPrimary {
   width: 100%;
-  background: linear-gradient(135deg, #A78BFA, #8b5cf6);
+  background: linear-gradient(135deg, var(--accent-secondary), #8b5cf6);
   border: none; border-radius: 8px;
   padding: 12px 24px; font-size: 15px; font-weight: 700;
   color: #fff; cursor: pointer; margin-bottom: 12px;
@@ -296,7 +296,7 @@
 .subsectionLabel {
   font-size: 18px;
   font-weight: 600;
-  color: #f3f4f6;
+  color: var(--text);
   margin: 24px 0 12px;
   display: flex;
   align-items: center;
@@ -323,11 +323,11 @@
 .confirmBarTotal {
   font-size: 20px;
   font-weight: 700;
-  color: #aa3bff;
+  color: var(--accent);
 }
 
 .confirmBtn {
-  background: linear-gradient(135deg, #aa3bff, #7c3aed);
+  background: linear-gradient(135deg, var(--accent), #7c3aed);
   border: none;
   border-radius: 10px;
   padding: 12px 28px;

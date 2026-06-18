@@ -31,7 +31,7 @@
   background: rgba(255, 255, 255, 0.05);
   border: 1px solid rgba(167, 139, 250, 0.15);
   border-radius: 8px;
-  color: #A78BFA;
+  color: var(--accent-secondary);
   font-size: 13px;
   font-family: 'Courier New', monospace;
   outline: none;

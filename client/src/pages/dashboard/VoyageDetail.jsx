@@ -45,7 +45,7 @@ export default function VoyageDetail() {
     return (
       <div className={styles.page}>
         <div className={styles.centered}>
-          <Spinner size={32} color="#aa3bff" label="Chargement du voyage..." />
+          <Spinner size={32} color="var(--accent)" label="Chargement du voyage..." />
         </div>
       </div>
     );

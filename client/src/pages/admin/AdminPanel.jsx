@@ -50,7 +50,7 @@ export default function AdminPanel() {
           <div className={styles.tableHeader}>
             <h2 className={styles.tableTitle}>Utilisateurs</h2>
             <input
-              style={{ background: "#0f1724", border: "1px solid rgba(255,255,255,0.08)", borderRadius: 6, padding: "8px 14px", fontSize: 13, color: "#e7f0ff", outline: "none" }}
+              style={{ background: "var(--bg-input)", border: "1px solid var(--border)", borderRadius: 6, padding: "8px 14px", fontSize: 13, color: "#e7f0ff", outline: "none" }}
               placeholder="Rechercher..."
               value={search}
               onChange={(e) => setSearch(e.target.value)}

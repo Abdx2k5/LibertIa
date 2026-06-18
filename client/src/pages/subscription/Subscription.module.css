@@ -4,8 +4,8 @@
 
 .page {
   min-height: 100vh;
-  background: linear-gradient(135deg, #0b1026 0%, #1a1a2e 100%);
-  font-family: 'Inter', sans-serif; color: #fff;
+  background: var(--bg);
+  font-family: 'Inter', sans-serif; color: var(--text);
 }
 
 .main { max-width: 900px; margin: 0 auto; padding: 40px 24px; }
@@ -17,7 +17,7 @@
 .section {
   backdrop-filter: blur(6px);
   background-color: rgba(255,255,255,0.03);
-  border: 1px solid rgba(255,255,255,0.08);
+  border: 1px solid var(--border);
   border-radius: 16px; padding: 28px; margin-bottom: 24px;
 }
 
@@ -27,10 +27,10 @@
 .linkBtn {
   background: none; border: none; padding: 0; cursor: pointer;
   font-family: 'Inter', sans-serif; font-size: 13px; font-weight: 500;
-  color: #A78BFA; text-decoration: underline; text-decoration-color: transparent;
+  color: var(--accent-secondary); text-decoration: underline; text-decoration-color: transparent;
   transition: text-decoration-color 0.15s;
 }
-.linkBtn:hover { text-decoration-color: #A78BFA; }
+.linkBtn:hover { text-decoration-color: var(--accent-secondary); }
 
 /* ── Plan actuel ── */
 .currentPlanRow {
@@ -41,14 +41,14 @@
 
 .currentPlanStats { display: flex; gap: 24px; }
 .statBlock { display: flex; flex-direction: column; align-items: center; gap: 2px; }
-.statNum   { font-size: 22px; font-weight: 700; color: #A78BFA; }
+.statNum   { font-size: 22px; font-weight: 700; color: var(--accent-secondary); }
 .statLabel { font-size: 12px; color: #a1a1aa; }
 
 /* ── Billing toggle ── */
 .billingToggle {
   display: inline-flex; gap: 4px; padding: 4px;
   background-color: rgba(255,255,255,0.04);
-  border: 1px solid rgba(255,255,255,0.08);
+  border: 1px solid var(--border);
   border-radius: 10px; margin-bottom: 24px;
 }
 
@@ -61,12 +61,12 @@
   color: #94a3b8; transition: all 0.15s;
 }
 .billingOptionActive {
-  background: linear-gradient(135deg, #A78BFA 0%, #8b5cf6 100%);
+  background: linear-gradient(135deg, var(--accent-secondary) 0%, #8b5cf6 100%);
   color: #ffffff;
 }
 
 .billingBadge {
-  font-size: 11px; font-weight: 600; color: #4ade80;
+  font-size: 11px; font-weight: 600; color: var(--accent-green);
   background: rgba(34,197,94,0.15);
   border-radius: 8px; padding: 2px 6px;
 }
@@ -79,7 +79,7 @@
   display: flex; flex-direction: column; gap: 16px;
   padding: 24px;
   background-color: rgba(255,255,255,0.02);
-  border: 1px solid rgba(255,255,255,0.08);
+  border: 1px solid var(--border);
   border-radius: 14px;
 }
 
@@ -102,7 +102,7 @@
   flex-shrink: 0;
   display: inline-flex; align-items: center; justify-content: center;
   width: 18px; height: 18px; border-radius: 50%;
-  background-color: rgba(34,197,94,0.15); color: #4ade80;
+  background-color: rgba(34,197,94,0.15); color: var(--accent-green);
   font-size: 11px; font-weight: 700; margin-top: 1px;
 }
 
@@ -122,10 +122,10 @@
 .dangerZone {
   display: flex; align-items: center; justify-content: space-between; gap: 16px;
   margin-top: 16px; padding-top: 20px;
-  border-top: 1px solid rgba(255,255,255,0.08);
+  border-top: 1px solid var(--border);
   flex-wrap: wrap;
 }
-.dangerTitle { font-size: 14px; font-weight: 600; color: #f87171; margin-bottom: 4px; }
+.dangerTitle { font-size: 14px; font-weight: 600; color: var(--error); margin-bottom: 4px; }
 .dangerText  { font-size: 12px; color: #94a3b8; max-width: 420px; }
 
 /* ── Responsive ── */

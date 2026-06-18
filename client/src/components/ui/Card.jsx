@@ -20,7 +20,7 @@ const VARIANT_STYLES = {
   glass: {
     backdropFilter: "blur(6px)",
     backgroundColor: "rgba(255,255,255,0.03)",
-    border: "1px solid rgba(255,255,255,0.08)",
+    border: "1px solid var(--border)",
   },
   "glass-cyan": {
     backdropFilter: "blur(8px)",
@@ -31,13 +31,13 @@ const VARIANT_STYLES = {
   solid: {
     backdropFilter: "blur(8px)",
     backgroundColor: "rgba(255,255,255,0.03)",
-    border: "1px solid rgba(255,255,255,0.08)",
+    border: "1px solid var(--border)",
     boxShadow: "0px 25px 50px -12px rgba(0,0,0,0.5)",
   },
   destination: {
     backdropFilter: "blur(6px)",
     backgroundColor: "rgba(255,255,255,0.03)",
-    border: "1px solid rgba(255,255,255,0.08)",
+    border: "1px solid var(--border)",
     overflow: "hidden",
   },
 };

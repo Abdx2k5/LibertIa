@@ -4,7 +4,7 @@
   margin-top: 24px;
   padding: 18px 20px;
   border-radius: 16px;
-  background-color: rgba(255, 255, 255, 0.04);
+  background-color: var(--bg-secondary);
   border: 1px solid rgba(167, 139, 250, 0.15);
   box-shadow: 0 10px 30px rgba(0, 0, 0, 0.25);
 }
@@ -28,7 +28,7 @@
   font-weight: 700;
   letter-spacing: 0.04em;
   text-transform: uppercase;
-  color: #A78BFA;
+  color: var(--accent-secondary);
 }
 
 .status {
@@ -49,12 +49,12 @@
   margin-top: 12px;
   font-size: 13px;
   font-weight: 600;
-  color: #4ade80;
+  color: var(--accent-green);
 }
 
 .error {
   font-size: 13px;
-  color: #f87171;
+  color: var(--error);
   margin-bottom: 8px;
 }
 
@@ -79,5 +79,5 @@
 
 .cancelBtn:hover {
   border-color: rgba(255, 255, 255, 0.4);
-  background: rgba(255, 255, 255, 0.08);
+  background: var(--border);
 }

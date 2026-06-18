@@ -19,8 +19,8 @@
 
 const VARIANT_STYLES = {
   default: {
-    backgroundColor: "#0f1724",
-    border: "1px solid rgba(255,255,255,0.08)",
+    backgroundColor: "var(--bg-input)",
+    border: "1px solid var(--border)",
     color: "#e7f0ff",
   },
   search: {
@@ -29,7 +29,7 @@ const VARIANT_STYLES = {
     color: "#ffffff",
   },
   error: {
-    backgroundColor: "#0f1724",
+    backgroundColor: "var(--bg-input)",
     border: "1px solid rgba(248,113,113,0.5)",
     color: "#e7f0ff",
   },
@@ -47,7 +47,7 @@ const s = {
   },
   iconLeft:  { position: "absolute", left: 16, width: 18, height: 18, pointerEvents: "none" },
   iconRight: { position: "absolute", right: 16, width: 18, height: 18, cursor: "pointer", opacity: 0.6 },
-  errorMsg:  { fontSize: 12, color: "#f87171", marginTop: 2 },
+  errorMsg:  { fontSize: 12, color: "var(--error)", marginTop: 2 },
 };
 
 export default function Input({
