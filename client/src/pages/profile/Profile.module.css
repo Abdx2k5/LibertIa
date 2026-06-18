@@ -59,7 +59,7 @@
 .navBtn:hover { background-color: rgba(255,255,255,0.05); color: #fff; }
 
 .navBtnActive {
-  background: linear-gradient(135deg, rgba(6,182,212,0.15), rgba(139,92,246,0.15));
+  background: linear-gradient(135deg, rgba(167,139,250,0.15), rgba(139,92,246,0.15));
   border: 1px solid rgba(139,92,246,0.3);
   color: #fff;
 }
@@ -265,7 +265,7 @@
   transition: border-color 0.2s;
 }
 .input::placeholder { color: #94a3b8; }
-.input:focus        { border-color: rgba(110,231,243,0.4); }
+.input:focus        { border-color: rgba(167,139,250,0.4); }
 .inputDisabled      { opacity: 0.5; cursor: not-allowed; }
 .inputError         { border-color: rgba(239,68,68,0.5) !important; }
 
@@ -285,7 +285,7 @@
   min-height: 120px;
 }
 .textarea::placeholder { color: #94a3b8; }
-.textarea:focus { border-color: rgba(110,231,243,0.4); }
+.textarea:focus { border-color: rgba(167,139,250,0.4); }
 
 .selectInput {
   width: 100%;
@@ -300,7 +300,7 @@
   font-family: 'Inter', sans-serif;
   transition: border-color 0.2s;
 }
-.selectInput:focus { border-color: rgba(110,231,243,0.4); }
+.selectInput:focus { border-color: rgba(167,139,250,0.4); }
 .selectInput option {
   background-color: #0f1724;
   color: #e7f0ff;
@@ -396,10 +396,10 @@
 }
 
 .btnSave {
-  background: linear-gradient(135deg, #06b6d4, #8b5cf6);
+  background: linear-gradient(135deg, #A78BFA, #8b5cf6);
   border: none; border-radius: 6px;
   padding: 11px 24px; font-size: 14px; font-weight: 700;
-  color: #061826; cursor: pointer;
+  color: #ffffff; cursor: pointer;
   font-family: 'Inter', sans-serif; transition: opacity 0.2s;
 }
 .btnSave:hover { opacity: 0.9; }

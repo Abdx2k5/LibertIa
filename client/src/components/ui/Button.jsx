@@ -23,9 +23,9 @@
 
 const VARIANT_STYLES = {
   primary: {
-    background: "linear-gradient(135deg, #06b6d4 0%, #8b5cf6 100%)",
+    background: "linear-gradient(135deg, #A78BFA 0%, #8b5cf6 100%)",
     border: "none",
-    color: "#061826",
+    color: "#ffffff",
     fontWeight: 700,
   },
   outline: {

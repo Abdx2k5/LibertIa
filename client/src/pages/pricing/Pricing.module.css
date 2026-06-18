@@ -47,8 +47,8 @@
   color: #94a3b8; transition: all 0.15s;
 }
 .billingOptionActive {
-  background: linear-gradient(135deg, #06b6d4 0%, #8b5cf6 100%);
-  color: #061826;
+  background: linear-gradient(135deg, #A78BFA 0%, #8b5cf6 100%);
+  color: #ffffff;
 }
 
 .billingBadge {
@@ -114,7 +114,7 @@
   text-align: center;
   display: flex; flex-direction: column; align-items: center; gap: 16px;
   padding: 40px 24px;
-  background: linear-gradient(135deg, rgba(6,182,212,0.08), rgba(139,92,246,0.08));
+  background: linear-gradient(135deg, rgba(167,139,250,0.08), rgba(139,92,246,0.08));
   border: 1px solid rgba(139,92,246,0.2);
   border-radius: 16px;
 }

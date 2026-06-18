@@ -27,10 +27,10 @@
 .subtitle { font-size: 16px; color: #94a3b8; line-height: 1.6; margin: 0; }
 
 .btn {
-  background: linear-gradient(135deg, #06b6d4, #8b5cf6);
+  background: linear-gradient(135deg, #A78BFA, #8b5cf6);
   border: none; border-radius: 8px;
   padding: 13px 32px; font-size: 15px; font-weight: 700;
-  color: #061826; cursor: pointer; text-decoration: none;
+  color: #ffffff; cursor: pointer; text-decoration: none;
   font-family: 'Inter', sans-serif; transition: opacity 0.2s;
 }
 .btn:hover { opacity: 0.9; }

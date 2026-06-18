@@ -117,7 +117,7 @@
   display: flex; align-items: center; justify-content: center;
   cursor: pointer; flex-shrink: 0; transition: background 0.2s;
 }
-.sendBtn:hover    { background-color: #06b6d4; }
+.sendBtn:hover    { background-color: #8b5cf6; }
 .sendBtn:disabled { opacity: 0.6; cursor: not-allowed; }
 .btnImg { width: 24px; height: 24px; }
 

@@ -18,7 +18,7 @@ export default function Pill({ children, active = false, onClick, style = {} }) 
         fontSize: 14, fontFamily: "'Inter', sans-serif",
         cursor: "pointer", transition: "all 0.15s",
         backgroundColor: active ? "rgba(139,92,246,0.2)" : "#0f1724",
-        border: active ? "1px solid #6ee7f3" : "1px solid rgba(255,255,255,0.08)",
+        border: active ? "1px solid #A78BFA" : "1px solid rgba(255,255,255,0.08)",
         color: active ? "#e7f0ff" : "#94a3b8",
         ...style,
       }}

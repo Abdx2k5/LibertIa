@@ -98,10 +98,10 @@
 .saveWrap { display: flex; justify-content: flex-end; margin-top: 8px; }
 
 .btnSave {
-  background: linear-gradient(135deg, #06b6d4, #8b5cf6);
+  background: linear-gradient(135deg, #A78BFA, #8b5cf6);
   border: none; border-radius: 6px;
   padding: 11px 32px; font-size: 14px; font-weight: 700;
-  color: #061826; cursor: pointer;
+  color: #ffffff; cursor: pointer;
   font-family: 'Inter', sans-serif; transition: opacity 0.2s;
 }
 .btnSave:hover { opacity: 0.9; }
