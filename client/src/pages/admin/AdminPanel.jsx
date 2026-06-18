@@ -1,5 +1,6 @@
 import { useMemo, useState } from "react";
 import styles from "./AdminPanel.module.css";
+import AdminNav from "./AdminNav";
 
 const KPI_DATA = [
   { label: "Utilisateurs",       num: "1,248", delta: "+12%", cls: styles.kpiCyan   },
@@ -66,6 +67,8 @@ export default function AdminPanel() {
       <div className={styles.main}>
         <h1 className={styles.pageTitle}>Panel Admin</h1>
         <p className={styles.pageSub}>Vue d'ensemble de la plateforme LibertIA.</p>
+
+        <AdminNav />
 
         {/* KPI */}
         <div className={styles.kpiGrid}>

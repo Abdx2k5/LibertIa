@@ -14,6 +14,8 @@ const boiteRoutes = require('./routes/boiteRoutes');
 const notificationRoutes = require('./routes/notificationRoutes');
 const avisRoutes = require('./routes/avisRoutes');
 const agencyRoutes = require('./routes/agencyRoutes');
+const exportRoutes = require('./routes/exportRoutes');
+const { swaggerSpec, swaggerHtml } = require('./config/swagger');
 const { initBoiteSocket } = require('./sockets/boiteSocket');
 const { initNotificationSocket } = require('./sockets/notificationSocket');
 
@@ -53,9 +55,20 @@ app.use('/api/boites', boiteRoutes);
 app.use('/api/notifications', notificationRoutes);
 app.use('/api/avis', avisRoutes);
 app.use('/api/agences', agencyRoutes);
+app.use('/api/export', exportRoutes);
+
+// T141 — Documentation Swagger / OpenAPI
+//   GET /api-docs      → interface Swagger UI (rendue via CDN)
+//   GET /api-docs.json → spécification OpenAPI brute
+app.get('/api-docs.json', (_req, res) => {
+    res.json(swaggerSpec);
+});
+app.get('/api-docs', (_req, res) => {
+    res.type('html').send(swaggerHtml);
+});
 
 app.get('/', (_req, res) => {
-    res.json({ message: '🐦 Libertia API is running', version: '1.0.0' });
+    res.json({ message: '🐦 Libertia API is running', version: '1.0.0', docs: '/api-docs' });
 });
 
 const PORT = process.env.PORT || 5000;

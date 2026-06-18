@@ -1,0 +1,163 @@
+/* ============================================================
+   AgencesAdmin.module.css — T125 (M9)
+   ============================================================ */
+
+.page {
+  min-height: 100vh;
+  background: linear-gradient(135deg, #0b1026 0%, #1a1a2e 100%);
+  font-family: 'Inter', sans-serif;
+  color: #fff;
+}
+
+.main { max-width: 1200px; margin: 0 auto; padding: 40px 24px; }
+
+.pageTitle { font-size: 28px; font-weight: 700; color: #fff; margin: 0 0 8px; }
+.pageSub   { font-size: 15px; color: #a1a1aa; margin: 0 0 24px; }
+
+/* ── Stats ── */
+.statGrid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-bottom: 28px; }
+
+.statCard {
+  backdrop-filter: blur(6px);
+  background-color: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 12px;
+  padding: 18px 20px;
+  display: flex; flex-direction: column; gap: 6px;
+}
+.statLabel { font-size: 13px; color: #a1a1aa; }
+.statNum   { font-size: 28px; font-weight: 700; }
+.statOrange { color: #f97316; }
+.statGreen  { color: #4ade80; }
+.statRed    { color: #f87171; }
+.statMuted  { color: #94a3b8; }
+
+/* ── Filtres ── */
+.filters { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 18px; }
+.filterPill {
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: rgba(255, 255, 255, 0.03);
+  color: #a1a1aa;
+  border-radius: 999px;
+  padding: 7px 14px;
+  font-size: 13px;
+  font-family: inherit;
+  cursor: pointer;
+  transition: background 0.15s, color 0.15s, border-color 0.15s;
+}
+.filterPill:hover { color: #e7f0ff; }
+.filterPillActive {
+  border-color: rgba(170, 59, 255, 0.45);
+  background: rgba(170, 59, 255, 0.15);
+  color: #f3f4f6;
+}
+
+/* ── Table ── */
+.tableWrap {
+  backdrop-filter: blur(6px);
+  background-color: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 16px;
+  overflow: hidden;
+}
+.table { width: 100%; border-collapse: collapse; }
+.th {
+  text-align: left; padding: 12px 24px;
+  font-size: 12px; font-weight: 500; color: #71717a;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+  text-transform: uppercase; letter-spacing: 0.05em;
+}
+.td {
+  padding: 14px 24px; font-size: 14px; color: #e7f0ff;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+  vertical-align: top;
+}
+.tr:hover .td { background-color: rgba(255, 255, 255, 0.02); }
+
+.agencyName  { font-weight: 600; color: #f3f4f6; }
+.agencyEmail { font-size: 12px; color: #94a3b8; margin-top: 2px; }
+.motif {
+  font-size: 12px; color: #f87171; margin-top: 6px; font-style: italic;
+  max-width: 320px;
+}
+
+/* ── Badges ── */
+.badge {
+  display: inline-flex; padding: 3px 10px; border-radius: 99px;
+  font-size: 11px; font-weight: 500; white-space: nowrap;
+}
+.badgeActive  { background: rgba(34, 197, 94, 0.1);  color: #4ade80; }
+.badgePending { background: rgba(249, 115, 22, 0.1); color: #f97316; }
+.badgeBanned  { background: rgba(239, 68, 68, 0.1);  color: #f87171; }
+.badgeMuted   { background: rgba(148, 163, 184, 0.1); color: #94a3b8; }
+
+/* ── Actions ── */
+.actions { display: flex; gap: 8px; flex-wrap: wrap; }
+.actionBtn {
+  border: 1px solid transparent;
+  cursor: pointer;
+  padding: 6px 14px; border-radius: 8px; font-size: 13px;
+  font-family: inherit; font-weight: 500;
+  transition: opacity 0.15s, background 0.15s;
+}
+.actionBtn:disabled { opacity: 0.5; cursor: not-allowed; }
+.btnApprove {
+  background: rgba(34, 197, 94, 0.12);
+  border-color: rgba(34, 197, 94, 0.3);
+  color: #4ade80;
+}
+.btnApprove:hover:not(:disabled) { background: rgba(34, 197, 94, 0.2); }
+.btnReject {
+  background: rgba(239, 68, 68, 0.12);
+  border-color: rgba(239, 68, 68, 0.3);
+  color: #f87171;
+}
+.btnReject:hover:not(:disabled) { background: rgba(239, 68, 68, 0.2); }
+
+/* ── Modal motif ── */
+.overlay {
+  position: fixed; inset: 0;
+  background: rgba(0, 0, 0, 0.6);
+  display: flex; align-items: center; justify-content: center;
+  z-index: 1000; padding: 20px;
+}
+.modal {
+  background: #14182b;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 16px;
+  padding: 28px;
+  width: 100%; max-width: 440px;
+}
+.modalTitle { font-size: 20px; font-weight: 700; color: #fff; margin: 0 0 8px; }
+.modalText  { font-size: 14px; color: #a1a1aa; margin: 0 0 16px; }
+.textarea {
+  width: 100%;
+  background: #0f1724;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 8px;
+  padding: 12px;
+  color: #e7f0ff;
+  font-family: inherit;
+  font-size: 14px;
+  resize: vertical;
+  outline: none;
+  box-sizing: border-box;
+}
+.textarea:focus { border-color: rgba(170, 59, 255, 0.5); }
+.modalActions { display: flex; gap: 12px; margin-top: 20px; }
+.modalCancel, .modalConfirm {
+  flex: 1; padding: 11px; border-radius: 8px;
+  font-size: 14px; font-weight: 600; font-family: inherit;
+  cursor: pointer; border: 1px solid transparent;
+}
+.modalCancel {
+  background: rgba(255, 255, 255, 0.05);
+  border-color: rgba(255, 255, 255, 0.1);
+  color: #e7f0ff;
+}
+.modalConfirm { background: #aa3bff; color: #fff; }
+.modalConfirm:hover { background: #9326e8; }
+
+@media (max-width: 760px) {
+  .statGrid { grid-template-columns: repeat(2, 1fr); }
+}

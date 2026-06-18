@@ -107,3 +107,60 @@ export function getAgencyById(id) {
 export function getAllAgencies() {
   return Object.values(AGENCIES);
 }
+
+// ── T125 — données admin (validation / suspension) ──
+// Vue back-office : liste des agences avec leur statut de modération.
+// Utilisée comme fallback quand l'API /api/agences/admin est indisponible.
+export const ADMIN_AGENCIES = [
+  {
+    id: "1",
+    nom: "Collectif Alpes Voyages",
+    email: "contact@collectif-alpes.fr",
+    localisation: "Chamonix, France",
+    statut: "approuvee",
+    dateDemande: "2024-02-12",
+    specialites: ["Montagne", "Ski", "Groupes"],
+  },
+  {
+    id: "2",
+    nom: "Sakura Travel",
+    email: "contact@sakura-travel.jp",
+    localisation: "Tokyo, Japon",
+    statut: "approuvee",
+    dateDemande: "2024-01-30",
+    specialites: ["Japon", "Culture", "Sur-mesure"],
+  },
+  {
+    id: "3",
+    nom: "Atlas Évasion",
+    email: "hello@atlas-evasion.ma",
+    localisation: "Marrakech, Maroc",
+    statut: "en_attente",
+    dateDemande: "2024-06-10",
+    specialites: ["Désert", "Randonnée", "Groupes"],
+  },
+  {
+    id: "4",
+    nom: "Nordic Roads",
+    email: "booking@nordicroads.no",
+    localisation: "Tromsø, Norvège",
+    statut: "en_attente",
+    dateDemande: "2024-06-14",
+    specialites: ["Aurores boréales", "Van", "Aventure"],
+  },
+  {
+    id: "5",
+    nom: "Sunset Deals Travel",
+    email: "promo@sunset-deals.com",
+    localisation: "Inconnue",
+    statut: "suspendue",
+    dateDemande: "2024-03-01",
+    motif: "Avis frauduleux signalés à plusieurs reprises",
+    specialites: ["Promotions"],
+  },
+];
+
+export function getAgenciesForAdmin() {
+  // Copie défensive pour ne pas muter la source lors des changements de statut.
+  return ADMIN_AGENCIES.map((a) => ({ ...a }));
+}

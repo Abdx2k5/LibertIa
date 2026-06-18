@@ -18,7 +18,8 @@ const auditLogSchema = new mongoose.Schema({
             'delete_account',
             'refresh_token',
             'forgot_password',
-            'reset_password'
+            'reset_password',
+            'export_data'
         ]
     },
     ip: {

@@ -19,6 +19,8 @@ export const ROUTES = {
   MEMORIES:     "/souvenirs",
   COLLAB_BOXES: "/boites",
   ADMIN:        "/admin",
+  ADMIN_AGENCIES:   "/admin/agences",
+  ADMIN_MODERATION: "/admin/moderation",
   DESIGN_SYSTEM: "/design-system",
   NOT_FOUND:    "*",
 };

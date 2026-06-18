@@ -8,7 +8,7 @@
 // =============================================================
 
 import api from "./api";
-import { getAllAgencies, getAgencyById } from "../mocks/agencyData";
+import { getAllAgencies, getAgencyById, getAgenciesForAdmin } from "../mocks/agencyData";
 
 // Normalise la réponse backend ({ success, data }) en tableau/objet simple
 const unwrap = (payload) => payload?.data ?? payload;
@@ -53,11 +53,26 @@ const agencyService = {
     }
   },
 
-  // ── Admin ──
+  // ── Admin (T125 — validation / suspension) ──
+  // GET /api/agences/admin  → toutes les agences avec leur statut
+  // (en_attente | approuvee | rejetee | suspendue) pour le back-office.
+  listerToutes: async () => {
+    try {
+      const response = await api.get("/api/agences/admin");
+      return unwrap(response.data) || [];
+    } catch {
+      return getAgenciesForAdmin();
+    }
+  },
+
   // GET /api/agences/en-attente
   listerEnAttente: async () => {
-    const response = await api.get("/api/agences/en-attente");
-    return unwrap(response.data) || [];
+    try {
+      const response = await api.get("/api/agences/en-attente");
+      return unwrap(response.data) || [];
+    } catch {
+      return getAgenciesForAdmin().filter((a) => a.statut === "en_attente");
+    }
   },
 
   // PATCH /api/agences/:id/valider
@@ -69,6 +84,18 @@ const agencyService = {
   // PATCH /api/agences/:id/rejeter
   rejeterAgence: async (id, motif) => {
     const response = await api.patch(`/api/agences/${id}/rejeter`, { motif });
+    return unwrap(response.data);
+  },
+
+  // PATCH /api/agences/:id/suspendre  → suspend une agence approuvée
+  suspendreAgence: async (id, motif) => {
+    const response = await api.patch(`/api/agences/${id}/suspendre`, { motif });
+    return unwrap(response.data);
+  },
+
+  // PATCH /api/agences/:id/reactiver  → lève la suspension
+  reactiverAgence: async (id) => {
+    const response = await api.patch(`/api/agences/${id}/reactiver`);
     return unwrap(response.data);
   },
 };

@@ -32,6 +32,8 @@ import MesVoyages   from "./pages/voyages/MesVoyages";
 import MesSouvenirs from "./pages/souvenirs/MesSouvenirs";
 import BoitesCollaboratives from "./pages/collaboration/BoitesCollaboratives";
 import AdminPanel   from "./pages/admin/AdminPanel";
+import AgencesAdmin    from "./pages/admin/AgencesAdmin";
+import ModerationAdmin from "./pages/admin/ModerationAdmin";
 import NotFound     from "./pages/NotFound";
 
 // Pages publiques (marketing)
@@ -83,6 +85,8 @@ export default function App() {
             <Route element={<AdminRoute />}>
               <Route element={<DashboardLayout />}>
                 <Route path={ROUTES.ADMIN} element={<AdminPanel />} />
+              <Route path={ROUTES.ADMIN_AGENCIES}   element={<AgencesAdmin />} />
+              <Route path={ROUTES.ADMIN_MODERATION} element={<ModerationAdmin />} />
               </Route>
             </Route>
 
