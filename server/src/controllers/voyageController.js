@@ -1,6 +1,7 @@
 const axios = require('axios');
 const { spawn } = require('child_process');
 const path = require('path');
+const PDFDocument = require('pdfkit');
 const ROOT = path.join(__dirname, '..', '..', '..');
 const User = require('../models/User');
 const Voyage = require('../models/Voyage');
@@ -674,8 +675,246 @@ const updatePrivacite = async (req, res) => {
     }
 };
 
+// ─────────────────────────────────────────────
+//  T24 — @POST /api/voyages/generer/stream
+//  Génération en streaming SSE — tokens envoyés un par un
+// ─────────────────────────────────────────────
+const genererVoyageStream = async (req, res) => {
+    const sendEvent = (event, data) => {
+        res.write(`event: ${event}\ndata: ${JSON.stringify(data)}\n\n`);
+    };
+
+    try {
+        const { prompt } = req.body;
+        const userId = req.user._id;
+
+        if (!prompt || prompt.trim().length < 5) {
+            return res.status(400).json({ success: false, message: 'Le prompt doit contenir au moins 5 caractères' });
+        }
+
+        const user = await User.findById(userId);
+        if (!user) return res.status(404).json({ success: false, message: 'Utilisateur non trouvé' });
+        if (!user.peutGenerer()) {
+            return res.status(403).json({
+                success: false,
+                message: 'Limite atteinte — passez en premium',
+                code: 'QUOTA_EXCEEDED',
+                promptsRestants: user.promptsRestants()
+            });
+        }
+
+        // SSE headers
+        res.setHeader('Content-Type', 'text/event-stream');
+        res.setHeader('Cache-Control', 'no-cache');
+        res.setHeader('Connection', 'keep-alive');
+        res.flushHeaders();
+
+        sendEvent('status', { message: 'Analyse de votre demande...' });
+        const infos = await extraireInfosPrompt(prompt);
+        const destination = infos.destination || 'Paris';
+        const checkin = infos.checkin || getDateIn(7);
+        const checkout = infos.checkout || getDateIn(10);
+        const origine = infos.origine || 'CMN';
+
+        sendEvent('status', { message: `Destination : ${destination}` });
+
+        const [ragContexte, coordonnees] = await Promise.all([
+            getRAGContexte(prompt, destination),
+            geocoderDestination(destination)
+        ]);
+
+        sendEvent('status', { message: 'Génération de votre itinéraire...' });
+
+        const systemPrompt = `Tu es LibertIa, un expert en voyage personnalisé. Réponds UNIQUEMENT en JSON valide, sans texte avant ou après.`;
+        const userPrompt = `DEMANDE : "${prompt}"\nDestination : ${destination}\nDates : ${checkin} au ${checkout}\nBudget : ${infos.budget || 'moyen'}\n${ragContexte}\n\nStructure JSON requise :\n{"destination":"","duree_jours":0,"budget_estime":"","checkin":"","checkout":"","jours":[{"jour":1,"matin":{"activite":"","lieu":"","duree":""},"apres_midi":{"activite":"","lieu":"","duree":""},"soir":{"activite":"","lieu":"","duree":""}}],"hebergement_recommande":{"nom":"","prix_nuit":"","lien":""},"vol_recommande":{"compagnie":"","prix":"","duree":""},"restaurants_recommandes":[],"conseils":[],"budget_detail":{"hotel":"","transport":"","repas":"","activites":"","total":""}}`;
+
+        const groqResponse = await axios.post(DS_API_URL, {
+            model: DS_MODEL,
+            messages: [
+                { role: 'system', content: systemPrompt },
+                { role: 'user', content: userPrompt }
+            ],
+            temperature: 0.7,
+            max_tokens: 2000,
+            stream: true
+        }, {
+            headers: {
+                'Authorization': `Bearer ${process.env.GROQ_API_KEY}`,
+                'Content-Type': 'application/json',
+                'Accept': 'text/event-stream'
+            },
+            responseType: 'stream',
+            timeout: 60000
+        });
+
+        let fullText = '';
+
+        await new Promise((resolve, reject) => {
+            let buffer = '';
+            groqResponse.data.on('data', (chunk) => {
+                buffer += chunk.toString();
+                const lines = buffer.split('\n');
+                buffer = lines.pop();
+                for (const line of lines) {
+                    const trimmed = line.trim();
+                    if (!trimmed || !trimmed.startsWith('data: ')) continue;
+                    const jsonStr = trimmed.slice(6);
+                    if (jsonStr === '[DONE]') { resolve(); return; }
+                    try {
+                        const parsed = JSON.parse(jsonStr);
+                        const token = parsed.choices?.[0]?.delta?.content;
+                        if (token) {
+                            fullText += token;
+                            sendEvent('token', { token });
+                        }
+                    } catch { /* chunk partiel */ }
+                }
+            });
+            groqResponse.data.on('end', resolve);
+            groqResponse.data.on('error', reject);
+        });
+
+        let itineraireData;
+        try {
+            const jsonMatch = fullText.match(/\{[\s\S]*\}/);
+            itineraireData = JSON.parse(jsonMatch[0]);
+            if (!itineraireData.destination || !itineraireData.jours) throw new Error('Structure incomplète');
+        } catch {
+            itineraireData = {
+                destination, duree_jours: 3, budget_estime: 'À définir',
+                checkin, checkout,
+                jours: [{ jour: 1, matin: { activite: 'Exploration', lieu: 'Centre-ville', duree: '3h' }, apres_midi: { activite: 'Visites', lieu: 'À découvrir', duree: '3h' }, soir: { activite: 'Dîner', lieu: 'Restaurant local', duree: '2h' } }],
+                conseils: ['Vérifiez les conditions locales'],
+                budget_detail: { hotel: 'À définir', transport: 'À définir', repas: 'À définir', activites: 'À définir', total: 'À définir' }
+            };
+        }
+
+        await User.findByIdAndUpdate(userId, { $inc: { promptsUtilises: 1 } });
+
+        const voyage = await Voyage.create({
+            user: userId,
+            prompt,
+            itineraire: itineraireData,
+            titre: `${destination} — ${checkin}`,
+            destination,
+            dates: { start: new Date(checkin), end: new Date(checkout) },
+            coordonnees: coordonnees || { lat: null, lng: null },
+            scraping_utilise: false
+        });
+
+        sendEvent('done', { voyageId: voyage._id, itineraire: itineraireData });
+        res.end();
+
+    } catch (err) {
+        console.error('❌ Erreur genererVoyageStream:', err);
+        if (!res.headersSent) {
+            return res.status(500).json({ success: false, message: err.message });
+        }
+        sendEvent('error', { message: err.message });
+        res.end();
+    }
+};
+
+// ─────────────────────────────────────────────
+//  T107 — @GET /api/voyages/:id/export-pdf
+//  Génère et télécharge le PDF de l'itinéraire
+// ─────────────────────────────────────────────
+const exportPDF = async (req, res) => {
+    try {
+        const voyage = await Voyage.findById(req.params.id);
+        if (!voyage) return res.status(404).json({ success: false, message: 'Voyage non trouvé' });
+        if (voyage.user.toString() !== req.user._id.toString()) {
+            return res.status(403).json({ success: false, message: 'Non autorisé' });
+        }
+
+        const doc = new PDFDocument({ margin: 50, size: 'A4' });
+        const filename = `libertia-voyage-${voyage._id}.pdf`;
+
+        res.setHeader('Content-Type', 'application/pdf');
+        res.setHeader('Content-Disposition', `attachment; filename="${filename}"`);
+        doc.pipe(res);
+
+        const itin = voyage.itineraire || {};
+
+        // En-tête
+        doc.fontSize(24).fillColor('#1B4F72').text('LibertIa', { align: 'center' });
+        doc.fontSize(16).fillColor('#333').text(voyage.titre, { align: 'center' });
+        doc.moveDown(0.5);
+        doc.fontSize(11).fillColor('#666').text(`Destination : ${voyage.destination}`, { align: 'center' });
+        if (voyage.dates?.start && voyage.dates?.end) {
+            const start = new Date(voyage.dates.start).toLocaleDateString('fr-FR');
+            const end = new Date(voyage.dates.end).toLocaleDateString('fr-FR');
+            doc.text(`Dates : ${start} → ${end}`, { align: 'center' });
+        }
+        doc.moveDown();
+        doc.moveTo(50, doc.y).lineTo(545, doc.y).strokeColor('#1B4F72').stroke();
+        doc.moveDown();
+
+        // Budget
+        if (itin.budget_estime || itin.budget_detail) {
+            doc.fontSize(14).fillColor('#1B4F72').text('Budget estimé');
+            doc.moveDown(0.3);
+            doc.fontSize(11).fillColor('#333');
+            if (itin.budget_estime) doc.text(`Total estimé : ${itin.budget_estime}`);
+            const bd = itin.budget_detail || {};
+            if (bd.hotel) doc.text(`  Hébergement : ${bd.hotel}`);
+            if (bd.transport) doc.text(`  Transport : ${bd.transport}`);
+            if (bd.repas) doc.text(`  Repas : ${bd.repas}`);
+            if (bd.activites) doc.text(`  Activités : ${bd.activites}`);
+            doc.moveDown();
+        }
+
+        // Itinéraire jour par jour
+        if (Array.isArray(itin.jours) && itin.jours.length > 0) {
+            doc.fontSize(14).fillColor('#1B4F72').text('Programme');
+            doc.moveDown(0.3);
+            itin.jours.forEach((j) => {
+                doc.fontSize(12).fillColor('#1B4F72').text(`Jour ${j.jour}`);
+                doc.fontSize(10).fillColor('#333');
+                const periodes = [
+                    { label: 'Matin', data: j.matin },
+                    { label: 'Après-midi', data: j.apres_midi },
+                    { label: 'Soir', data: j.soir }
+                ];
+                periodes.forEach(({ label, data }) => {
+                    if (data?.activite) {
+                        doc.text(`  ${label} : ${data.activite}${data.lieu ? ' — ' + data.lieu : ''}${data.duree ? ' (' + data.duree + ')' : ''}`);
+                    }
+                });
+                doc.moveDown(0.5);
+            });
+        }
+
+        // Hébergement recommandé
+        if (itin.hebergement_recommande?.nom) {
+            doc.fontSize(14).fillColor('#1B4F72').text('Hébergement recommandé');
+            doc.moveDown(0.3);
+            const h = itin.hebergement_recommande;
+            doc.fontSize(11).fillColor('#333').text(`${h.nom}${h.prix_nuit ? ' — ' + h.prix_nuit + '/nuit' : ''}`);
+            doc.moveDown();
+        }
+
+        // Conseils
+        if (Array.isArray(itin.conseils) && itin.conseils.length > 0) {
+            doc.fontSize(14).fillColor('#1B4F72').text('Conseils');
+            doc.moveDown(0.3);
+            doc.fontSize(11).fillColor('#333');
+            itin.conseils.forEach((c) => doc.text(`• ${c}`));
+            doc.moveDown();
+        }
+
+        // Pied de page
+        doc.moveDown();
+        doc.fontSize(9).fillColor('#aaa').text('Généré par LibertIa — www.libertia.com', { align: 'center' });
+
+        doc.end();
+    } catch (err) {
+        res.status(500).json({ success: false, message: err.message });
+    }
+};
+
 module.exports = {
-    genererVoyage, getMesVoyages, getVoyage, getCarteVoyages, supprimerVoyage, togglePartage, ajouterLike, retirerLike,
+    genererVoyage, genererVoyageStream, getMesVoyages, getVoyage, getCarteVoyages, supprimerVoyage, togglePartage, ajouterLike, retirerLike,
     getBudget, updateBudget, recalculerBudget, getConseils, regenererConseils,
-    getPrivacite, updatePrivacite
+    getPrivacite, updatePrivacite, exportPDF
 };

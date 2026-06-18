@@ -2,6 +2,8 @@ const Voyage = require('../models/Voyage');
 const Comment = require('../models/Comment');
 const User = require('../models/User');
 const Groupe = require('../models/Groupe');
+const Dossier = require('../models/Dossier');
+const Signalement = require('../models/Signalement');
 const { estVoyageVisiblePour } = require('../utils/visibilite');
 const { creerNotification } = require('./notificationController');
 
@@ -410,6 +412,165 @@ const recherche = async (req, res) => {
     }
 };
 
+// ─────────────────────────────────────────────
+//  T66 — @POST /api/community/users/:id/follow
+// ─────────────────────────────────────────────
+const followUser = async (req, res) => {
+    try {
+        const targetId = req.params.id;
+        const userId = req.user._id.toString();
+
+        if (targetId === userId) {
+            return res.status(400).json({ success: false, message: 'Vous ne pouvez pas vous suivre vous-même' });
+        }
+
+        const target = await User.findById(targetId);
+        if (!target) return res.status(404).json({ success: false, message: 'Utilisateur non trouvé' });
+
+        await Promise.all([
+            User.findByIdAndUpdate(userId, { $addToSet: { following: targetId } }),
+            User.findByIdAndUpdate(targetId, { $addToSet: { followers: userId } })
+        ]);
+
+        await creerNotification({
+            destinataire: targetId,
+            expediteur: userId,
+            type: 'follow',
+            contenu: `${req.user.nom} vous suit maintenant`,
+            lien: `/profil/${userId}`
+        });
+
+        res.json({ success: true, message: 'Utilisateur suivi' });
+    } catch (err) {
+        res.status(500).json({ success: false, message: err.message });
+    }
+};
+
+// ─────────────────────────────────────────────
+//  T66 — @DELETE /api/community/users/:id/unfollow
+// ─────────────────────────────────────────────
+const unfollowUser = async (req, res) => {
+    try {
+        const targetId = req.params.id;
+        const userId = req.user._id;
+
+        await Promise.all([
+            User.findByIdAndUpdate(userId, { $pull: { following: targetId } }),
+            User.findByIdAndUpdate(targetId, { $pull: { followers: userId } })
+        ]);
+
+        res.json({ success: true, message: 'Abonnement retiré' });
+    } catch (err) {
+        res.status(500).json({ success: false, message: err.message });
+    }
+};
+
+// ─────────────────────────────────────────────
+//  T66 — @GET /api/community/users/:id/followers
+// ─────────────────────────────────────────────
+const getFollowers = async (req, res) => {
+    try {
+        const user = await User.findById(req.params.id)
+            .select('followers')
+            .populate('followers', 'nom profilePhoto');
+        if (!user) return res.status(404).json({ success: false, message: 'Utilisateur non trouvé' });
+        res.json({ success: true, data: user.followers, total: user.followers.length });
+    } catch (err) {
+        res.status(500).json({ success: false, message: err.message });
+    }
+};
+
+// ─────────────────────────────────────────────
+//  T66 — @GET /api/community/users/:id/following
+// ─────────────────────────────────────────────
+const getFollowing = async (req, res) => {
+    try {
+        const user = await User.findById(req.params.id)
+            .select('following')
+            .populate('following', 'nom profilePhoto');
+        if (!user) return res.status(404).json({ success: false, message: 'Utilisateur non trouvé' });
+        res.json({ success: true, data: user.following, total: user.following.length });
+    } catch (err) {
+        res.status(500).json({ success: false, message: err.message });
+    }
+};
+
+// ─────────────────────────────────────────────
+//  T70 — @POST /api/community/signalements
+// ─────────────────────────────────────────────
+const creerSignalement = async (req, res) => {
+    try {
+        const { type, cible, cibleId, raison } = req.body;
+
+        if (!type || !cible || !cibleId || !raison) {
+            return res.status(400).json({ success: false, message: 'type, cible, cibleId et raison sont requis' });
+        }
+
+        const signalement = await Signalement.create({
+            type,
+            cible,
+            cibleId,
+            raison: String(raison).substring(0, 500),
+            auteur: req.user._id
+        });
+
+        res.status(201).json({ success: true, data: signalement });
+    } catch (err) {
+        res.status(500).json({ success: false, message: err.message });
+    }
+};
+
+// ─────────────────────────────────────────────
+//  T88 — @GET /api/timeline
+//  Voyages + photos de l'utilisateur, triés par date
+// ─────────────────────────────────────────────
+const getTimeline = async (req, res) => {
+    try {
+        const userId = req.user._id;
+
+        const [voyages, dossiers] = await Promise.all([
+            Voyage.find({ user: userId })
+                .select('titre destination dates createdAt visibilite budget')
+                .sort({ createdAt: -1 })
+                .limit(100),
+            Dossier.find({ user: userId, 'photos.0': { $exists: true } })
+                .select('titre voyage photos.caption photos.date photos._id')
+                .populate('voyage', 'titre destination')
+        ]);
+
+        const items = [];
+
+        voyages.forEach(v => {
+            items.push({
+                type: 'voyage',
+                date: v.dates?.start || v.createdAt,
+                data: v
+            });
+        });
+
+        dossiers.forEach(d => {
+            d.photos.forEach(p => {
+                items.push({
+                    type: 'photo',
+                    date: p.date || d.createdAt,
+                    data: {
+                        id: p._id,
+                        caption: p.caption,
+                        dossierId: d._id,
+                        voyage: d.voyage
+                    }
+                });
+            });
+        });
+
+        items.sort((a, b) => new Date(b.date) - new Date(a.date));
+
+        res.json({ success: true, data: items.slice(0, 100), total: items.length });
+    } catch (err) {
+        res.status(500).json({ success: false, message: err.message });
+    }
+};
+
 module.exports = {
     getFeed,
     getCommentaires,
@@ -420,5 +581,11 @@ module.exports = {
     getGroupe,
     rejoindreGroupe,
     quitterGroupe,
-    recherche
+    recherche,
+    followUser,
+    unfollowUser,
+    getFollowers,
+    getFollowing,
+    creerSignalement,
+    getTimeline
 };

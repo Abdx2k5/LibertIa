@@ -2,6 +2,7 @@ const express = require('express');
 const router = express.Router();
 const {
     genererVoyage,
+    genererVoyageStream,
     getMesVoyages,
     getVoyage,
     getCarteVoyages,
@@ -15,15 +16,19 @@ const {
     getConseils,
     regenererConseils,
     getPrivacite,
-    updatePrivacite
+    updatePrivacite,
+    exportPDF
 } = require('../controllers/voyageController');
 const { proteger } = require('../middlewares/authMiddleware');
 
+// Routes littérales déclarées AVANT "/:id"
 router.post('/generer', proteger, genererVoyage);
+// T24 — Génération streaming SSE
+router.post('/generer/stream', proteger, genererVoyageStream);
 router.get('/mes-voyages', proteger, getMesVoyages);
-// T44 — route littérale "/carte" déclarée AVANT "/:id" pour éviter
-// qu'elle ne soit interceptée comme un paramètre :id
+// T44 — route littérale "/carte" déclarée AVANT "/:id"
 router.get('/carte', proteger, getCarteVoyages);
+
 router.get('/:id', proteger, getVoyage);
 router.delete('/:id', proteger, supprimerVoyage);
 router.patch('/:id/partage', proteger, togglePartage);
@@ -39,5 +44,8 @@ router.post('/:id/conseils/regenerer', proteger, regenererConseils);
 
 router.get('/:id/privacite', proteger, getPrivacite);
 router.patch('/:id/privacite', proteger, updatePrivacite);
+
+// T107 — Export PDF
+router.get('/:id/export-pdf', proteger, exportPDF);
 
 module.exports = router;
