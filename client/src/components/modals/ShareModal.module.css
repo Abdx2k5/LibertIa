@@ -29,7 +29,7 @@
   flex: 1;
   padding: 10px 12px;
   background: rgba(255, 255, 255, 0.05);
-  border: 1px solid rgba(0, 255, 255, 0.15);
+  border: 1px solid rgba(167, 139, 250, 0.15);
   border-radius: 8px;
   color: #06b6d4;
   font-size: 13px;
@@ -39,8 +39,8 @@
 }
 
 .linkInput:focus {
-  border-color: rgba(0, 255, 255, 0.4);
-  background: rgba(0, 255, 255, 0.05);
+  border-color: rgba(167, 139, 250, 0.4);
+  background: rgba(167, 139, 250, 0.05);
 }
 
 .divider {

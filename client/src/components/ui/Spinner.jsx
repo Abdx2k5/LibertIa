@@ -17,7 +17,7 @@ if (typeof document !== "undefined" && !document.getElementById("libertia-spinne
   document.head.appendChild(s);
 }
 
-export default function Spinner({ size = 24, color = "#00ffff", label, style = {} }) {
+export default function Spinner({ size = 24, color = "#A78BFA", label, style = {} }) {
   return (
     <div style={{ display: "inline-flex", alignItems: "center", gap: label ? 10 : 0, ...style }}>
       <div style={{

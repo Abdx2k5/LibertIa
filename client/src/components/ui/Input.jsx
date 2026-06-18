@@ -25,7 +25,7 @@ const VARIANT_STYLES = {
   },
   search: {
     backgroundColor: "rgba(255,255,255,0.05)",
-    border: "1px solid rgba(0,255,255,0.2)",
+    border: "1px solid rgba(167,139,250,0.2)",
     color: "#ffffff",
   },
   error: {
