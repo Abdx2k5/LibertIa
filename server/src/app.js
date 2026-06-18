@@ -65,7 +65,7 @@ app.use('/api/agences', agenceRoutes);
 // T109 — Factures
 app.use('/api/factures', factureRoutes);
 // T112 — Météo
-app.use('/api/meteo', meteoRoutes);
+//app.use('/api/meteo', meteoRoutes);
 // T119/T122/T126 — Admin
 app.use('/api/admin', adminRoutes);
 
