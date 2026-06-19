@@ -1,0 +1,12 @@
+// T140 — variables d'environnement nécessaires aux tests unitaires.
+// Exécuté AVANT le chargement des modules testés (jest setupFiles).
+process.env.NODE_ENV = 'test';
+
+// Clé AES de 32 octets (64 hex) — factice, réservée aux tests de chiffrement.
+process.env.ENCRYPTION_KEY =
+    process.env.ENCRYPTION_KEY ||
+    '0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef';
+
+// Secrets JWT factices pour les tests d'intégration (auth).
+process.env.JWT_SECRET = process.env.JWT_SECRET || 'test-jwt-secret';
+process.env.JWT_REFRESH_SECRET = process.env.JWT_REFRESH_SECRET || 'test-jwt-refresh-secret';

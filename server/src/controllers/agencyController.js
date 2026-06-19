@@ -1,4 +1,5 @@
 const Agency = require('../models/Agency');
+const { auditLog } = require('../utils/auditLogger'); // T127
 
 const PROPRIETAIRE_SELECT = 'nom email';
 
@@ -110,6 +111,15 @@ const validerAgence = async (req, res) => {
         agence.motifRejet = undefined;
         await agence.save();
 
+        // T127 — trace de l'action admin
+        await auditLog({
+            userId: req.user._id,
+            action: 'admin_valider_agence',
+            req,
+            success: true,
+            details: { agenceId: String(agence._id), nom: agence.nom },
+        });
+
         res.json({ success: true, data: agence });
     } catch (err) {
         res.status(500).json({ success: false, message: err.message });
@@ -131,6 +141,15 @@ const rejeterAgence = async (req, res) => {
         agence.verifiee = false;
         agence.motifRejet = (req.body.motif || '').trim();
         await agence.save();
+
+        // T127 — trace de l'action admin
+        await auditLog({
+            userId: req.user._id,
+            action: 'admin_rejeter_agence',
+            req,
+            success: true,
+            details: { agenceId: String(agence._id), nom: agence.nom, motif: agence.motifRejet },
+        });
 
         res.json({ success: true, data: agence });
     } catch (err) {

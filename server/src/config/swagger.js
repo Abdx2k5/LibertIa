@@ -69,6 +69,7 @@ const swaggerSpec = {
         { name: 'Notifications', description: 'Notifications utilisateur' },
         { name: 'Compagnon', description: 'Compagnon IA gamifié' },
         { name: 'Export', description: 'Export CSV/Excel (admin)' },
+        { name: 'Admin', description: 'Journaux d\'activité (admin)' },
     ],
     components: {
         securitySchemes: {
@@ -556,6 +557,24 @@ const swaggerSpec = {
                 ],
                 responses: { 200: { description: 'Fichier CSV', content: { 'text/csv': { schema: { type: 'string', format: 'binary' } } } }, 401: unauthorized, 403: forbidden },
             },
+        },
+
+        // ───────────────── ADMIN — LOGS (T127) ─────────────────
+        '/api/admin/logs': {
+            get: {
+                tags: ['Admin'], summary: 'Consulter les journaux d\'activité', security: [{ bearerAuth: [] }],
+                parameters: [
+                    { name: 'action', in: 'query', schema: { type: 'string' }, description: 'Filtrer par type d\'action' },
+                    { name: 'success', in: 'query', schema: { type: 'string', enum: ['true', 'false'] } },
+                    { name: 'userId', in: 'query', schema: { type: 'string' } },
+                    { name: 'page', in: 'query', schema: { type: 'integer', default: 1 } },
+                    { name: 'limit', in: 'query', schema: { type: 'integer', default: 50, maximum: 200 } },
+                ],
+                responses: { 200: { description: 'Liste paginée des logs' }, 401: unauthorized, 403: forbidden },
+            },
+        },
+        '/api/admin/logs/stats': {
+            get: { tags: ['Admin'], summary: 'Statistiques des journaux (par action)', security: [{ bearerAuth: [] }], responses: { 200: { description: 'Statistiques' }, 401: unauthorized, 403: forbidden } },
         },
     },
 };

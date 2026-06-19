@@ -1,10 +1,20 @@
+// =============================================================
+// FICHIER  : src/app.js
+// RÔLE     : Construit et exporte l'application Express (middlewares,
+//            routes, gestion d'erreurs) SANS effet de bord.
+//
+// Aucun appel à connectDB(), aucun listen(), aucun socket ici : le
+// démarrage réel vit dans server.js. Cette séparation permet aux
+// tests (supertest + mongodb-memory-server) d'importer `app` sans
+// ouvrir de port ni dépendre d'une base externe (T140).
+// =============================================================
+
 const express = require('express');
 const cors = require('cors');
-const http = require('http');
-const { Server } = require('socket.io');
-require('dotenv').config();
+const morgan = require('morgan');
+require('dotenv').config({ quiet: true });
 
-const connectDB = require('./config/db');
+const logger = require('./config/logger'); // T138
 const authRoutes = require('./routes/authRoutes');
 const voyageRoutes = require('./routes/voyageRoutes');
 const compagnonRoutes = require('./routes/compagnonRoutes');
@@ -15,13 +25,10 @@ const notificationRoutes = require('./routes/notificationRoutes');
 const avisRoutes = require('./routes/avisRoutes');
 const agencyRoutes = require('./routes/agencyRoutes');
 const exportRoutes = require('./routes/exportRoutes');
+const adminRoutes = require('./routes/adminRoutes'); // T127
 const { swaggerSpec, swaggerHtml } = require('./config/swagger');
-const { initBoiteSocket } = require('./sockets/boiteSocket');
-const { initNotificationSocket } = require('./sockets/notificationSocket');
 
 const app = express();
-
-connectDB();
 
 app.use(cors({
     origin: "http://localhost:5173",
@@ -29,6 +36,12 @@ app.use(cors({
 }));
 // limite augmentée pour l'upload de photos en base64 (T79)
 app.use(express.json({ limit: '5mb' }));
+
+// T138 — journalisation HTTP via Morgan, redirigée vers Winston.
+// Désactivée en environnement de test pour ne pas polluer Jest.
+if (process.env.NODE_ENV !== 'test') {
+    app.use(morgan('combined', { stream: logger.stream }));
+}
 
 app.use((req, res, next) => {
     const sanitize = (obj) => {
@@ -56,6 +69,7 @@ app.use('/api/notifications', notificationRoutes);
 app.use('/api/avis', avisRoutes);
 app.use('/api/agences', agencyRoutes);
 app.use('/api/export', exportRoutes);
+app.use('/api/admin', adminRoutes);
 
 // T141 — Documentation Swagger / OpenAPI
 //   GET /api-docs      → interface Swagger UI (rendue via CDN)
@@ -71,22 +85,12 @@ app.get('/', (_req, res) => {
     res.json({ message: '🐦 Libertia API is running', version: '1.0.0', docs: '/api-docs' });
 });
 
-const PORT = process.env.PORT || 5000;
-
-// T84 — serveur HTTP partagé entre Express et Socket.IO
-const server = http.createServer(app);
-const io = new Server(server, {
-    cors: {
-        origin: "http://localhost:5173",
-        credentials: true
-    }
-});
-
-initBoiteSocket(io);
-initNotificationSocket(io);
-
-server.listen(PORT, () => {
-    console.log(` Serveur Libertia démarré sur le port ${PORT}`);
+// T138 — gestionnaire d'erreurs : journalise la stack via Winston
+// (placé après toutes les routes pour capter les erreurs propagées).
+// eslint-disable-next-line no-unused-vars
+app.use((err, req, res, _next) => {
+    logger.error(`${req.method} ${req.originalUrl} — ${err.message}`, { stack: err.stack });
+    res.status(err.status || 500).json({ success: false, message: 'Erreur serveur' });
 });
 
 module.exports = app;

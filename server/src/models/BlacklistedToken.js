@@ -14,8 +14,8 @@ const blacklistedTokenSchema = new mongoose.Schema({
     }
 });
 
-// Index unique sur le token pour les lookups rapides
-blacklistedTokenSchema.index({ token: 1 });
+// NB : `unique: true` sur le champ `token` crée déjà l'index de lookup ;
+// pas de schema.index({ token: 1 }) supplémentaire (sinon index dupliqué).
 
 // TTL index : purge automatique (expires: 0 = supprimer à expireAt exactement)
 blacklistedTokenSchema.index({ expireAt: 1 }, { expireAfterSeconds: 0 });

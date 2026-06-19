@@ -19,7 +19,12 @@ const auditLogSchema = new mongoose.Schema({
             'refresh_token',
             'forgot_password',
             'reset_password',
-            'export_data'
+            'export_data',
+            // T127 — actions d'administration
+            'admin_valider_agence',
+            'admin_rejeter_agence',
+            'admin_suspendre_agence',
+            'admin_reactiver_agence'
         ]
     },
     ip: {
