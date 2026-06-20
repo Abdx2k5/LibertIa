@@ -182,11 +182,8 @@ const MOCK_BUDGET = {
 export default function Dashboard() {
   const navigate = useNavigate();
   const { theme, toggleTheme } = useUiStore();
-<<<<<<< HEAD
   const { toggleSidebar } = useUIStore();
-=======
   const { t, language, toggleLanguage } = useTranslation();
->>>>>>> develop
   const { user } = useAuthStore();
   const { getMesVoyages, voyages } = useVoyage();
 
@@ -291,22 +288,15 @@ export default function Dashboard() {
 
       {/* ── NAVBAR ── */}
       <nav className={styles.navbar}>
-<<<<<<< HEAD
         <div className={styles.navLeft}>
           <button type="button" className={styles.hamburgerBtn} onClick={toggleSidebar} aria-label="Ouvrir le menu">
             <IconMenu />
           </button>
-          <div className={styles.navLogo}>
+          <Link to="/" className={styles.navLogo}>
             <img src={imgLogo} alt="Libertia" className={styles.navLogoImg} />
             <span className={styles.navLogoText}>Libertia</span>
-          </div>
+          </Link>
         </div>
-=======
-        <Link to="/" className={styles.navLogo}>
-          <img src={imgLogo} alt="Libertia" className={styles.navLogoImg} />
-          <span className={styles.navLogoText}>Libertia</span>
-        </Link>
->>>>>>> develop
         <div className={styles.navLinks}>
           {[t("navHome"), t("navFlights"), t("navHotels"), t("navActivities"), t("navCommunity")].map((item) => (
             <button key={item} className={styles.navLink}>{item}</button>
