@@ -8,10 +8,10 @@ import { FREEMIUM , ROUTES} from "../../utils/constants";
 import { ProgressBar, ShareButton, DeleteButton, StreamingOutput, ItineraireJourJour, VolCard, HotelCard, ActiviteCard, MicroAnimated, BudgetChart, RechercheVoyages, NotificationBell, PaymentModal } from "../../components/ui";
 import ShareModal from "../../components/modals/ShareModal";
 import DeleteConfirmModal from "../../components/modals/DeleteConfirmModal";
+import seoulImg from "../../assets/images/destinations/seoul-1.jpg";
+import lisbonneImg from "../../assets/images/destinations/lisbonne-1.jpg";
 
 const imgProfile      = "https://www.figma.com/api/mcp/asset/0926e5cc-1f5e-4862-a22b-22daa1cef4d7";
-const imgSeoul        = "https://www.figma.com/api/mcp/asset/3c1af9b5-dd28-4164-be5d-ba041556100d";
-const imgLisbonne     = "https://www.figma.com/api/mcp/asset/70e1e8fa-050a-4109-9a22-d6a1ac34a25d";
 const imgLogo         = "https://www.figma.com/api/mcp/asset/d93104aa-ce16-42fe-b9cd-8bbe43f0929d";
 const imgMoon         = "https://www.figma.com/api/mcp/asset/a418505c-a505-4ba9-896b-219cc8be6ab1";
 const imgGlobe        = "https://www.figma.com/api/mcp/asset/13bb7fda-e931-4924-85b4-1f7753f52556";
@@ -36,7 +36,7 @@ const DEMO_HISTORY = [
 
 const SUGGESTIONS = [
   { id: 1, img: null,     city: "Osaka, Japon",        desc: "Découvrez la capitale gastronomique du Japon.", tag: "Vous avez aimé Tokyo", price: "~1200€", type: "Vol + Hôtel" },
-  { id: 2, img: imgSeoul, city: "Séoul, Corée du Sud", desc: "Une ville moderne et accessible pour les voyageurs solitaires.", tag: "Idéal Voyage Solo", price: "~1300€", type: "Vol + Hôtel" },
+  { id: 2, img: seoulImg, city: "Séoul, Corée du Sud", desc: "Une ville moderne et accessible pour les voyageurs solitaires.", tag: "Idéal Voyage Solo", price: "~1300€", type: "Vol + Hôtel" },
 ];
 
 const MAX_FREE_PROMPTS = 10;
@@ -506,7 +506,7 @@ export default function Dashboard() {
               ))}
 
               <div className={styles.suggestWide}>
-                <img src={imgLisbonne} alt="Lisbonne" className={styles.suggestWideImg} />
+                <img src={lisbonneImg} alt="Lisbonne" className={styles.suggestWideImg} />
                 <div className={styles.suggestWideBody}>
                   <div className={styles.suggestTag}>
                     <img src={imgIconStar} alt="" className={styles.suggestTagIcon} />

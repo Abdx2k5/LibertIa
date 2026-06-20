@@ -7,6 +7,8 @@ import imgParis from "../../assets/images/destinations/paris.png";
 import imgTokyo from "../../assets/images/destinations/tokyo.png";
 import imgNewYork from "../../assets/images/destinations/new-york.png";
 import imgMarrakech from "../../assets/images/destinations/marrakech.png";
+import imgBarcelone from "../../assets/images/destinations/barcelone-1.jpg";
+import imgRio from "../../assets/images/destinations/bresil-1.jpg";
 
 // BACKGROUND
 import imgSpaceBg from "../../assets/images/backgrounds/space-bg.png";
@@ -42,7 +44,8 @@ const DESTINATIONS = [
   { img: imgTokyo,     name: "Tokyo",     country: "Japon",      price: "~1200€", count: "3.4k intéressés", tags: ["Technologie", "Cuisine"] },
   { img: imgNewYork,   name: "New York",  country: "États-Unis", price: "~850€",  count: "2.1k intéressés", tags: ["Shopping", "Culture"] },
   { img: imgMarrakech, name: "Marrakech", country: "Maroc",      price: "~320€",  count: "950 intéressés",  tags: ["Aventure", "Gastronomie"] },
-  { img: null,         name: "Barcelone", country: "Espagne",    price: "~400€",  count: "1.8k intéressés", tags: ["Plage", "Nightlife"] },
+  { img: imgBarcelone, name: "Barcelone", country: "Espagne",    price: "~450€",  count: "1.8k intéressés", tags: ["Plage", "Nightlife"] },
+  { img: imgRio,       name: "Rio de Janeiro", country: "Brésil", price: "~900€",  count: "1.6k intéressés", tags: ["Plage", "Culture"] },
   { img: null,         name: "Dubai",     country: "Émirats",    price: "~700€",  count: "2.5k intéressés", tags: ["Luxe", "Shopping"] },
 ];
 
@@ -425,7 +428,7 @@ export default function Landing() {
               <p className={styles.sectionSub}>Les lieux les plus demandés cette semaine par notre IA</p>
             </div>
             <div className={styles.destCards}>
-              {DESTINATIONS.slice(0, 4).map((dest) => (
+              {DESTINATIONS.slice(0, 6).map((dest) => (
                 <div key={dest.name} className={styles.destCard} onClick={() => handleDestClick(dest)}>
                   {dest.img
                     ? <img src={dest.img} alt={dest.name} className={styles.destImg} />
