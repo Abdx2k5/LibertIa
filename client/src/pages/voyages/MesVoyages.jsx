@@ -17,6 +17,31 @@ const MapIcon = () => (
     <path d="M9 20l-5.447-2.724A1 1 0 0 1 3 16.382V5.618a1 1 0 0 1 1.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0 0 21 18.382V7.618a1 1 0 0 0-.553-.894L15 4m0 13V4m0 0L9 7" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
   </svg>
 );
+const SparklesIcon = () => (
+  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ marginRight: 4, verticalAlign: -2 }} aria-hidden="true">
+    <path d="m12 3-1.9 5.7a2 2 0 0 1-1.3 1.3L3 12l5.8 1.9a2 2 0 0 1 1.3 1.3L12 21l1.9-5.7a2 2 0 0 1 1.3-1.3L21 12l-5.8-1.9a2 2 0 0 1-1.3-1.3Z" />
+  </svg>
+);
+const MapPinIcon = () => (
+  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ marginRight: 4, verticalAlign: -2 }} aria-hidden="true">
+    <path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z" /><circle cx="12" cy="10" r="3" />
+  </svg>
+);
+const CalendarIcon = () => (
+  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ marginRight: 4, verticalAlign: -2 }} aria-hidden="true">
+    <rect width="18" height="18" x="3" y="4" rx="2" ry="2" /><line x1="16" y1="2" x2="16" y2="6" /><line x1="8" y1="2" x2="8" y2="6" /><line x1="3" y1="10" x2="21" y2="10" />
+  </svg>
+);
+const WalletIcon = () => (
+  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ marginRight: 4, verticalAlign: -2 }} aria-hidden="true">
+    <path d="M21 12V7H5a2 2 0 0 1 0-4h14v4" /><path d="M3 5v14a2 2 0 0 0 2 2h16v-5" /><path d="M18 12a2 2 0 0 0 0 4h4v-4Z" />
+  </svg>
+);
+const HeartIcon = () => (
+  <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ marginRight: 4, verticalAlign: -2 }} aria-hidden="true">
+    <path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z" />
+  </svg>
+);
 
 // ── Voyages de démonstration (affichés si l'utilisateur n'a encore rien généré) ──
 const MOCK_VOYAGES = [
@@ -130,7 +155,7 @@ export default function MesVoyages() {
             <p className={styles.pageSub}>Retrouvez tous les itinéraires générés par votre assistant IA.</p>
           </div>
           <Button variant="primary" onClick={() => navigate(ROUTES.DASHBOARD)}>
-            ✨ Nouveau voyage
+            <SparklesIcon /> Nouveau voyage
           </Button>
         </div>
 
@@ -194,7 +219,7 @@ export default function MesVoyages() {
                   <div className={styles.cardHeader}>
                     <div>
                       <h3 className={styles.cardTitle}>{v.titre || v.destination}</h3>
-                      <p className={styles.cardDestination}>📍 {v.destination}</p>
+                      <p className={styles.cardDestination}><MapPinIcon />{v.destination}</p>
                     </div>
                     <VisibilityToggle
                       variant="segmented"
@@ -204,11 +229,11 @@ export default function MesVoyages() {
                   </div>
 
                   <div className={styles.cardMeta}>
-                    <span>🗓️ {formatDate(v.dates?.start)} → {formatDate(v.dates?.end)}</span>
+                    <span><CalendarIcon />{formatDate(v.dates?.start)} → {formatDate(v.dates?.end)}</span>
                     {v.budget?.total != null && (
-                      <span>💰 {v.budget.total} {v.budget.currency || "EUR"}</span>
+                      <span><WalletIcon />{v.budget.total} {v.budget.currency || "EUR"}</span>
                     )}
-                    {v.likeCount > 0 && <span>❤️ {v.likeCount}</span>}
+                    {v.likeCount > 0 && <span><HeartIcon />{v.likeCount}</span>}
                   </div>
 
                   <div className={styles.cardActions}>

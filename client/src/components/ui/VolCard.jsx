@@ -1,5 +1,11 @@
 import styles from "./VolCard.module.css";
 
+const IconCheck = (p) => (
+  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...p}>
+    <polyline points="20 6 9 17 4 12"/>
+  </svg>
+);
+
 export default function VolCard({ vol, onSelect, isSelected }) {
   const initials = vol.compagnie
     .split(" ")
@@ -13,7 +19,7 @@ export default function VolCard({ vol, onSelect, isSelected }) {
       className={`${styles.card} ${isSelected ? styles.selected : ""}`}
       onClick={() => onSelect?.(vol)}
     >
-      {isSelected && <div className={styles.checkmark}>✓</div>}
+      {isSelected && <div className={styles.checkmark}><IconCheck /></div>}
 
       <div className={styles.content}>
         {/* Left: Logo */}

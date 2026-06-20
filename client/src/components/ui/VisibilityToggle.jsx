@@ -16,6 +16,10 @@
 import { useState } from "react";
 import styles from "./VisibilityToggle.module.css";
 
+const svgProps = { width: 16, height: 16, viewBox: "0 0 24 24", fill: "none", stroke: "currentColor", strokeWidth: "2", strokeLinecap: "round", strokeLinejoin: "round" };
+const IconGlobe = (p) => <svg {...svgProps} {...p}><circle cx="12" cy="12" r="10"/><path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20"/><path d="M2 12h20"/></svg>;
+const IconLock  = (p) => <svg {...svgProps} {...p}><rect width="18" height="11" x="3" y="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>;
+
 export default function VisibilityToggle({
   isPublic: isPublicProp = false,
   onChange,
@@ -39,7 +43,7 @@ export default function VisibilityToggle({
           onClick={() => set(false)}
           aria-pressed={!isPublic}
         >
-          🔒 Privé
+          <IconLock /> Privé
         </button>
         <button
           type="button"
@@ -47,7 +51,7 @@ export default function VisibilityToggle({
           onClick={() => set(true)}
           aria-pressed={isPublic}
         >
-          🌍 Public
+          <IconGlobe /> Public
         </button>
       </div>
     );
@@ -62,7 +66,7 @@ export default function VisibilityToggle({
       disabled={disabled}
     >
       <span className={styles.info}>
-        <span className={styles.icon}>{isPublic ? "🌍" : "🔒"}</span>
+        <span className={styles.icon}>{isPublic ? <IconGlobe /> : <IconLock />}</span>
         <span className={styles.labels}>
           <span className={styles.label}>{isPublic ? "Public" : "Privé"}</span>
           <span className={styles.hint}>

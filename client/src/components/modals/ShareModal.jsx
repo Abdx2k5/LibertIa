@@ -3,6 +3,10 @@ import Modal from '../ui/Modal';
 import Button from '../ui/Button';
 import styles from './ShareModal.module.css';
 
+const svgProps = { width: 16, height: 16, viewBox: "0 0 24 24", fill: "none", stroke: "currentColor", strokeWidth: "2", strokeLinecap: "round", strokeLinejoin: "round", style: { marginRight: 4, verticalAlign: -3 } };
+const IconCheck = (p) => <svg {...svgProps} strokeWidth="2.5" {...p}><polyline points="20 6 9 17 4 12"/></svg>;
+const IconMail  = (p) => <svg {...svgProps} {...p}><rect width="20" height="16" x="2" y="4" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/></svg>;
+
 export default function ShareModal({ isOpen, onClose, voyageTitle, voyageId }) {
   const [copied, setCopied] = useState(false);
 
@@ -60,7 +64,7 @@ export default function ShareModal({ isOpen, onClose, voyageTitle, voyageId }) {
               size="sm"
               onClick={handleCopyLink}
             >
-              {copied ? '✓ Copié' : 'Copier'}
+              {copied ? <><IconCheck />Copié</> : 'Copier'}
             </Button>
           </div>
         </div>
@@ -74,7 +78,7 @@ export default function ShareModal({ isOpen, onClose, voyageTitle, voyageId }) {
             onClick={handleShareEmail}
             className={styles.socialBtn}
           >
-            ✉️ Email
+<IconMail />Email
           </Button>
           <Button
             variant="outline"

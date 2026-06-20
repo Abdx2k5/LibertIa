@@ -1,5 +1,11 @@
 import Button from './Button';
 
+const IconShare2 = (p) => (
+  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ marginRight: 4, verticalAlign: -2 }} {...p}>
+    <circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/>
+  </svg>
+);
+
 export default function ShareButton({ voyageId, onShare, variant = 'outline', size = 'md', className = '', disabled = false }) {
   const handleClick = () => {
     if (onShare) {
@@ -15,7 +21,7 @@ export default function ShareButton({ voyageId, onShare, variant = 'outline', si
       onClick={handleClick}
       disabled={disabled}
     >
-      📤 Partager
+      <IconShare2 />Partager
     </Button>
   );
 }
