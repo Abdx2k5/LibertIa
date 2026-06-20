@@ -18,6 +18,12 @@
 
 import { useEffect } from "react";
 
+const IconX = (p) => (
+  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...p}>
+    <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
+  </svg>
+);
+
 const SIZE_WIDTHS = { sm: 380, md: 480, lg: 600 };
 
 const s = {
@@ -48,6 +54,7 @@ const s = {
     color: "#94a3b8", fontSize: 20,
     cursor: "pointer", padding: "4px 8px",
     borderRadius: 6, lineHeight: 1,
+    display: "inline-flex", alignItems: "center",
   },
   body:   { padding: "16px 28px", flex: 1, color: "#94a3b8", fontSize: 15, lineHeight: 1.6 },
   footer: { padding: "0 28px 24px", display: "flex", flexDirection: "column", gap: 10 },
@@ -84,7 +91,7 @@ export default function Modal({
           <div style={s.header}>
             {title && <h2 style={s.title}>{title}</h2>}
             {showClose && (
-              <button style={s.closeBtn} onClick={onClose} aria-label="Fermer">✕</button>
+              <button style={s.closeBtn} onClick={onClose} aria-label="Fermer"><IconX /></button>
             )}
           </div>
         )}

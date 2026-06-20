@@ -15,6 +15,12 @@
 import { useState } from "react";
 import styles from "./FollowButton.module.css";
 
+const IconCheck = (p) => (
+  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" {...p}>
+    <polyline points="20 6 9 17 4 12"/>
+  </svg>
+);
+
 export default function FollowButton({
   following: followingProp = false,
   onToggle,
@@ -48,7 +54,7 @@ export default function FollowButton({
       {following ? (
         <>
           <span className={styles.labelDefault}>
-            <span className={styles.check}>✓</span> Abonné
+            <span className={styles.check}><IconCheck /></span> Abonné
           </span>
           <span className={styles.labelHover}>Ne plus suivre</span>
         </>

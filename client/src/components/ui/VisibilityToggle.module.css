@@ -94,6 +94,9 @@
 }
 
 .segment {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
   border: none;
   background: transparent;
   color: #9ca3af;

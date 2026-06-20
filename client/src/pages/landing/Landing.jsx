@@ -38,6 +38,22 @@ import imgGlobLight from "../../assets/icons/icon-globe-light.png";
 import imgGlobe from "../../assets/icons/icon-globe.png";
 import imgIconHeart from "../../assets/icons/Icon_heart.png";
 import imgIconComment from "../../assets/icons/Icon_comments.png";
+
+const IconRocket = (p) => (
+  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ marginLeft: 4, verticalAlign: -2 }} {...p}>
+    <path d="M4.5 16.5c-1.5 1.26-2 5-2 5s3.74-.5 5-2c.71-.84.7-2.13-.09-2.91a2.18 2.18 0 0 0-2.91-.09z"/><path d="m12 15-3-3a22 22 0 0 1 2-3.95A12.88 12.88 0 0 1 22 2c0 2.72-.78 7.5-6 11a22.35 22.35 0 0 1-4 2z"/><path d="M9 12H4s.55-3.03 2-4c1.62-1.08 5 0 5 0"/><path d="M12 15v5s3.03-.55 4-2c1.08-1.62 0-5 0-5"/>
+  </svg>
+);
+const IconBot = (p) => (
+  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ marginRight: 6, verticalAlign: -2 }} {...p}>
+    <path d="M12 8V4H8"/><rect width="16" height="12" x="4" y="8" rx="2"/><path d="M2 14h2"/><path d="M20 14h2"/><path d="M15 13v2"/><path d="M9 13v2"/>
+  </svg>
+);
+const IconX = (p) => (
+  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...p}>
+    <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
+  </svg>
+);
 // Donneee ────────────────────────────────────────────────────────
 const DESTINATIONS = [
   { img: imgParis,     name: "Paris",     country: "France",     price: "~450€",  count: "1.2k intéressés", tags: ["Culture", "Gastronomie"] },
@@ -342,7 +358,7 @@ export default function Landing() {
             <p className={styles.searchHint}>
               {isAiMode
                 ? isAuthenticated
-                  ? "Appuyez sur Entrée pour générer votre itinéraire 🚀"
+                  ? <>Appuyez sur Entrée pour générer votre itinéraire<IconRocket /></>
                   : "Vous serez invité à vous inscrire pour utiliser l'assistant IA"
                 : "Tapez une destination pour voir les suggestions"}
             </p>
@@ -515,7 +531,7 @@ export default function Landing() {
           <div className={styles.panel}>
             <div className={styles.panelHeader}>
               <span className={styles.panelTitle}>Résultats pour "{query}"</span>
-              <button className={styles.panelClose} onClick={() => setPanelOpen(false)}>✕</button>
+              <button className={styles.panelClose} onClick={() => setPanelOpen(false)}><IconX /></button>
             </div>
             <div className={styles.panelContent}>
               <p className={styles.panelCount}>
@@ -543,7 +559,7 @@ export default function Landing() {
                 className={styles.panelAiBtn}
                 onClick={() => { setIsAiMode(true); setPanelOpen(false); setQuery(`Je veux visiter ${query}`); }}
               >
-                🤖 Générer un itinéraire IA pour "{query}"
+<IconBot />Générer un itinéraire IA pour "{query}"
               </button>
             </div>
           </div>
