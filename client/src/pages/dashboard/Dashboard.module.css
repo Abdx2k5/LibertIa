@@ -19,6 +19,13 @@
   display: flex; align-items: center; justify-content: space-between;
 }
 
+.navLeft     { display: flex; align-items: center; gap: 16px; }
+.hamburgerBtn {
+  background: none; border: none; cursor: pointer;
+  color: #fff; padding: 6px; display: flex; align-items: center;
+  border-radius: 6px; transition: background 0.15s;
+}
+.hamburgerBtn:hover { background: rgba(255,255,255,0.08); }
 .navLogo     { display: flex; align-items: center; gap: 12px; }
 .navLogoImg  { width: 32px; height: 32px; }
 .navLogoText { font-size: 20px; font-weight: 700; color: #fff; }

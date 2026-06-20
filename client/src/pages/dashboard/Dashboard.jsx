@@ -1,13 +1,20 @@
 import { useState, useEffect, useCallback } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 import styles from "./Dashboard.module.css";
 import { useAuthStore } from "../../store/authStore";
-import { useUiStore } from "../../store/uiStore";
+import { useUiStore, useUIStore } from "../../store/uiStore";
 import { useVoyage } from "../../hooks/useVoyage";
 import { FREEMIUM , ROUTES} from "../../utils/constants";
 import { ProgressBar, ShareButton, DeleteButton, StreamingOutput, ItineraireJourJour, VolCard, HotelCard, ActiviteCard, MicroAnimated, BudgetChart, RechercheVoyages, NotificationBell, PaymentModal } from "../../components/ui";
 import ShareModal from "../../components/modals/ShareModal";
 import DeleteConfirmModal from "../../components/modals/DeleteConfirmModal";
+import HamburgerSidebar from "../../components/layout/HamburgerSidebar";
+
+const IconMenu = (p) => (
+  <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...p}>
+    <line x1="4" y1="6" x2="20" y2="6"/><line x1="4" y1="12" x2="20" y2="12"/><line x1="4" y1="18" x2="20" y2="18"/>
+  </svg>
+);
 import seoulImg from "../../assets/images/destinations/seoul-1.jpg";
 import lisbonneImg from "../../assets/images/destinations/lisbonne-1.jpg";
 
@@ -148,6 +155,7 @@ const MOCK_BUDGET = {
 export default function Dashboard() {
   const navigate = useNavigate();
   const { theme, toggleTheme } = useUiStore();
+  const { toggleSidebar } = useUIStore();
   const { user } = useAuthStore();
   const { getMesVoyages, voyages } = useVoyage();
 
@@ -248,11 +256,18 @@ export default function Dashboard() {
   return (
     <div className={`${styles.page} ${theme === "dark" ? styles.dark : ""}`}>
 
+      <HamburgerSidebar />
+
       {/* ── NAVBAR ── */}
       <nav className={styles.navbar}>
-        <div className={styles.navLogo}>
-          <img src={imgLogo} alt="Libertia" className={styles.navLogoImg} />
-          <span className={styles.navLogoText}>Libertia</span>
+        <div className={styles.navLeft}>
+          <button type="button" className={styles.hamburgerBtn} onClick={toggleSidebar} aria-label="Ouvrir le menu">
+            <IconMenu />
+          </button>
+          <div className={styles.navLogo}>
+            <img src={imgLogo} alt="Libertia" className={styles.navLogoImg} />
+            <span className={styles.navLogoText}>Libertia</span>
+          </div>
         </div>
         <div className={styles.navLinks}>
           {["Accueil", "Vols", "Hébergements", "Activités", "Communauté"].map((item) => (

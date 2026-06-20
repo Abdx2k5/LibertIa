@@ -18,7 +18,7 @@ import { createContext, useContext, useState, useSyncExternalStore, createElemen
 const UIContext = createContext(null);
 
 export function UIProvider({ children }) {
-  const [sidebarOpen, setSidebarOpen] = useState(true);
+  const [sidebarOpen, setSidebarOpen] = useState(false);
   const toggleSidebar = () => setSidebarOpen((prev) => !prev);
 
   return createElement(

@@ -2,11 +2,19 @@ import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import styles from "./Profile.module.css";
 import { useAuthStore } from "../../store/authStore";
+import { useUIStore } from "../../store/uiStore";
 import authService from "../../services/auth.service";
 import dossierService from "../../services/dossier.service";
 import { GaleriePhoto, CarteMapbox, LogoutButton, Modal, UploadMultiplePhotos } from "../../components/ui";
+import HamburgerSidebar from "../../components/layout/HamburgerSidebar";
 import { FREEMIUM, ROUTES } from "../../utils/constants";
 import imgAvatar from "../../assets/images/community/avatar.png";
+
+const IconMenu = (p) => (
+  <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...p}>
+    <line x1="4" y1="6" x2="20" y2="6"/><line x1="4" y1="12" x2="20" y2="12"/><line x1="4" y1="18" x2="20" y2="18"/>
+  </svg>
+);
 
 const MAX_FREE_PROMPTS = FREEMIUM.MAX_FREE_PROMPTS;
 
@@ -77,6 +85,7 @@ const SECTIONS = [
 export default function Profile() {
   const navigate = useNavigate();
   const { user, updateUser } = useAuthStore();
+  const { toggleSidebar } = useUIStore();
   const isPremium = user?.abonnement === "premium";
   const [activeSection, setActiveSection] = useState("overview");
   const [form, setForm] = useState({
@@ -334,6 +343,12 @@ export default function Profile() {
 
   return (
     <div className={styles.page}>
+      <HamburgerSidebar />
+
+      <button type="button" className={styles.hamburgerBtn} onClick={toggleSidebar} aria-label="Ouvrir le menu">
+        <IconMenu />
+      </button>
+
       <div className={styles.layout}>
 
         {/* ── Sidebar de navigation du profil ── */}
