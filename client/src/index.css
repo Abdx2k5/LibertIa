@@ -27,7 +27,61 @@ body {
    T130 — Variables de thème (clair / sombre)
    Pilotées par l'attribut [data-theme] posé sur <html>
    (voir main.jsx + store/uiStore.js).
+
+   IMPORTANT — ordre des règles : :root doit être déclaré AVANT
+   [data-theme="dark"/"light"]. :root et [data-theme=...] ont la
+   même spécificité CSS (0,1,0) ; en cas d'égalité, c'est l'ordre
+   dans le fichier qui tranche. Si :root passait après (comme
+   c'était le cas avant ce correctif), ses valeurs gagnaient
+   TOUJOURS et le thème clair ne s'appliquait jamais.
    ───────────────────────────────────────────────────────────── */
+:root {
+  /* fallback avant que React/useEffect pose [data-theme] = dark,
+     mêmes valeurs que [data-theme="dark"] ci-dessous */
+  --bg: #16171d;
+  --bg-secondary: #1e1f27;
+  --bg-tertiary: #2a2b35;
+  --bg-input: #0f1724;
+  --border: rgba(255,255,255,0.08);
+  --text: #f3f4f6;
+  --text-muted: #6b7280;
+  --text-inverse: #16171d;
+  --accent: #aa3bff;
+  --accent-secondary: #A78BFA;
+  --accent-green: #4ade80;
+  --accent-bg: rgba(170,59,255,0.15);
+  --accent-border: rgba(170,59,255,0.4);
+  --success: #4ade80;
+  --error: #f87171;
+  --warning: #fbbf24;
+  --warning-bg: rgba(251,191,36,0.15);
+  --shadow: 0 4px 24px rgba(0,0,0,0.3);
+  --card-shadow: 0 4px 24px rgba(0,0,0,0.3);
+
+  /* anciennes variables conservées pour la typographie globale
+     (h1, h2, code, .counter ci-dessous) — non pilotées par [data-theme] */
+  --text-h: #f3f4f6;
+  --code-bg: #1f2028;
+  --social-bg: rgba(47, 48, 58, 0.5);
+
+  --sans: system-ui, 'Segoe UI', Roboto, sans-serif;
+  --heading: system-ui, 'Segoe UI', Roboto, sans-serif;
+  --mono: ui-monospace, Consolas, monospace;
+
+  font: 18px/145% var(--sans);
+  letter-spacing: 0.18px;
+  color-scheme: light dark;
+  color: var(--text);
+  background: var(--bg);
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+
+  @media (max-width: 1024px) {
+    font-size: 16px;
+  }
+}
 [data-theme="dark"] {
   --bg: #16171d;
   --bg-secondary: #1e1f27;
@@ -69,54 +123,6 @@ body {
   --warning-bg: rgba(217,119,6,0.1);
   --shadow: 0 4px 24px rgba(23,23,29,0.06);
   --card-shadow: 0 4px 24px rgba(23,23,29,0.08);
-}
-:root {
-  /* fallback before JS runs = dark, same as [data-theme="dark"] */
-  --bg: #16171d;
-  --bg-secondary: #1e1f27;
-  --bg-tertiary: #2a2b35;
-  --bg-input: #0f1724;
-  --border: rgba(255,255,255,0.08);
-  --text: #f3f4f6;
-  --text-muted: #6b7280;
-  --text-inverse: #16171d;
-  --accent: #aa3bff;
-  --accent-secondary: #A78BFA;
-  --accent-green: #4ade80;
-  --accent-bg: rgba(170,59,255,0.15);
-  --accent-border: rgba(170,59,255,0.4);
-  --success: #4ade80;
-  --error: #f87171;
-  --warning: #fbbf24;
-  --warning-bg: rgba(251,191,36,0.15);
-  --shadow: 0 4px 24px rgba(0,0,0,0.3);
-  --card-shadow: 0 4px 24px rgba(0,0,0,0.3);
-
-  /* anciennes variables conservées pour la typographie globale
-     (h1, h2, code, .counter ci-dessous) — non pilotées par [data-theme] */
-  --text-h: #f3f4f6;
-  --code-bg: #1f2028;
-  --accent-bg: rgba(192, 132, 252, 0.15);
-  --accent-border: rgba(192, 132, 252, 0.5);
-  --social-bg: rgba(47, 48, 58, 0.5);
-
-  --sans: system-ui, 'Segoe UI', Roboto, sans-serif;
-  --heading: system-ui, 'Segoe UI', Roboto, sans-serif;
-  --mono: ui-monospace, Consolas, monospace;
-
-  font: 18px/145% var(--sans);
-  letter-spacing: 0.18px;
-  color-scheme: light dark;
-  color: var(--text);
-  background: var(--bg);
-  font-synthesis: none;
-  text-rendering: optimizeLegibility;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-
-  @media (max-width: 1024px) {
-    font-size: 16px;
-  }
 }
 
 #social .button-icon {

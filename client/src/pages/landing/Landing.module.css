@@ -4,16 +4,23 @@
    ✅ Responsive mobile complet + menu hamburger
    ============================================================ */
 
-:root {
+/* ── Thème local à cette page ──────────────────────────────────
+   NOTE : ces règles DOIVENT rester scopées à .page (jamais :root
+   ni un [data-theme] nu) : :root et [data-theme="..."] ne sont
+   pas des sélecteurs de classe, CSS Modules ne les hash pas, donc
+   ils s'appliqueraient à TOUT le document (toutes les pages),
+   pas seulement à Landing. C'était un bug réel : .page[data-theme]
+   sans le préfixe écrasait --bg/--text partout dans l'app dès que
+   [data-theme="light"] était posé sur <html> par le thème global. */
+.page {
   --bg: #09090b;
   --bg2: #171123;
   --text: #ffffff;
   --muted: #a1a1aa;
   --card: rgba(255, 255, 255, 0.03);
-  --border: var(--border);
 }
 
-[data-theme="light"] {
+.page[data-theme="light"] {
   --bg: #eef5ff;
   --bg2: #c0d8f5;
   --text: #07111f;
@@ -21,19 +28,19 @@
   --card: rgba(255, 255, 255, 0.72);
   --border: rgba(215, 230, 245, 0.85);
 }
-[data-theme="light"] .navbar {
+.page[data-theme="light"] .navbar {
   background-color: rgba(255, 255, 255, 0.8);
   border-bottom: 1px solid rgba(0, 0, 0, 0.08);
 }
-[data-theme="light"] .searchBox {
+.page[data-theme="light"] .searchBox {
   background-color: rgba(255, 255, 255, 0.6);
   border: 1px solid rgba(0, 0, 0, 0.1);
 }
-[data-theme="light"] .glassCard,
-[data-theme="light"] .commCard,
-[data-theme="light"] .destCard,
-[data-theme="light"] .whyCard,
-[data-theme="light"] .panelDestCard {
+.page[data-theme="light"] .glassCard,
+.page[data-theme="light"] .commCard,
+.page[data-theme="light"] .destCard,
+.page[data-theme="light"] .whyCard,
+.page[data-theme="light"] .panelDestCard {
   background-color: rgba(255, 255, 255, 0.8);
   border: 1px solid rgba(0, 0, 0, 0.08);
 }
