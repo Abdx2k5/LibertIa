@@ -2,7 +2,7 @@ import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import styles from "./Register.module.css";
 import { useAuthStore } from "../../store/authStore";
-import authService from "../../services/Auth.service";
+import authService from "../../services/auth.service";
 import imgLogo from "../../assets/logos/logo.png";
 const imgSpaceBg  = "https://www.figma.com/api/mcp/asset/d42b2bd3-40e7-4c81-9e00-2f6037d84ee4";
 const imgGlobe    = "https://www.figma.com/api/mcp/asset/ce67d7c1-e338-4383-8ae7-5ea7ae0b31e4";
