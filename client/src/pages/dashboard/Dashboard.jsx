@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 import styles from "./Dashboard.module.css";
 import { useAuthStore } from "../../store/authStore";
 import { useUiStore } from "../../store/uiStore";
@@ -278,10 +278,10 @@ export default function Dashboard() {
 
       {/* ── NAVBAR ── */}
       <nav className={styles.navbar}>
-        <div className={styles.navLogo}>
+        <Link to="/" className={styles.navLogo}>
           <img src={imgLogo} alt="Libertia" className={styles.navLogoImg} />
           <span className={styles.navLogoText}>Libertia</span>
-        </div>
+        </Link>
         <div className={styles.navLinks}>
           {[t("navHome"), t("navFlights"), t("navHotels"), t("navActivities"), t("navCommunity")].map((item) => (
             <button key={item} className={styles.navLink}>{item}</button>

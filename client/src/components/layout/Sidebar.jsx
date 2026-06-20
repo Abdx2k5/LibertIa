@@ -1,4 +1,4 @@
-import { useNavigate, useLocation } from "react-router-dom";
+import { useNavigate, useLocation, Link } from "react-router-dom";
 import styles from "./Sidebar.module.css";
 import { useAuthStore } from "../../store/authStore";
 
@@ -28,10 +28,10 @@ export default function Sidebar() {
 
   return (
     <aside className={styles.sidebar}>
-      <div className={styles.logo}>
+      <Link to="/" className={styles.logo}>
         <img src={imgLogo} alt="Libertia" className={styles.logoImg} />
         <span className={styles.logoText}>Libertia</span>
-      </div>
+      </Link>
 
       <nav className={styles.nav}>
         {NAV_ITEMS.map((item) => (
