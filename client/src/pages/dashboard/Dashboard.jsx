@@ -10,6 +10,7 @@ import ShareModal from "../../components/modals/ShareModal";
 import DeleteConfirmModal from "../../components/modals/DeleteConfirmModal";
 import seoulImg from "../../assets/images/destinations/seoul-1.jpg";
 import lisbonneImg from "../../assets/images/destinations/lisbonne-1.jpg";
+import { useTranslation } from "../../hooks/useTranslation";
 
 const imgProfile      = "https://www.figma.com/api/mcp/asset/0926e5cc-1f5e-4862-a22b-22daa1cef4d7";
 const imgLogo         = "https://www.figma.com/api/mcp/asset/d93104aa-ce16-42fe-b9cd-8bbe43f0929d";
@@ -148,6 +149,7 @@ const MOCK_BUDGET = {
 export default function Dashboard() {
   const navigate = useNavigate();
   const { theme, toggleTheme } = useUiStore();
+  const { t, language, toggleLanguage } = useTranslation();
   const { user } = useAuthStore();
   const { getMesVoyages, voyages } = useVoyage();
 
@@ -255,20 +257,20 @@ export default function Dashboard() {
           <span className={styles.navLogoText}>Libertia</span>
         </div>
         <div className={styles.navLinks}>
-          {["Accueil", "Vols", "Hébergements", "Activités", "Communauté"].map((item) => (
+          {[t("navHome"), t("navFlights"), t("navHotels"), t("navActivities"), t("navCommunity")].map((item) => (
             <button key={item} className={styles.navLink}>{item}</button>
           ))}
         </div>
         <div className={styles.navRight}>
           <button className={styles.navIconBtn} onClick={toggleTheme}><img src={imgMoon} alt="" className={styles.navIconImg} /></button>
-          <button className={styles.navIconBtn}><img src={imgGlobe} alt="" className={styles.navIconImg} />FR</button>
+          <button className={styles.navIconBtn} onClick={toggleLanguage}><img src={imgGlobe} alt="" className={styles.navIconImg} />{language.toUpperCase()}</button>
           <NotificationBell />
           <div className={styles.navAvatar}>
             <img src={user?.profilePhoto || imgProfile} alt={user?.nom || "Profil"} className={styles.navAvatarImg} />
           </div>
           <div className={styles.navBadge}>
             <img src={imgIconAssistant} alt="" style={{ width: 13, height: 13 }} />
-            <span className={styles.navBadgeText}>Assistant IA</span>
+            <span className={styles.navBadgeText}>{t("assistantBadge")}</span>
           </div>
         </div>
       </nav>
@@ -277,9 +279,9 @@ export default function Dashboard() {
 
         {/* ── HERO ── */}
         <section className={styles.hero}>
-          <h1 className={styles.heroTitle}>Où votre imagination vous porte-t-elle aujourd'hui ?</h1>
+          <h1 className={styles.heroTitle}>{t("dashboardHeroTitle")}</h1>
           <p className={styles.heroSubtitle}>
-            Bonjour {user?.nom?.split(" ")[0] || ""}  ! Je trouve vols, hôtels et activités selon vos envies.
+            {t("dashboardGreeting")} {user?.nom?.split(" ")[0] || ""} {t("dashboardHeroSubtitleRest")}
           </p>
 
           <form onSubmit={handleSubmit} style={{ width: "100%", display: "flex", justifyContent: "center" }}>
