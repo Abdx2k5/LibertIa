@@ -21,6 +21,12 @@
   gap: 18px;
 }
 
+.sidebarColumn {
+  position: sticky;
+  top: 20px;
+  align-self: flex-start;
+}
+
 .heroCard,
 .composerCard,
 .sidebarCard,
@@ -387,6 +393,7 @@
 
   .sidebarColumn {
     order: 2;
+    position: static;
   }
 }
 
