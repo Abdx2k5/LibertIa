@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import styles from "./Dashboard.module.css";
 import { useAuthStore } from "../../store/authStore";
@@ -54,6 +54,15 @@ const IconRocket = (p) => (
     <path d="M4.5 16.5c-1.5 1.26-2 5-2 5s3.74-.5 5-2c.71-.84.7-2.13-.09-2.91a2.18 2.18 0 0 0-2.91-.09z"/><path d="m12 15-3-3a22 22 0 0 1 2-3.95A12.88 12.88 0 0 1 22 2c0 2.72-.78 7.5-6 11a22.35 22.35 0 0 1-4 2z"/><path d="M9 12H4s.55-3.03 2-4c1.62-1.08 5 0 5 0"/><path d="M12 15v5s3.03-.55 4-2c1.08-1.62 0-5 0-5"/>
   </svg>
 );
+
+const menuSvgProps = { width: 16, height: 16, viewBox: "0 0 24 24", fill: "none", stroke: "currentColor", strokeWidth: "2", strokeLinecap: "round", strokeLinejoin: "round" };
+const IconUser       = (p) => <svg {...menuSvgProps} {...p}><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>;
+const IconSettingsGear = (p) => <svg {...menuSvgProps} {...p}><path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"/><circle cx="12" cy="12" r="3"/></svg>;
+const IconCreditCard = (p) => <svg {...menuSvgProps} {...p}><rect width="20" height="14" x="2" y="5" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/></svg>;
+const IconLogOut     = (p) => <svg {...menuSvgProps} {...p}><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>;
+const IconInstagram  = (p) => <svg {...menuSvgProps} {...p}><rect width="20" height="20" x="2" y="2" rx="5"/><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/></svg>;
+const IconTwitter    = (p) => <svg {...menuSvgProps} {...p}><path d="M22 4s-.7 2.1-2 3.4c1.6 10-9.4 17.3-18 11.6 2.2.1 4.4-.6 6-2C3 15.5 1.8 9.1 2 6c2.2 2.6 5.6 4.1 9 4-.9-4.2 4-6.6 7-3.8 1.1 0 3-1.2 3-1.2z"/></svg>;
+const IconFacebook   = (p) => <svg {...menuSvgProps} {...p}><path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"/></svg>;
 
 const FILTERS = [
   { id: "vol",    icon: IconPlane,    label: "Vol uniquement" },
@@ -184,8 +193,32 @@ export default function Dashboard() {
   const { theme, toggleTheme } = useUiStore();
   const { toggleSidebar } = useUIStore();
   const { t, language, toggleLanguage } = useTranslation();
-  const { user } = useAuthStore();
+  const { user, logout } = useAuthStore();
   const { getMesVoyages, voyages } = useVoyage();
+
+  // ── Menu déroulant du profil (avatar navbar) ──
+  const [avatarMenuOpen, setAvatarMenuOpen] = useState(false);
+  const avatarMenuRef = useRef(null);
+
+  useEffect(() => {
+    if (!avatarMenuOpen) return undefined;
+    const onClickOutside = (e) => {
+      if (avatarMenuRef.current && !avatarMenuRef.current.contains(e.target)) setAvatarMenuOpen(false);
+    };
+    const onKey = (e) => { if (e.key === "Escape") setAvatarMenuOpen(false); };
+    document.addEventListener("mousedown", onClickOutside);
+    document.addEventListener("keydown", onKey);
+    return () => {
+      document.removeEventListener("mousedown", onClickOutside);
+      document.removeEventListener("keydown", onKey);
+    };
+  }, [avatarMenuOpen]);
+
+  const handleLogout = () => {
+    setAvatarMenuOpen(false);
+    logout();
+    navigate(ROUTES.HOME);
+  };
 
   // ── Selected items state ──
   const [selectedVol, setSelectedVol] = useState(null);
@@ -298,16 +331,67 @@ export default function Dashboard() {
           </Link>
         </div>
         <div className={styles.navLinks}>
-          {[t("navHome"), t("navFlights"), t("navHotels"), t("navActivities"), t("navCommunity")].map((item) => (
-            <button key={item} className={styles.navLink}>{item}</button>
+          {[
+            { key: "navHome", action: () => navigate(ROUTES.DASHBOARD) },
+            { key: "navFlights", action: () => setActiveFilter("vol") },
+            { key: "navHotels", action: () => setActiveFilter("hotel") },
+            { key: "navActivities", action: () => setActiveFilter("activ") },
+            { key: "navCommunity", action: () => navigate(ROUTES.COMMUNITY) },
+          ].map((item) => (
+            <button key={item.key} className={styles.navLink} onClick={item.action}>{t(item.key)}</button>
           ))}
         </div>
         <div className={styles.navRight}>
           <button className={styles.navIconBtn} onClick={toggleTheme}><img src={imgMoon} alt="" className={styles.navIconImg} /></button>
           <button className={styles.navIconBtn} onClick={toggleLanguage}><img src={imgGlobe} alt="" className={styles.navIconImg} />{language.toUpperCase()}</button>
           <NotificationBell />
-          <div className={styles.navAvatar}>
-            <img src={user?.profilePhoto || imgProfile} alt={user?.nom || "Profil"} className={styles.navAvatarImg} />
+          <div className={styles.avatarMenuWrap} ref={avatarMenuRef}>
+            <button
+              type="button"
+              className={styles.navAvatar}
+              onClick={() => setAvatarMenuOpen((v) => !v)}
+              aria-haspopup="menu"
+              aria-expanded={avatarMenuOpen}
+              aria-label="Menu du profil"
+            >
+              <img src={user?.profilePhoto || imgProfile} alt={user?.nom || "Profil"} className={styles.navAvatarImg} />
+            </button>
+
+            {avatarMenuOpen && (
+              <div className={styles.avatarMenu} role="menu">
+                <div className={styles.avatarMenuHeader}>
+                  <div className={styles.avatarMenuName}>{user?.nom || "Utilisateur"}</div>
+                  <div className={styles.avatarMenuEmail}>{user?.email || ""}</div>
+                </div>
+
+                <button type="button" role="menuitem" className={styles.avatarMenuItem} onClick={() => { setAvatarMenuOpen(false); navigate(ROUTES.PROFILE); }}>
+                  <IconUser /> Voir le profil
+                </button>
+                <button type="button" role="menuitem" className={styles.avatarMenuItem} onClick={() => { setAvatarMenuOpen(false); navigate(ROUTES.SETTINGS); }}>
+                  <IconSettingsGear /> Paramètres
+                </button>
+                <button type="button" role="menuitem" className={styles.avatarMenuItem} onClick={() => { setAvatarMenuOpen(false); navigate(ROUTES.SUBSCRIPTION); }}>
+                  <IconCreditCard /> Abonnement
+                </button>
+
+                <div className={styles.avatarMenuDivider} />
+
+                <div className={styles.avatarMenuSocial}>
+                  <span className={styles.avatarMenuSocialLabel}>Suivez-nous</span>
+                  <div className={styles.avatarMenuSocialIcons}>
+                    <button type="button" className={styles.avatarMenuSocialIcon} disabled title="Bientôt disponible" aria-label="Instagram"><IconInstagram /></button>
+                    <button type="button" className={styles.avatarMenuSocialIcon} disabled title="Bientôt disponible" aria-label="Twitter"><IconTwitter /></button>
+                    <button type="button" className={styles.avatarMenuSocialIcon} disabled title="Bientôt disponible" aria-label="Facebook"><IconFacebook /></button>
+                  </div>
+                </div>
+
+                <div className={styles.avatarMenuDivider} />
+
+                <button type="button" role="menuitem" className={`${styles.avatarMenuItem} ${styles.avatarMenuLogout}`} onClick={handleLogout}>
+                  <IconLogOut /> Se déconnecter
+                </button>
+              </div>
+            )}
           </div>
           <div className={styles.navBadge}>
             <img src={imgIconAssistant} alt="" style={{ width: 13, height: 13 }} />
