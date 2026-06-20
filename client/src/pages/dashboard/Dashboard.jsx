@@ -17,6 +17,7 @@ const IconMenu = (p) => (
 );
 import seoulImg from "../../assets/images/destinations/seoul-1.jpg";
 import lisbonneImg from "../../assets/images/destinations/lisbonne-1.jpg";
+import { useTranslation } from "../../hooks/useTranslation";
 
 const imgProfile      = "https://www.figma.com/api/mcp/asset/0926e5cc-1f5e-4862-a22b-22daa1cef4d7";
 const imgLogo         = "https://www.figma.com/api/mcp/asset/d93104aa-ce16-42fe-b9cd-8bbe43f0929d";
@@ -28,11 +29,37 @@ const imgIconSuggests = "https://www.figma.com/api/mcp/asset/03afb187-49b3-467b-
 const imgIconStar     = "https://www.figma.com/api/mcp/asset/03c56ae0-a2fe-4cd1-a8c1-7a98c835b6fe";
 const imgIconAssistant= "https://www.figma.com/api/mcp/asset/da457562-2f7c-406b-9c8f-af640f84933e";
 
+const IconPlane = (p) => (
+  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...p}>
+    <path d="M17.8 19.2 16 11l3.5-3.5C21 6 21.5 4 21 3c-1-.5-3 0-4.5 1.5L13 8 4.8 6.2c-.5-.1-1 .1-1.3.5l-.7.8c-.4.5-.2 1.2.3 1.5L9 12l-2 3H4l-1 1 3 2 2 3 1-1v-3l3-2 3.5 5.3c.3.5 1 .7 1.5.3l.8-.7c.4-.3.6-.8.5-1.3Z"/>
+  </svg>
+);
+const IconHotel = (p) => (
+  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...p}>
+    <path d="M6 22V4a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v18Z"/><path d="M6 12H4a2 2 0 0 0-2 2v6a2 2 0 0 0 2 2h2"/><path d="M18 9h2a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2h-2"/><path d="M10 6h4"/><path d="M10 10h4"/><path d="M10 14h4"/><path d="M10 18h4"/>
+  </svg>
+);
+const IconActivity = (p) => (
+  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...p}>
+    <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/>
+  </svg>
+);
+const IconUsers = (p) => (
+  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...p}>
+    <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/>
+  </svg>
+);
+const IconRocket = (p) => (
+  <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...p}>
+    <path d="M4.5 16.5c-1.5 1.26-2 5-2 5s3.74-.5 5-2c.71-.84.7-2.13-.09-2.91a2.18 2.18 0 0 0-2.91-.09z"/><path d="m12 15-3-3a22 22 0 0 1 2-3.95A12.88 12.88 0 0 1 22 2c0 2.72-.78 7.5-6 11a22.35 22.35 0 0 1-4 2z"/><path d="M9 12H4s.55-3.03 2-4c1.62-1.08 5 0 5 0"/><path d="M12 15v5s3.03-.55 4-2c1.08-1.62 0-5 0-5"/>
+  </svg>
+);
+
 const FILTERS = [
-  { id: "vol",    label: "✈️ Vol uniquement" },
-  { id: "hotel",  label: "🏨 Hôtel uniquement" },
-  { id: "activ",  label: "🏃 Activités" },
-  { id: "groupe", label: "👥 Groupe" },
+  { id: "vol",    icon: IconPlane,    label: "Vol uniquement" },
+  { id: "hotel",  icon: IconHotel,    label: "Hôtel uniquement" },
+  { id: "activ",  icon: IconActivity, label: "Activités" },
+  { id: "groupe", icon: IconUsers,    label: "Groupe" },
 ];
 
 const DEMO_HISTORY = [
@@ -155,7 +182,11 @@ const MOCK_BUDGET = {
 export default function Dashboard() {
   const navigate = useNavigate();
   const { theme, toggleTheme } = useUiStore();
+<<<<<<< HEAD
   const { toggleSidebar } = useUIStore();
+=======
+  const { t, language, toggleLanguage } = useTranslation();
+>>>>>>> develop
   const { user } = useAuthStore();
   const { getMesVoyages, voyages } = useVoyage();
 
@@ -260,6 +291,7 @@ export default function Dashboard() {
 
       {/* ── NAVBAR ── */}
       <nav className={styles.navbar}>
+<<<<<<< HEAD
         <div className={styles.navLeft}>
           <button type="button" className={styles.hamburgerBtn} onClick={toggleSidebar} aria-label="Ouvrir le menu">
             <IconMenu />
@@ -269,21 +301,27 @@ export default function Dashboard() {
             <span className={styles.navLogoText}>Libertia</span>
           </div>
         </div>
+=======
+        <Link to="/" className={styles.navLogo}>
+          <img src={imgLogo} alt="Libertia" className={styles.navLogoImg} />
+          <span className={styles.navLogoText}>Libertia</span>
+        </Link>
+>>>>>>> develop
         <div className={styles.navLinks}>
-          {["Accueil", "Vols", "Hébergements", "Activités", "Communauté"].map((item) => (
+          {[t("navHome"), t("navFlights"), t("navHotels"), t("navActivities"), t("navCommunity")].map((item) => (
             <button key={item} className={styles.navLink}>{item}</button>
           ))}
         </div>
         <div className={styles.navRight}>
           <button className={styles.navIconBtn} onClick={toggleTheme}><img src={imgMoon} alt="" className={styles.navIconImg} /></button>
-          <button className={styles.navIconBtn}><img src={imgGlobe} alt="" className={styles.navIconImg} />FR</button>
+          <button className={styles.navIconBtn} onClick={toggleLanguage}><img src={imgGlobe} alt="" className={styles.navIconImg} />{language.toUpperCase()}</button>
           <NotificationBell />
           <div className={styles.navAvatar}>
             <img src={user?.profilePhoto || imgProfile} alt={user?.nom || "Profil"} className={styles.navAvatarImg} />
           </div>
           <div className={styles.navBadge}>
             <img src={imgIconAssistant} alt="" style={{ width: 13, height: 13 }} />
-            <span className={styles.navBadgeText}>Assistant IA</span>
+            <span className={styles.navBadgeText}>{t("assistantBadge")}</span>
           </div>
         </div>
       </nav>
@@ -292,9 +330,9 @@ export default function Dashboard() {
 
         {/* ── HERO ── */}
         <section className={styles.hero}>
-          <h1 className={styles.heroTitle}>Où votre imagination vous porte-t-elle aujourd'hui ?</h1>
+          <h1 className={styles.heroTitle}>{t("dashboardHeroTitle")}</h1>
           <p className={styles.heroSubtitle}>
-            Bonjour {user?.nom?.split(" ")[0] || ""}  ! Je trouve vols, hôtels et activités selon vos envies.
+            {t("dashboardGreeting")} {user?.nom?.split(" ")[0] || ""} {t("dashboardHeroSubtitleRest")}
           </p>
 
           <form onSubmit={handleSubmit} style={{ width: "100%", display: "flex", justifyContent: "center" }}>
@@ -312,8 +350,9 @@ export default function Dashboard() {
                       key={f.id} type="button"
                       className={activeFilter === f.id ? styles.filterPillActive : styles.filterPill}
                       onClick={() => setActiveFilter((p) => p === f.id ? null : f.id)}
+                      style={{ display: 'inline-flex', alignItems: 'center', gap: 6 }}
                     >
-                      {f.label}
+                      <f.icon /> {f.label}
                     </button>
                   ))}
                 </div>
@@ -372,7 +411,7 @@ export default function Dashboard() {
 
               {/* Flights subsection */}
               <div>
-                <div className={styles.subsectionLabel}>✈️ Vols disponibles</div>
+                <div className={styles.subsectionLabel}><IconPlane width={18} height={18} /> Vols disponibles</div>
                 <div className={styles.cardsGrid}>
                   {MOCK_VOLS.map((v) => (
                     <VolCard key={v.numero} vol={v} onSelect={handleSelectVol} isSelected={selectedVol?.numero === v.numero} />
@@ -382,7 +421,7 @@ export default function Dashboard() {
 
               {/* Hotels subsection */}
               <div>
-                <div className={styles.subsectionLabel}>🏨 Hébergements</div>
+                <div className={styles.subsectionLabel}><IconHotel width={18} height={18} /> Hébergements</div>
                 <div className={styles.cardsGrid}>
                   {MOCK_HOTELS.map((h) => (
                     <HotelCard key={h.nom} hotel={h} onSelect={handleSelectHotel} isSelected={selectedHotel?.nom === h.nom} budgetRestant={70} />
@@ -392,7 +431,7 @@ export default function Dashboard() {
 
               {/* Activities subsection */}
               <div>
-                <div className={styles.subsectionLabel}>🏃 Activités recommandées</div>
+                <div className={styles.subsectionLabel}><IconActivity width={18} height={18} /> Activités recommandées</div>
                 <div className={styles.cardsGrid}>
                   {MOCK_ACTIVITES.map((a) => (
                     <ActiviteCard key={a.titre} activite={a} onAdd={handleAddActivite} isAdded={addedActivites.some(x => x.titre === a.titre)} />
@@ -548,7 +587,7 @@ export default function Dashboard() {
       {showLimitModal && (
         <div className={styles.modalOverlay} onClick={() => setShowLimitModal(false)}>
           <div className={styles.modal} onClick={(e) => e.stopPropagation()}>
-            <div className={styles.modalEmoji}>🚀</div>
+            <div className={styles.modalEmoji}><IconRocket /></div>
             <h2 className={styles.modalTitle}>Limite atteinte !</h2>
             <p className={styles.modalText}>
               Vous avez utilisé vos {MAX_FREE_PROMPTS} prompts gratuits ce mois-ci.

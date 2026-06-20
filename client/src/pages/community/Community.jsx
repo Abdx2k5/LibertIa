@@ -3,6 +3,7 @@ import styles from "./Community.module.css";
 import PostCard from "../../components/ui/PostCard";
 import FollowButton from "../../components/ui/FollowButton";
 import { ROUTES } from "../../utils/constants";
+import { useTranslation } from "../../hooks/useTranslation";
 
 import avatar1 from "../../assets/images/community/avatar-1.png";
 import avatar2 from "../../assets/images/community/avatar-2.png";
@@ -146,6 +147,7 @@ const upcomingEvents = [
 
 export default function Community() {
   const navigate = useNavigate();
+  const { t } = useTranslation();
   const activeTab = "Pour vous";
 
   return (
@@ -154,12 +156,12 @@ export default function Community() {
         <section className={styles.mainColumn}>
           <header className={styles.heroCard}>
             <div className={styles.heroText}>
-              <span className={styles.heroKicker}>Communauté</span>
+              <span className={styles.heroKicker}>{t("communityKicker")}</span>
               <h1 className={styles.heroTitle}>
                 La communauté <span>Libertia</span>
               </h1>
               <p className={styles.heroSubtitle}>
-                Échangez avec des voyageurs passionnés, partagez vos découvertes et trouvez l’inspiration pour votre prochaine aventure.
+                {t("communityHeroSubtitle")}
               </p>
 
               <div className={styles.statsGrid}>
@@ -183,7 +185,7 @@ export default function Community() {
             </div>
 
             <button type="button" className={styles.heroButton} onClick={() => navigate(ROUTES.GROUPS)}>
-              Rejoindre un voyage de groupe
+              {t("communityHeroButton")}
             </button>
           </header>
 

@@ -19,6 +19,7 @@
   display: flex; align-items: center; justify-content: space-between;
 }
 
+<<<<<<< HEAD
 .navLeft     { display: flex; align-items: center; gap: 16px; }
 .hamburgerBtn {
   background: none; border: none; cursor: pointer;
@@ -27,6 +28,9 @@
 }
 .hamburgerBtn:hover { background: rgba(255,255,255,0.08); }
 .navLogo     { display: flex; align-items: center; gap: 12px; }
+=======
+.navLogo     { display: flex; align-items: center; gap: 12px; cursor: pointer; text-decoration: none; }
+>>>>>>> develop
 .navLogoImg  { width: 32px; height: 32px; }
 .navLogoText { font-size: 20px; font-weight: 700; color: #fff; }
 .navLinks    { display: flex; gap: 32px; }

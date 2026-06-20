@@ -71,15 +71,28 @@ const DEFAULT_PREFERENCES = {
   language: "fr",
 };
 
+const navSvgProps = { width: 16, height: 16, viewBox: "0 0 24 24", fill: "none", stroke: "currentColor", strokeWidth: "2", strokeLinecap: "round", strokeLinejoin: "round" };
+const IconHome     = (p) => <svg {...navSvgProps} {...p}><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>;
+const IconUser      = (p) => <svg {...navSvgProps} {...p}><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>;
+const IconFileText  = (p) => <svg {...navSvgProps} {...p}><path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z"/><path d="M14 2v4a2 2 0 0 0 2 2h4"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><line x1="10" y1="9" x2="8" y2="9"/></svg>;
+const IconSettingsP = (p) => <svg {...navSvgProps} {...p}><path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"/><circle cx="12" cy="12" r="3"/></svg>;
+const IconSparklesP = (p) => <svg {...navSvgProps} {...p}><path d="m12 3-1.9 5.7a2 2 0 0 1-1.3 1.3L3 12l5.8 1.9a2 2 0 0 1 1.3 1.3L12 21l1.9-5.7a2 2 0 0 1 1.3-1.3L21 12l-5.8-1.9a2 2 0 0 1-1.3-1.3Z"/></svg>;
+const IconCameraP   = (p) => <svg {...navSvgProps} {...p}><path d="M14.5 4h-5L7 7H4a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-3l-2.5-3z"/><circle cx="12" cy="13" r="3"/></svg>;
+const IconLockP     = (p) => <svg {...navSvgProps} {...p}><rect width="18" height="11" x="3" y="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>;
+const IconCheckP    = (p) => <svg {...navSvgProps} strokeWidth="2.5" width="14" height="14" {...p}><polyline points="20 6 9 17 4 12"/></svg>;
+const IconXP        = (p) => <svg {...navSvgProps} strokeWidth="2.5" width="14" height="14" {...p}><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>;
+const IconPencilP   = (p) => <svg {...navSvgProps} width="14" height="14" {...p}><path d="M21.174 6.812a1 1 0 0 0-3.986-3.986L3.842 16.174a2 2 0 0 0-.5.83l-1.321 4.352a.5.5 0 0 0 .623.622l4.353-1.32a2 2 0 0 0 .83-.497Z"/><path d="m15 5 4 4"/></svg>;
+const IconTagP      = (p) => <svg {...navSvgProps} width="13" height="13" {...p}><path d="M12.586 2.586A2 2 0 0 0 11.172 2H4a2 2 0 0 0-2 2v7.172a2 2 0 0 0 .586 1.414l8.704 8.704a2.426 2.426 0 0 0 3.42 0l6.58-6.58a2.426 2.426 0 0 0 0-3.42Z"/><circle cx="7.5" cy="7.5" r=".5" fill="currentColor"/></svg>;
+
 // Sections affichées via la sidebar de navigation du profil
 const SECTIONS = [
-  { id: "overview",     label: "Vue d'ensemble",  icon: "🏠" },
-  { id: "info",         label: "Informations",    icon: "👤" },
-  { id: "bio",          label: "À propos de moi", icon: "📝" },
-  { id: "preferences",  label: "Préférences",     icon: "⚙️" },
-  { id: "subscription", label: "Abonnement",      icon: "✨" },
-  { id: "memories",     label: "Mes souvenirs",   icon: "📸" },
-  { id: "security",     label: "Sécurité",        icon: "🔒" },
+  { id: "overview",     label: "Vue d'ensemble",  icon: IconHome },
+  { id: "info",         label: "Informations",    icon: IconUser },
+  { id: "bio",          label: "À propos de moi", icon: IconFileText },
+  { id: "preferences",  label: "Préférences",     icon: IconSettingsP },
+  { id: "subscription", label: "Abonnement",      icon: IconSparklesP },
+  { id: "memories",     label: "Mes souvenirs",   icon: IconCameraP },
+  { id: "security",     label: "Sécurité",        icon: IconLockP },
 ];
 
 export default function Profile() {
@@ -360,7 +373,7 @@ export default function Profile() {
             <div className={styles.sideNavName}>{user?.nom || "Utilisateur"}</div>
             <div className={styles.sideNavEmail}>{user?.email}</div>
             <div className={styles.heroBadge}>
-              {isPremium ? "✨ Membre Premium" : "🆓 Membre Gratuit"}
+              {isPremium ? <><IconSparklesP width={14} height={14} /> Membre Premium</> : <><IconTagP /> Membre Gratuit</>}
             </div>
           </div>
 
@@ -372,7 +385,7 @@ export default function Profile() {
                 className={`${styles.navBtn} ${activeSection === section.id ? styles.navBtnActive : ""}`}
                 onClick={() => setActiveSection(section.id)}
               >
-                <span className={styles.navBtnIcon}>{section.icon}</span>
+                <span className={styles.navBtnIcon}><section.icon /></span>
                 {section.label}
               </button>
             ))}
@@ -401,13 +414,13 @@ export default function Profile() {
                     <div className={styles.avatar}>
                       <img src={avatarSrc} alt="Avatar" className={styles.avatarImg} />
                     </div>
-                    <button type="button" className={styles.avatarEditBtn} title="Changer la photo">✏️</button>
+                    <button type="button" className={styles.avatarEditBtn} title="Changer la photo"><IconPencilP /></button>
                   </div>
                   <div className={styles.heroInfo}>
                     <h1 className={styles.heroName}>{user?.nom || "Utilisateur"}</h1>
                     <p className={styles.heroEmail}>{user?.email}</p>
                     <div className={styles.heroBadge}>
-                      {isPremium ? "✨ Membre Premium" : "🆓 Membre Gratuit"}
+                      {isPremium ? <><IconSparklesP width={14} height={14} /> Membre Premium</> : <><IconTagP /> Membre Gratuit</>}
                     </div>
                     {user?.bio && <p style={{ fontSize: 14, color: "#a1a1aa", marginTop: 8 }}>{user.bio}</p>}
                   </div>
@@ -740,25 +753,25 @@ export default function Profile() {
                     <div className={styles.preferencesList}>
                       <div className={styles.prefItem}>
                         <span className={styles.prefCheck}>
-                          {form.preferences.profilePublic ? "✓" : "✗"}
+                          {form.preferences.profilePublic ? <IconCheckP /> : <IconXP />}
                         </span>
                         <span>Profil public</span>
                       </div>
                       <div className={styles.prefItem}>
                         <span className={styles.prefCheck}>
-                          {form.preferences.voyagesPublic ? "✓" : "✗"}
+                          {form.preferences.voyagesPublic ? <IconCheckP /> : <IconXP />}
                         </span>
                         <span>Voyages publics</span>
                       </div>
                       <div className={styles.prefItem}>
                         <span className={styles.prefCheck}>
-                          {form.preferences.emailNotifications ? "✓" : "✗"}
+                          {form.preferences.emailNotifications ? <IconCheckP /> : <IconXP />}
                         </span>
                         <span>Notifications par email</span>
                       </div>
                       <div className={styles.prefItem}>
                         <span className={styles.prefCheck}>
-                          {form.preferences.newsNotifications ? "✓" : "✗"}
+                          {form.preferences.newsNotifications ? <IconCheckP /> : <IconXP />}
                         </span>
                         <span>Infolettre hebdomadaire</span>
                       </div>

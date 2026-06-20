@@ -15,6 +15,12 @@
 import { useState } from "react";
 import styles from "./DuplicateButton.module.css";
 
+const IconCheck = (p) => (
+  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" {...p}>
+    <polyline points="20 6 9 17 4 12"/>
+  </svg>
+);
+
 export default function DuplicateButton({
   voyageId,
   onDuplicate,
@@ -53,7 +59,7 @@ export default function DuplicateButton({
           <span className={styles.spinner} aria-hidden="true" /> Duplication...
         </>
       ) : state === "done" ? (
-        <>✓ Dupliqué</>
+        <><IconCheck /> Dupliqué</>
       ) : (
         <>⧉ Dupliquer</>
       )}

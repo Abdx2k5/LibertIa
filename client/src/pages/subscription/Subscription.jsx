@@ -5,6 +5,10 @@ import { useAuthStore } from "../../store/authStore";
 import { Badge, Button, Modal } from "../../components/ui";
 import { FREEMIUM, ROUTES } from "../../utils/constants";
 
+const IconCheck      = (p) => <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" {...p}><polyline points="20 6 9 17 4 12"/></svg>;
+const IconSparkles   = (p) => <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...p}><path d="m12 3-1.9 5.7a2 2 0 0 1-1.3 1.3L3 12l5.8 1.9a2 2 0 0 1 1.3 1.3L12 21l1.9-5.7a2 2 0 0 1 1.3-1.3L21 12l-5.8-1.9a2 2 0 0 1-1.3-1.3Z"/></svg>;
+const IconCreditCard = (p) => <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ marginRight: 4, verticalAlign: -3 }} {...p}><rect width="20" height="14" x="2" y="5" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/></svg>;
+
 const PREMIUM_FEATURES = [
   "Itinéraires illimités générés par l'IA",
   "Accès prioritaire aux nouvelles fonctionnalités",
@@ -72,7 +76,7 @@ export default function Subscription() {
               <div className={styles.currentPlanLabel}>Formule actuelle</div>
               <div className={styles.currentPlanName}>
                 {isPremium ? "Premium" : "Gratuit"}
-                {isPremium && <Badge variant="premium" style={{ marginLeft: 10 }}>✨ Premium</Badge>}
+                {isPremium && <Badge variant="premium" style={{ marginLeft: 10 }}><IconSparkles /> Premium</Badge>}
               </div>
             </div>
             <div className={styles.currentPlanStats}>
@@ -124,7 +128,7 @@ export default function Subscription() {
                 <div className={styles.planPrice}>0€ <span className={styles.planPeriod}>/ mois</span></div>
                 <ul className={styles.featuresList}>
                   {FREE_FEATURES.map((f) => (
-                    <li key={f}><span className={styles.checkIcon}>✓</span>{f}</li>
+                    <li key={f}><span className={styles.checkIcon}><IconCheck /></span>{f}</li>
                   ))}
                 </ul>
               </div>
@@ -133,14 +137,14 @@ export default function Subscription() {
               <div className={`${styles.planCard} ${styles.planCardPremium}`}>
                 <div className={styles.planHeader}>
                   <span className={styles.planName}>Premium</span>
-                  <Badge variant="premium">✨ Recommandé</Badge>
+                  <Badge variant="premium"><IconSparkles /> Recommandé</Badge>
                 </div>
                 <div className={styles.planPrice}>
                   {PLANS[billingCycle].price} <span className={styles.planPeriod}>{PLANS[billingCycle].period}</span>
                 </div>
                 <ul className={styles.featuresList}>
                   {PREMIUM_FEATURES.map((f) => (
-                    <li key={f}><span className={styles.checkIcon}>✓</span>{f}</li>
+                    <li key={f}><span className={styles.checkIcon}><IconCheck /></span>{f}</li>
                   ))}
                 </ul>
                 <Button variant="primary" fullWidth loading={loading} onClick={handleUpgrade}>
@@ -175,7 +179,7 @@ export default function Subscription() {
             <div className={styles.manageRow}>
               <div className={styles.manageInfo}>
                 <span className={styles.manageLabel}>Moyen de paiement</span>
-                <span className={styles.manageValue}>💳 •••• •••• •••• 4242</span>
+                <span className={styles.manageValue}><IconCreditCard />•••• •••• •••• 4242</span>
               </div>
               <Button variant="outline" size="sm">Modifier</Button>
             </div>

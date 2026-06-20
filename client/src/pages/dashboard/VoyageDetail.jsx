@@ -9,6 +9,12 @@ import DeleteConfirmModal from "../../components/modals/DeleteConfirmModal";
 import { formatDate } from "../../utils/helpers";
 import { ROUTES } from "../../utils/constants";
 
+const IconX = (p) => (
+  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...p}>
+    <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
+  </svg>
+);
+
 const MOMENTS = [
   { key: "matin", label: "Matin" },
   { key: "apres_midi", label: "Après-midi" },
@@ -231,7 +237,7 @@ export default function VoyageDetail() {
       {deleteError && (
         <div className={styles.deleteErrorToast}>
           {deleteError}
-          <Button variant="ghost" size="sm" onClick={() => setDeleteError(null)}>✕</Button>
+          <Button variant="ghost" size="sm" onClick={() => setDeleteError(null)}><IconX /></Button>
         </div>
       )}
     </div>

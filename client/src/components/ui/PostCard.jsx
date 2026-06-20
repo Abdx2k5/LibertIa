@@ -4,6 +4,11 @@ import LikeButton from "./LikeButton";
 import CommentSection from "./CommentSection";
 import ReportModal from "../modals/ReportModal";
 
+const svgProps = { width: 16, height: 16, viewBox: "0 0 24 24", fill: "none", stroke: "currentColor", strokeWidth: "2", strokeLinecap: "round", strokeLinejoin: "round" };
+const IconFlag           = (p) => <svg {...svgProps} {...p}><path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"/><line x1="4" y1="22" x2="4" y2="15"/></svg>;
+const IconMessageCircle  = (p) => <svg {...svgProps} {...p}><path d="M7.9 20A9 9 0 1 0 4 16.1L2 22Z"/></svg>;
+const IconLink2          = (p) => <svg {...svgProps} {...p}><path d="M9 17H7A5 5 0 0 1 7 7h2"/><path d="M15 7h2a5 5 0 1 1 0 10h-2"/><line x1="8" y1="12" x2="16" y2="12"/></svg>;
+
 function formatCount(value) {
   if (value == null) return "0";
   if (value < 1000) return String(value);
@@ -76,7 +81,7 @@ export default function PostCard({ post }) {
             aria-label="Signaler cette publication"
             title="Signaler"
           >
-            ⚐
+            <IconFlag width={14} height={14} />
           </button>
         </div>
       </header>
@@ -134,12 +139,12 @@ export default function PostCard({ post }) {
             onClick={() => setShowComments((v) => !v)}
             aria-expanded={showComments}
           >
-            <span className={styles.actionIcon}>💬</span>
+            <span className={styles.actionIcon}><IconMessageCircle /></span>
             <span>{formatCount(post?.commentaires)}</span>
           </button>
 
           <button type="button" className={styles.actionButton}>
-            <span className={styles.actionIcon}>🔗</span>
+            <span className={styles.actionIcon}><IconLink2 /></span>
             <span>{formatCount(post?.partages)}</span>
           </button>
         </div>

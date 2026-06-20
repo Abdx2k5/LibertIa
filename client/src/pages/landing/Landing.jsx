@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import styles from "./Landing.module.css";
+import { useTranslation } from "../../hooks/useTranslation";
 
 // DESTINATIONS
 import imgParis from "../../assets/images/destinations/paris.png";
@@ -38,6 +39,22 @@ import imgGlobLight from "../../assets/icons/icon-globe-light.png";
 import imgGlobe from "../../assets/icons/icon-globe.png";
 import imgIconHeart from "../../assets/icons/Icon_heart.png";
 import imgIconComment from "../../assets/icons/Icon_comments.png";
+
+const IconRocket = (p) => (
+  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ marginLeft: 4, verticalAlign: -2 }} {...p}>
+    <path d="M4.5 16.5c-1.5 1.26-2 5-2 5s3.74-.5 5-2c.71-.84.7-2.13-.09-2.91a2.18 2.18 0 0 0-2.91-.09z"/><path d="m12 15-3-3a22 22 0 0 1 2-3.95A12.88 12.88 0 0 1 22 2c0 2.72-.78 7.5-6 11a22.35 22.35 0 0 1-4 2z"/><path d="M9 12H4s.55-3.03 2-4c1.62-1.08 5 0 5 0"/><path d="M12 15v5s3.03-.55 4-2c1.08-1.62 0-5 0-5"/>
+  </svg>
+);
+const IconBot = (p) => (
+  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ marginRight: 6, verticalAlign: -2 }} {...p}>
+    <path d="M12 8V4H8"/><rect width="16" height="12" x="4" y="8" rx="2"/><path d="M2 14h2"/><path d="M20 14h2"/><path d="M15 13v2"/><path d="M9 13v2"/>
+  </svg>
+);
+const IconX = (p) => (
+  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...p}>
+    <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
+  </svg>
+);
 // Donneee ────────────────────────────────────────────────────────
 const DESTINATIONS = [
   { img: imgParis,     name: "Paris",     country: "France",     price: "~450€",  count: "1.2k intéressés", tags: ["Culture", "Gastronomie"] },
@@ -56,12 +73,12 @@ const AI_EXAMPLES = [
 ];
 
 const navItems = [
-  { label: "Accueil",     to: "/" },
-  { label: "Vols" },
-  { label: "Hébergements" },
-  { label: "Activités" },
-  { label: "Communauté",  to: "/community" },
-  { label: "Tarifs",      to: "/tarifs" },
+  { tKey: "navHome",       to: "/" },
+  { tKey: "navFlights" },
+  { tKey: "navHotels" },
+  { tKey: "navActivities" },
+  { tKey: "navCommunity",  to: "/community" },
+  { tKey: "navPricing",    to: "/tarifs" },
 ];
 
 const howItWorks = [
@@ -94,6 +111,7 @@ const footerCols = [
 // ── Composant ──────────────────────────────────────────────────────
 export default function Landing() {
   const navigate = useNavigate();
+  const { t } = useTranslation();
 
   const isAuthenticated = !!localStorage.getItem("libertia_token");
 
@@ -176,11 +194,11 @@ export default function Landing() {
           <div className={styles.navLinks}>
             {navItems.map((item) => (
               <button
-                key={item.label}
+                key={item.tKey}
                 className={styles.navLink}
                 onClick={item.to ? () => navigate(item.to) : undefined}
               >
-                {item.label}
+                {t(item.tKey)}
               </button>
             ))}
           </div>
@@ -196,10 +214,10 @@ export default function Landing() {
               FR
             </button>
             <Link to="/login">
-              <button className={styles.btnOutline}>Se connecter</button>
+              <button className={styles.btnOutline}>{t("btnLogin")}</button>
             </Link>
             <Link to="/register">
-              <button className={styles.btnPurple}>S'inscrire</button>
+              <button className={styles.btnPurple}>{t("btnRegister")}</button>
             </Link>
           </div>
 
@@ -219,19 +237,19 @@ export default function Landing() {
         <div className={`${styles.mobileMenu} ${menuOpen ? styles.mobileMenuOpen : ""}`}>
           {navItems.map((item) => (
             <button
-              key={item.label}
+              key={item.tKey}
               className={styles.mobileNavLink}
               onClick={() => { setMenuOpen(false); if (item.to) navigate(item.to); }}
             >
-              {item.label}
+              {t(item.tKey)}
             </button>
           ))}
           <div className={styles.mobileActions}>
             <Link to="/login" style={{ textDecoration: "none" }} onClick={() => setMenuOpen(false)}>
-              <button className={styles.mobileBtnOutline}>Se connecter</button>
+              <button className={styles.mobileBtnOutline}>{t("btnLogin")}</button>
             </Link>
             <Link to="/register" style={{ textDecoration: "none" }} onClick={() => setMenuOpen(false)}>
-              <button className={styles.mobileBtnPurple}>S'inscrire</button>
+              <button className={styles.mobileBtnPurple}>{t("btnRegister")}</button>
             </Link>
           </div>
         </div>
@@ -243,10 +261,10 @@ export default function Landing() {
           </div>
           <div className={styles.heroContent}>
             <h1 className={styles.heroTitle}>
-              Voyagez intelligemment<br />avec Libertia
+              {t("landingHeroTitle")}
             </h1>
             <p className={styles.heroSubtitle}>
-              Une communauté de voyageurs, un assistant IA qui réserve tout pour vous.
+              {t("landingHeroSubtitle")}
             </p>
 
             {/* Toggle */}
@@ -258,7 +276,7 @@ export default function Landing() {
               >
                  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-search" viewBox="0 0 16 16">
   <path d="M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398h-.001q.044.06.098.115l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.85-3.85a1 1 0 0 0-.115-.1zM12 6.5a5.5 5.5 0 1 1-11 0 5.5 5.5 0 0 1 11 0"/>
-</svg> Recherche
+</svg> {t("toggleSearch")}
               </button>
               <button
                 type="button"
@@ -269,7 +287,7 @@ export default function Landing() {
       <path d="M6 12.5a.5.5 0 0 1 .5-.5h3a.5.5 0 0 1 0 1h-3a.5.5 0 0 1-.5-.5M3 8.062C3 6.76 4.235 5.765 5.53 5.886a26.6 26.6 0 0 0 4.94 0C11.765 5.765 13 6.76 13 8.062v1.157a.93.93 0 0 1-.765.935c-.845.147-2.34.346-4.235.346s-3.39-.2-4.235-.346A.93.93 0 0 1 3 9.219zm4.542-.827a.25.25 0 0 0-.217.068l-.92.9a25 25 0 0 1-1.871-.183.25.25 0 0 0-.068.495c.55.076 1.232.149 2.02.193a.25.25 0 0 0 .189-.071l.754-.736.847 1.71a.25.25 0 0 0 .404.062l.932-.97a25 25 0 0 0 1.922-.188.25.25 0 0 0-.068-.495c-.538.074-1.207.145-1.98.189a.25.25 0 0 0-.166.076l-.754.785-.842-1.7a.25.25 0 0 0-.182-.135"/>
       <path d="M8.5 1.866a1 1 0 1 0-1 0V3h-2A4.5 4.5 0 0 0 1 7.5V8a1 1 0 0 0-1 1v2a1 1 0 0 0 1 1v1a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-1a1 1 0 0 0 1-1V9a1 1 0 0 0-1-1v-.5A4.5 4.5 0 0 0 10.5 3h-2zM14 7.5V13a1 1 0 0 1-1 1H3a1 1 0 0 1-1-1V7.5A3.5 3.5 0 0 1 5.5 4h5A3.5 3.5 0 0 1 14 7.5"/>
       </svg>
-                 Assistant IA
+                 {t("assistantBadge")}
               </button>
             </div>
 
@@ -342,7 +360,7 @@ export default function Landing() {
             <p className={styles.searchHint}>
               {isAiMode
                 ? isAuthenticated
-                  ? "Appuyez sur Entrée pour générer votre itinéraire 🚀"
+                  ? <>Appuyez sur Entrée pour générer votre itinéraire<IconRocket /></>
                   : "Vous serez invité à vous inscrire pour utiliser l'assistant IA"
                 : "Tapez une destination pour voir les suggestions"}
             </p>
@@ -515,7 +533,7 @@ export default function Landing() {
           <div className={styles.panel}>
             <div className={styles.panelHeader}>
               <span className={styles.panelTitle}>Résultats pour "{query}"</span>
-              <button className={styles.panelClose} onClick={() => setPanelOpen(false)}>✕</button>
+              <button className={styles.panelClose} onClick={() => setPanelOpen(false)}><IconX /></button>
             </div>
             <div className={styles.panelContent}>
               <p className={styles.panelCount}>
@@ -543,7 +561,7 @@ export default function Landing() {
                 className={styles.panelAiBtn}
                 onClick={() => { setIsAiMode(true); setPanelOpen(false); setQuery(`Je veux visiter ${query}`); }}
               >
-                🤖 Générer un itinéraire IA pour "{query}"
+<IconBot />Générer un itinéraire IA pour "{query}"
               </button>
             </div>
           </div>
