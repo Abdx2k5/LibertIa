@@ -3,11 +3,13 @@ import { useNavigate } from "react-router-dom";
 import styles from "./Subscription.module.css";
 import { useAuthStore } from "../../store/authStore";
 import { Badge, Button, Modal } from "../../components/ui";
+import FindFriendsModal from "../../components/modals/FindFriendsModal";
 import { FREEMIUM, ROUTES } from "../../utils/constants";
 
 const IconCheck      = (p) => <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" {...p}><polyline points="20 6 9 17 4 12"/></svg>;
 const IconSparkles   = (p) => <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...p}><path d="m12 3-1.9 5.7a2 2 0 0 1-1.3 1.3L3 12l5.8 1.9a2 2 0 0 1 1.3 1.3L12 21l1.9-5.7a2 2 0 0 1 1.3-1.3L21 12l-5.8-1.9a2 2 0 0 1-1.3-1.3Z"/></svg>;
 const IconCreditCard = (p) => <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ marginRight: 4, verticalAlign: -3 }} {...p}><rect width="20" height="14" x="2" y="5" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/></svg>;
+const IconUserPlus   = (p) => <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...p}><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><line x1="19" y1="8" x2="19" y2="14"/><line x1="22" y1="11" x2="16" y2="11"/></svg>;
 
 const PREMIUM_FEATURES = [
   "Itinéraires illimités générés par l'IA",
@@ -38,6 +40,7 @@ export default function Subscription() {
 
   const [billingCycle, setBillingCycle] = useState("monthly");
   const [cancelModalOpen, setCancelModalOpen] = useState(false);
+  const [findFriendsOpen, setFindFriendsOpen] = useState(false);
   const [loading, setLoading] = useState(false);
 
   // ── Simule le passage en Premium (en attendant l'API de paiement) ──
@@ -66,8 +69,26 @@ export default function Subscription() {
   return (
     <div className={styles.page}>
       <div className={styles.main}>
-        <h1 className={styles.pageTitle}>Mon abonnement</h1>
-        <p className={styles.pageSub}>Gérez votre formule et débloquez plus de fonctionnalités.</p>
+        <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", gap: 16 }}>
+          <div>
+            <h1 className={styles.pageTitle}>Mon abonnement</h1>
+            <p className={styles.pageSub}>Gérez votre formule et débloquez plus de fonctionnalités.</p>
+          </div>
+          <button
+            type="button"
+            onClick={() => setFindFriendsOpen(true)}
+            title="Trouver des amis"
+            aria-label="Trouver des amis"
+            style={{
+              display: "flex", alignItems: "center", justifyContent: "center",
+              width: 40, height: 40, borderRadius: 10, flexShrink: 0,
+              background: "var(--bg-secondary)", border: "1px solid var(--border)",
+              color: "var(--text)", cursor: "pointer",
+            }}
+          >
+            <IconUserPlus />
+          </button>
+        </div>
 
         {/* ── Plan actuel ── */}
         <div className={styles.section}>
@@ -217,6 +238,8 @@ export default function Subscription() {
             </Button>
           </div>
         </Modal>
+
+        <FindFriendsModal isOpen={findFriendsOpen} onClose={() => setFindFriendsOpen(false)} />
 
       </div>
     </div>
