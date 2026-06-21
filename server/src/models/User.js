@@ -18,6 +18,13 @@ const userSchema = new mongoose.Schema({
         type: String,
         required: true
     },
+    // Méthode de connexion (mot de passe local, ou OAuth tiers).
+    // Les comptes OAuth ont un motDePasse aléatoire jamais communiqué/utilisé.
+    authProvider: {
+        type: String,
+        enum: ['local', 'google', 'facebook'],
+        default: 'local'
+    },
     age: {
         type: Number
     },

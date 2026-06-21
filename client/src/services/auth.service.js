@@ -17,6 +17,14 @@ const authService = {
         const response = await api.post(`${AUTH_BASE}/login`, data);
         return response.data;
     },
+    loginWithGoogle: async (accessToken) => {
+        const response = await api.post(`${AUTH_BASE}/google`, { accessToken });
+        return response.data;
+    },
+    loginWithFacebook: async (accessToken) => {
+        const response = await api.post(`${AUTH_BASE}/facebook`, { accessToken });
+        return response.data;
+    },
     getMe: async () => {
         const response = await api.get(`${AUTH_BASE}/me`);
         return response.data;

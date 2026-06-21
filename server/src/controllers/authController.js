@@ -3,6 +3,7 @@ const Voyage = require('../models/Voyage');
 const jwt = require('jsonwebtoken');
 const crypto = require('crypto');
 const nodemailer = require('nodemailer');
+const axios = require('axios');
 const { encrypt } = require('../utils/encryption');   // SA2
 const { auditLog } = require('../utils/auditLogger'); // SA4
 
@@ -101,6 +102,129 @@ const login = async (req, res) => {
             refreshToken
         });
 
+    } catch (err) {
+        res.status(500).json({ message: err.message });
+    }
+};
+
+// ─────────────────────────────────────────────
+//  OAuth — @POST /api/auth/google
+//  body: { accessToken } — jeton OAuth2 renvoyé par
+//  google.accounts.oauth2.initTokenClient() côté client. On l'utilise
+//  pour interroger l'endpoint userinfo de Google, qui sert à la fois
+//  de vérification (refuse les jetons invalides/expirés) et de
+//  source du profil (email, nom, photo).
+// ─────────────────────────────────────────────
+const googleAuth = async (req, res) => {
+    try {
+        const { accessToken: googleAccessToken } = req.body;
+        if (!googleAccessToken) {
+            return res.status(400).json({ message: 'Jeton Google manquant.' });
+        }
+        if (!process.env.GOOGLE_CLIENT_ID) {
+            return res.status(500).json({ message: 'Connexion Google non configurée côté serveur.' });
+        }
+
+        const { data: payload } = await axios.get('https://www.googleapis.com/oauth2/v3/userinfo', {
+            headers: { Authorization: `Bearer ${googleAccessToken}` }
+        });
+
+        if (!payload.email) {
+            return res.status(401).json({ message: 'Jeton Google invalide.' });
+        }
+
+        let user = await User.findOne({ email: payload.email });
+
+        if (!user) {
+            user = await User.create({
+                nom: payload.name || payload.email.split('@')[0],
+                email: payload.email,
+                motDePasse: crypto.randomBytes(32).toString('hex'),
+                authProvider: 'google',
+                profilePhoto: payload.picture || 'default-avatar.png',
+            });
+        }
+
+        const accessToken = genererTokenAcces(user._id);
+        const refreshToken = genererTokenRafraichissement(user._id);
+        user.refreshToken = refreshToken;
+        user.lastLogin = new Date();
+        await user.save({ validateModifiedOnly: true });
+
+        await auditLog({ userId: user._id, action: 'login_google', req, success: true });
+
+        res.json({
+            _id: user._id,
+            nom: user.nom,
+            email: user.email,
+            abonnement: user.abonnement,
+            token: accessToken,
+            refreshToken
+        });
+    } catch (err) {
+        res.status(500).json({ message: err.message });
+    }
+};
+
+// ─────────────────────────────────────────────
+//  OAuth — @POST /api/auth/facebook
+//  body: { accessToken } — jeton renvoyé par le SDK Facebook côté client
+// ─────────────────────────────────────────────
+const facebookAuth = async (req, res) => {
+    try {
+        const { accessToken } = req.body;
+        if (!accessToken) {
+            return res.status(400).json({ message: 'Jeton Facebook manquant.' });
+        }
+        if (!process.env.FACEBOOK_APP_ID || !process.env.FACEBOOK_APP_SECRET) {
+            return res.status(500).json({ message: 'Connexion Facebook non configurée côté serveur.' });
+        }
+
+        // Vérifie que le jeton a bien été émis pour NOTRE app
+        const appToken = `${process.env.FACEBOOK_APP_ID}|${process.env.FACEBOOK_APP_SECRET}`;
+        const { data: debug } = await axios.get('https://graph.facebook.com/debug_token', {
+            params: { input_token: accessToken, access_token: appToken }
+        });
+        if (!debug?.data?.is_valid || debug.data.app_id !== process.env.FACEBOOK_APP_ID) {
+            return res.status(401).json({ message: 'Jeton Facebook invalide.' });
+        }
+
+        const { data: profile } = await axios.get('https://graph.facebook.com/me', {
+            params: { fields: 'id,name,email,picture', access_token: accessToken }
+        });
+
+        if (!profile.email) {
+            return res.status(400).json({ message: "Votre compte Facebook ne fournit pas d'adresse email publique." });
+        }
+
+        let user = await User.findOne({ email: profile.email });
+
+        if (!user) {
+            user = await User.create({
+                nom: profile.name || profile.email.split('@')[0],
+                email: profile.email,
+                motDePasse: crypto.randomBytes(32).toString('hex'),
+                authProvider: 'facebook',
+                profilePhoto: profile.picture?.data?.url || 'default-avatar.png',
+            });
+        }
+
+        const accessTokenJwt = genererTokenAcces(user._id);
+        const refreshToken = genererTokenRafraichissement(user._id);
+        user.refreshToken = refreshToken;
+        user.lastLogin = new Date();
+        await user.save({ validateModifiedOnly: true });
+
+        await auditLog({ userId: user._id, action: 'login_facebook', req, success: true });
+
+        res.json({
+            _id: user._id,
+            nom: user.nom,
+            email: user.email,
+            abonnement: user.abonnement,
+            token: accessTokenJwt,
+            refreshToken
+        });
     } catch (err) {
         res.status(500).json({ message: err.message });
     }
@@ -416,6 +540,8 @@ const logout = async (req, res) => {
 module.exports = {
     register,
     login,
+    googleAuth,
+    facebookAuth,
     getMe,
     forgotPassword,
     resetPassword,

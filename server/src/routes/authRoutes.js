@@ -3,6 +3,8 @@ const router = express.Router();
 const {
     register,
     login,
+    googleAuth,
+    facebookAuth,
     getMe,
     forgotPassword,
     resetPassword,
@@ -15,6 +17,11 @@ const { proteger } = require('../middlewares/authMiddleware');
 
 router.post('/register',              register);
 router.post('/login',                 login);
+
+// OAuth — connexion via Google / Facebook
+router.post('/google',                googleAuth);
+router.post('/facebook',              facebookAuth);
+
 router.get('/me',                     proteger, getMe);
 
 // T6 — Reset password envoi email
