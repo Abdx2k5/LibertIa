@@ -7,6 +7,7 @@ export const ROUTES = {
   DASHBOARD:    "/dashboard",
   VOYAGE_DETAIL: "/voyage/:id",
   PROFILE:      "/profile",
+  PUBLIC_PROFILE: "/profil/:userId",
   SETTINGS:     "/settings",
   SUBSCRIPTION: "/abonnement",
   AGENCY_DETAIL: "/agence/:id",
@@ -23,6 +24,9 @@ export const agencyDetailPath = (id) => `/agence/${id}`;
 
 // Génère le lien vers une conversation privée (ex: messageThreadPath("64f..."))
 export const messageThreadPath = (userId) => `/messages/${userId}`;
+
+// Génère le lien vers le profil public d'un utilisateur (ex: publicProfilePath("64f..."))
+export const publicProfilePath = (userId) => `/profil/${userId}`;
 
 export const ROLES = {
   USER:  "user",

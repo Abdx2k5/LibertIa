@@ -1,12 +1,13 @@
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 import styles from "./Community.module.css";
 import PostCard from "../../components/ui/PostCard";
 import FollowButton from "../../components/ui/FollowButton";
 import AppNavbar from "../../components/layout/AppNavbar";
 import FindFriendsModal from "../../components/modals/FindFriendsModal";
-import { ROUTES } from "../../utils/constants";
+import { ROUTES, publicProfilePath } from "../../utils/constants";
 import { useTranslation } from "../../hooks/useTranslation";
+import { MOCK_POSTS, MOCK_TRAVELERS } from "../../mocks/communityPosts";
 
 const IconUserPlus = (p) => (
   <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...p}>
@@ -14,126 +15,10 @@ const IconUserPlus = (p) => (
   </svg>
 );
 
-import avatar1 from "../../assets/images/community/avatar-1.png";
-import avatar2 from "../../assets/images/community/avatar-2.png";
-import avatar3 from "../../assets/images/community/avatar-3.png";
 import composerAvatar from "../../assets/images/community/profile.png";
-import tripMark from "../../assets/images/community/trip-mark.png";
-import tripSarah from "../../assets/images/community/trip-sarah.png";
-
-const mockPosts = [
-  {
-    id: "1",
-    auteur: {
-      nom: "Sophie Martin",
-      avatar: null,
-      badge: "Guide certifié",
-      localisation: "Tokyo, Japon",
-    },
-    temps: "il y a 2 heures",
-    contenu: "Ma première expérience avec Libertia a été impeccable. J’ai trouvé un vol, un hôtel et même des activités adaptées à mon budget en quelques minutes.",
-    images: [tripMark, tripSarah],
-    tags: ["#Japon", "#voyage", "#solo"],
-    likes: 234,
-    commentaires: 45,
-    partages: 12,
-    type: "post",
-  },
-  {
-    id: "2",
-    auteur: {
-      nom: "Mehdi El Amrani",
-      avatar: avatar1,
-      badge: "Membre actif",
-      localisation: "Lisbonne, Portugal",
-    },
-    temps: "il y a 4 heures",
-    contenu: "Quelqu’un a testé les quartiers calmes pour un séjour de 4 jours ? Je cherche une ambiance locale, pas trop touristique.",
-    images: [],
-    tags: ["#Portugal", "#citybreak", "#conseils"],
-    likes: 98,
-    commentaires: 21,
-    partages: 7,
-    type: "post",
-  },
-  {
-    id: "3",
-    auteur: {
-      nom: "Nina Laurent",
-      avatar: avatar2,
-      badge: "Rédactrice voyage",
-      localisation: "Bali, Indonésie",
-    },
-    temps: "hier",
-    contenu: "Découvrez comment organiser un voyage lent à Bali sans exploser votre budget ni rater les meilleurs spots au lever du soleil.",
-    images: [tripSarah],
-    tags: ["#article", "#budget", "#inspiration"],
-    likes: 412,
-    commentaires: 66,
-    partages: 24,
-    type: "article",
-  },
-  {
-    id: "4",
-    auteur: {
-      nom: "Collectif Alpes",
-      avatar: avatar3,
-      badge: "Groupe vérifié",
-      localisation: "Chamonix, France",
-    },
-    temps: "il y a 6 heures",
-    contenu: "Nous organisons une semaine ski et coworking avec des activités le soir. Débutants bienvenus, ambiance détendue.",
-    images: [tripMark, tripSarah, composerAvatar],
-    tags: ["#groupe", "#alpines", "#coworking"],
-    likes: 156,
-    commentaires: 18,
-    partages: 9,
-    type: "groupe",
-  },
-  {
-    id: "5",
-    auteur: {
-      nom: "Thomas R.",
-      avatar: null,
-      badge: "Explorateur",
-      localisation: "Séoul, Corée du Sud",
-    },
-    temps: "il y a 1 jour",
-    contenu: "Libertia m’a évité trois heures de recherche. J’ai pu comparer les activités, réserver rapidement et garder une vraie marge pour profiter sur place.",
-    images: [tripSarah, tripMark],
-    tags: ["#avis", "#gaindetemps"],
-    likes: 12400,
-    commentaires: 318,
-    partages: 89,
-    type: "post",
-  },
-  {
-    id: "6",
-    auteur: {
-      nom: "Clara Benali",
-      avatar: avatar1,
-      badge: "Guide certifié",
-      localisation: "Marrakech, Maroc",
-    },
-    temps: "il y a 2 jours",
-    contenu: "Petit carnet de route pour ceux qui aiment les escapades gourmandes et les ruelles animées. J’ai listé mes adresses préférées et les meilleurs créneaux pour visiter.",
-    images: [],
-    tags: ["#Marrakech", "#food", "#culture", "#tips"],
-    likes: 367,
-    commentaires: 29,
-    partages: 16,
-    type: "post",
-  },
-];
 
 const filterTabs = ["Pour vous", "Récent", "Populaire", "Abonnements"];
 const composerActions = ["Photo", "Vidéo", "Lieu", "Écrire un article"];
-
-const travelerCards = [
-  { nom: "Sophie Martin", info: "Guide certifié • Tokyo", avatar: avatar1 },
-  { nom: "Mehdi El Amrani", info: "Voyageur solo • Lisbonne", avatar: avatar2 },
-  { nom: "Nina Laurent", info: "Rédactrice voyage • Bali", avatar: avatar3 },
-];
 
 const trendingDestinations = [
   { tag: "#Japon", count: 1482 },
@@ -247,7 +132,7 @@ export default function Community() {
           </section>
 
           <section className={styles.feedList}>
-            {mockPosts.map((post) => (
+            {MOCK_POSTS.map((post) => (
               <PostCard key={post.id} post={post} />
             ))}
           </section>
@@ -257,15 +142,15 @@ export default function Community() {
           <section className={styles.sidebarCard}>
             <h2 className={styles.sidebarTitle}>Voyageurs à rencontrer</h2>
             <div className={styles.userList}>
-              {travelerCards.map((user) => (
-                <div key={user.nom} className={styles.userRow}>
-                  <div className={styles.userIdentity}>
+              {MOCK_TRAVELERS.map((user) => (
+                <div key={user.id} className={styles.userRow}>
+                  <Link to={publicProfilePath(user.id)} className={styles.userIdentity}>
                     <img src={user.avatar} alt={user.nom} className={styles.userAvatar} />
                     <div>
                       <p className={styles.userName}>{user.nom}</p>
                       <p className={styles.userInfo}>{user.info}</p>
                     </div>
-                  </div>
+                  </Link>
                   <FollowButton size="sm" />
                 </div>
               ))}

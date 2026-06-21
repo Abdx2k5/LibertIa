@@ -172,7 +172,7 @@ export default function Messages() {
               onClick={() => navigate(messageThreadPath(c.utilisateur._id))}
             >
               <img
-                src={c.utilisateur.profilePhoto || imgAvatar}
+                src={c.utilisateur.profilePhoto && c.utilisateur.profilePhoto !== "default-avatar.png" ? c.utilisateur.profilePhoto : imgAvatar}
                 alt={c.utilisateur.nom}
                 className={styles.convAvatar}
               />
@@ -196,7 +196,7 @@ export default function Messages() {
           {userId && (
             <>
               <header className={styles.threadHeader}>
-                <img src={activeUser?.profilePhoto || imgAvatar} alt={activeUser?.nom || ""} className={styles.threadAvatar} />
+                <img src={activeUser?.profilePhoto && activeUser.profilePhoto !== "default-avatar.png" ? activeUser.profilePhoto : imgAvatar} alt={activeUser?.nom || ""} className={styles.threadAvatar} />
                 <div className={styles.threadName}>{activeUser?.nom || "..."}</div>
               </header>
 

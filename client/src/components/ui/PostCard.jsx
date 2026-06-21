@@ -1,8 +1,10 @@
 import { useState } from "react";
+import { Link } from "react-router-dom";
 import styles from "./PostCard.module.css";
 import LikeButton from "./LikeButton";
 import CommentSection from "./CommentSection";
 import ReportModal from "../modals/ReportModal";
+import { publicProfilePath } from "../../utils/constants";
 
 const svgProps = { width: 16, height: 16, viewBox: "0 0 24 24", fill: "none", stroke: "currentColor", strokeWidth: "2", strokeLinecap: "round", strokeLinejoin: "round" };
 const IconFlag           = (p) => <svg {...svgProps} {...p}><path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"/><line x1="4" y1="22" x2="4" y2="15"/></svg>;
@@ -39,16 +41,20 @@ export default function PostCard({ post }) {
   const [reportOpen, setReportOpen] = useState(false);
 
   const authorName = post?.auteur?.nom || "Voyageur Libertia";
+  const authorId = post?.auteur?.id || post?.auteur?._id;
   const authorBadge = post?.auteur?.badge;
   const authorLocation = post?.auteur?.localisation || "Communauté Libertia";
   const images = post?.images || [];
   const isArticle = post?.type === "article";
   const isGroup = post?.type === "groupe";
 
+  const AuthorWrap = authorId ? Link : "div";
+  const authorWrapProps = authorId ? { to: publicProfilePath(authorId) } : {};
+
   return (
     <article className={styles.card}>
       <header className={styles.header}>
-        <div className={styles.author}>
+        <AuthorWrap className={styles.author} {...authorWrapProps}>
           <div className={styles.avatarWrap}>
             {post?.auteur?.avatar ? (
               <img src={post.auteur.avatar} alt={authorName} className={styles.avatar} />
@@ -70,7 +76,7 @@ export default function PostCard({ post }) {
             </div>
             <p className={styles.authorDetails}>{authorLocation}</p>
           </div>
-        </div>
+        </AuthorWrap>
 
         <div className={styles.headerRight}>
           <span className={styles.time}>{post?.temps}</span>

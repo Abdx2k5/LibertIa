@@ -33,6 +33,12 @@ const authService = {
         const response = await api.put(`${AUTH_BASE}/update-profile`, data);
         return response.data.user;
     },
+    // GET /api/auth/users/:userId/public — route publique, consultable
+    // sans connexion (le token est envoyé s'il existe mais n'est pas requis)
+    getPublicProfile: async (userId) => {
+        const response = await api.get(`${AUTH_BASE}/users/${userId}/public`);
+        return response.data.data;
+    },
     forgotPassword: async (email) => {
         const response = await api.post(`${AUTH_BASE}/forgot-password`, { email });
         return response.data;

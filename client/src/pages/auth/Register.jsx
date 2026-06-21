@@ -70,18 +70,11 @@ export default function Register() {
 
   // Applique la réponse plate { _id, nom, email, abonnement, token, ... }
   // qu'elle vienne de /register, /google ou /facebook — même forme partout.
+  // On transmet tout sauf les jetons : ne pas trier les champs ici évite
+  // de perdre bio/age/preferences/followers... à chaque (re)connexion.
   const applyLoginData = (data) => {
-    login(
-      {
-        _id:             data._id,
-        nom:             data.nom,
-        email:           data.email,
-        abonnement:      data.abonnement,
-        profilePhoto:    data.profilePhoto,
-        promptsRestants: data.promptsRestants,
-      },
-      data.token
-    );
+    const { token, refreshToken: _refreshToken, ...userData } = data;
+    login(userData, token);
     navigate("/dashboard");
   };
 
