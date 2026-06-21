@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import styles from "./Profile.module.css";
 import { useAuthStore } from "../../store/authStore";
@@ -32,6 +32,48 @@ const MapIcon = () => (
     <path d="M9 20l-5.447-2.724A1 1 0 0 1 3 16.382V5.618a1 1 0 0 1 1.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0 0 21 18.382V7.618a1 1 0 0 0-.553-.894L15 4m0 13V4m0 0L9 7" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
   </svg>
 );
+
+// ── Redimensionne (512px max) + compresse une photo de profil en JPEG,
+//    puis la convertit en data URL base64 — même approche que
+//    UploadMultiplePhotos.jsx, body attendu par PUT /api/auth/update-profile
+//    : { profilePhoto: <dataURL> } ──
+const AVATAR_MAX_DIMENSION = 512;
+const AVATAR_JPEG_QUALITY = 0.85;
+
+function compressAvatar(file) {
+  return new Promise((resolve, reject) => {
+    const objectUrl = URL.createObjectURL(file);
+    const img = new Image();
+
+    img.onload = () => {
+      let { width, height } = img;
+      if (width > AVATAR_MAX_DIMENSION || height > AVATAR_MAX_DIMENSION) {
+        if (width >= height) {
+          height = Math.round((height * AVATAR_MAX_DIMENSION) / width);
+          width = AVATAR_MAX_DIMENSION;
+        } else {
+          width = Math.round((width * AVATAR_MAX_DIMENSION) / height);
+          height = AVATAR_MAX_DIMENSION;
+        }
+      }
+
+      const canvas = document.createElement("canvas");
+      canvas.width = width;
+      canvas.height = height;
+      canvas.getContext("2d").drawImage(img, 0, 0, width, height);
+
+      URL.revokeObjectURL(objectUrl);
+      resolve(canvas.toDataURL("image/jpeg", AVATAR_JPEG_QUALITY));
+    };
+
+    img.onerror = () => {
+      URL.revokeObjectURL(objectUrl);
+      reject(new Error("Image invalide ou illisible"));
+    };
+
+    img.src = objectUrl;
+  });
+}
 
 // ── Icône inline (T77) ──
 const UploadIcon = () => (
@@ -100,6 +142,9 @@ export default function Profile() {
   const { user, updateUser } = useAuthStore();
   const { toggleSidebar } = useUIStore();
   const isPremium = user?.abonnement === "premium";
+  const avatarInputRef = useRef(null);
+  const [avatarUploading, setAvatarUploading] = useState(false);
+  const [avatarError, setAvatarError] = useState("");
   const [activeSection, setActiveSection] = useState("overview");
   const [form, setForm] = useState({
     nom: "",
@@ -219,9 +264,7 @@ export default function Profile() {
         }
         break;
       case "prenom":
-        if (!value.trim()) {
-          newErrors.prenom = "Le prénom est requis";
-        } else if (value.length < 2 || value.length > 50) {
+        if (value && (value.length < 2 || value.length > 50)) {
           newErrors.prenom = "Le prénom doit contenir entre 2 et 50 caractères";
         } else {
           delete newErrors.prenom;
@@ -260,10 +303,7 @@ export default function Profile() {
       isValid = false;
     }
 
-    if (!form.prenom.trim()) {
-      newErrors.prenom = "Le prénom est requis";
-      isValid = false;
-    } else if (form.prenom.length < 2 || form.prenom.length > 50) {
+    if (form.prenom && (form.prenom.length < 2 || form.prenom.length > 50)) {
       newErrors.prenom = "Le prénom doit contenir entre 2 et 50 caractères";
       isValid = false;
     }
@@ -330,6 +370,38 @@ export default function Profile() {
     setEditingSection(null);
     setErrors({});
     setErrorMsg("");
+  };
+
+  // ── Changer la photo de profil → PUT /api/auth/update-profile { profilePhoto } ──
+  const handleAvatarClick = () => {
+    if (!avatarUploading) avatarInputRef.current?.click();
+  };
+
+  const handleAvatarSelect = async (e) => {
+    const file = e.target.files?.[0];
+    e.target.value = "";
+    if (!file) return;
+
+    if (!["image/jpeg", "image/png", "image/webp"].includes(file.type)) {
+      setAvatarError("Format invalide. JPG, PNG ou WEBP uniquement.");
+      return;
+    }
+    if (file.size > 5 * 1024 * 1024) {
+      setAvatarError("Fichier trop lourd. Maximum 5 Mo.");
+      return;
+    }
+
+    setAvatarError("");
+    setAvatarUploading(true);
+    try {
+      const dataUrl = await compressAvatar(file);
+      const updated = await authService.updateProfile({ profilePhoto: dataUrl });
+      updateUser(updated);
+    } catch {
+      setAvatarError("Impossible de mettre à jour la photo de profil.");
+    } finally {
+      setAvatarUploading(false);
+    }
   };
 
   // T85 — points géolocalisés pour la carte des souvenirs
@@ -414,7 +486,24 @@ export default function Profile() {
                     <div className={styles.avatar}>
                       <img src={avatarSrc} alt="Avatar" className={styles.avatarImg} />
                     </div>
-                    <button type="button" className={styles.avatarEditBtn} title="Changer la photo"><IconPencilP /></button>
+                    <input
+                      ref={avatarInputRef}
+                      type="file"
+                      accept="image/jpeg,image/png,image/webp"
+                      onChange={handleAvatarSelect}
+                      style={{ display: "none" }}
+                    />
+                    <button
+                      type="button"
+                      className={styles.avatarEditBtn}
+                      title="Changer la photo"
+                      onClick={handleAvatarClick}
+                      disabled={avatarUploading}
+                      aria-busy={avatarUploading}
+                    >
+                      <IconPencilP />
+                    </button>
+                    {avatarError && <span className={styles.errorText} style={{ display: "block", marginTop: 8 }}>{avatarError}</span>}
                   </div>
                   <div className={styles.heroInfo}>
                     <h1 className={styles.heroName}>{user?.nom || "Utilisateur"}</h1>

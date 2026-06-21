@@ -191,17 +191,24 @@ const resetPassword = async (req, res) => {
     }
 };
 
+const MAX_AVATAR_SIZE = 2 * 1024 * 1024; // 2 Mo, encodé en base64
+
 // ─────────────────────────────────────────────
 //  T12 — @PUT /api/auth/update-profile
 // ─────────────────────────────────────────────
 const updateProfile = async (req, res) => {
     try {
         const userId = req.user._id;
-        const { nom, age, preferences, bio } = req.body;
+        const { nom, age, preferences, bio, profilePhoto } = req.body;
+
+        if (profilePhoto && profilePhoto.length > MAX_AVATAR_SIZE) {
+            return res.status(400).json({ message: 'Photo trop volumineuse (2 Mo max).' });
+        }
 
         const champsAutorises = {};
         if (nom)         champsAutorises.nom         = nom;
         if (age)         champsAutorises.age         = age;
+        if (profilePhoto) champsAutorises.profilePhoto = profilePhoto;
         // SA2 — chiffrer les données sensibles avant stockage
         if (preferences) champsAutorises.preferences = encrypt(JSON.stringify(preferences));
         if (bio)         champsAutorises.bio         = encrypt(bio);
