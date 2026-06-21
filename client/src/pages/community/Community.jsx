@@ -1,9 +1,18 @@
+import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import styles from "./Community.module.css";
 import PostCard from "../../components/ui/PostCard";
 import FollowButton from "../../components/ui/FollowButton";
+import AppNavbar from "../../components/layout/AppNavbar";
+import FindFriendsModal from "../../components/modals/FindFriendsModal";
 import { ROUTES } from "../../utils/constants";
 import { useTranslation } from "../../hooks/useTranslation";
+
+const IconUserPlus = (p) => (
+  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...p}>
+    <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><line x1="19" y1="8" x2="19" y2="14"/><line x1="22" y1="11" x2="16" y2="11"/>
+  </svg>
+);
 
 import avatar1 from "../../assets/images/community/avatar-1.png";
 import avatar2 from "../../assets/images/community/avatar-2.png";
@@ -149,9 +158,11 @@ export default function Community() {
   const navigate = useNavigate();
   const { t } = useTranslation();
   const activeTab = "Pour vous";
+  const [findFriendsOpen, setFindFriendsOpen] = useState(false);
 
   return (
     <main className={styles.page}>
+      <AppNavbar />
       <div className={styles.container}>
         <section className={styles.mainColumn}>
           <header className={styles.heroCard}>
@@ -184,9 +195,19 @@ export default function Community() {
               </div>
             </div>
 
-            <button type="button" className={styles.heroButton} onClick={() => navigate(ROUTES.GROUPS)}>
-              {t("communityHeroButton")}
-            </button>
+            <div style={{ display: "flex", gap: 10, flexWrap: "wrap" }}>
+              <button type="button" className={styles.heroButton} onClick={() => navigate(ROUTES.GROUPS)}>
+                {t("communityHeroButton")}
+              </button>
+              <button
+                type="button"
+                className={styles.heroButton}
+                onClick={() => setFindFriendsOpen(true)}
+                style={{ background: "var(--bg-tertiary)", color: "var(--text)", display: "inline-flex", alignItems: "center", gap: 6 }}
+              >
+                <IconUserPlus /> Trouver des amis
+              </button>
+            </div>
           </header>
 
           <section className={styles.composerCard}>
@@ -305,6 +326,8 @@ export default function Community() {
           </section>
         </aside>
       </div>
+
+      <FindFriendsModal isOpen={findFriendsOpen} onClose={() => setFindFriendsOpen(false)} />
     </main>
   );
 }

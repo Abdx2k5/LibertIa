@@ -197,7 +197,7 @@
 
 /* ── Section headers ── */
 .sectionHeader { display: flex; align-items: center; gap: 12px; margin-bottom: 6px; }
-.sectionIcon   { width: 24px; height: 24px; }
+.sectionIcon   { width: 24px; height: 24px; color: var(--accent-secondary); }
 .sectionTitle  { font-size: 24px; font-weight: 700; color: #fff; margin: 0; }
 .sectionSub    { font-size: 15px; color: #a1a1aa; margin-bottom: 17px; }
 
@@ -213,7 +213,7 @@
 }
 .historyCard:hover  { border-color: rgba(255,255,255,0.15); }
 .historyDate        { display: flex; align-items: center; gap: 6px; margin-bottom: 8px; }
-.historyDateIcon    { width: 13px; height: 13px; }
+.historyDateIcon    { width: 13px; height: 13px; color: var(--accent-secondary); }
 .historyDateText    { font-size: 13px; color: var(--accent-secondary); }
 .historyTitle       { font-size: 18px; font-weight: 700; color: #fff; margin-bottom: 4px; }
 .historySubtitle    { font-size: 14px; color: #a1a1aa; margin-bottom: 8px; }
@@ -257,7 +257,7 @@
   border: 1px solid rgba(255,215,0,0.2);
   border-radius: 20px; padding: 7px 13px; margin-bottom: 16px;
 }
-.suggestTagIcon     { width: 12px; height: 12px; }
+.suggestTagIcon     { width: 12px; height: 12px; color: #ffd700; }
 .suggestTagText     { font-size: 12px; color: #ffd700; }
 .suggestCity        { font-size: 20px; font-weight: 700; color: #fff; margin: 0 0 8px; }
 .suggestDesc        { font-size: 14px; color: #a1a1aa; line-height: 1.5; margin: 0 0 16px; }

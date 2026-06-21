@@ -1,8 +1,10 @@
 import { useState, useEffect, useRef } from "react";
+import { useNavigate } from "react-router-dom";
 import Modal from "../ui/Modal";
 import FollowButton from "../ui/FollowButton";
 import communityService from "../../services/community.service";
 import { useAuthStore } from "../../store/authStore";
+import { messageThreadPath } from "../../utils/constants";
 import imgAvatar from "../../assets/images/community/avatar.png";
 
 const IconSearch = (p) => (
@@ -11,7 +13,14 @@ const IconSearch = (p) => (
   </svg>
 );
 
+const IconMessageCircle = (p) => (
+  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...p}>
+    <path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z" />
+  </svg>
+);
+
 export default function FindFriendsModal({ isOpen, onClose }) {
+  const navigate = useNavigate();
   const { user } = useAuthStore();
   const [query, setQuery] = useState("");
   const [results, setResults] = useState([]);
@@ -59,6 +68,11 @@ export default function FindFriendsModal({ isOpen, onClose }) {
     action(targetId).catch(() => {});
   };
 
+  const handleMessage = (targetId) => {
+    onClose();
+    navigate(messageThreadPath(targetId));
+  };
+
   return (
     <Modal isOpen={isOpen} onClose={onClose} title="Trouver des amis" size="md">
       <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
@@ -96,6 +110,20 @@ export default function FindFriendsModal({ isOpen, onClose }) {
                 style={{ width: 36, height: 36, borderRadius: "50%", objectFit: "cover", flexShrink: 0 }}
               />
               <span style={{ flex: 1, fontSize: 14, color: "var(--text)", fontWeight: 500 }}>{u.nom}</span>
+              <button
+                type="button"
+                onClick={() => handleMessage(u._id)}
+                title="Envoyer un message"
+                aria-label={`Envoyer un message à ${u.nom}`}
+                style={{
+                  display: "flex", alignItems: "center", justifyContent: "center",
+                  width: 32, height: 32, borderRadius: 8, flexShrink: 0,
+                  background: "var(--bg-tertiary)", border: "1px solid var(--border)",
+                  color: "var(--text)", cursor: "pointer",
+                }}
+              >
+                <IconMessageCircle />
+              </button>
               <FollowButton
                 following={followingIds.has(u._id)}
                 size="sm"

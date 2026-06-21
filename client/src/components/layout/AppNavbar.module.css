@@ -1,0 +1,113 @@
+/* ============================================================
+   AppNavbar.module.css — barre persistante des pages connectées
+   ============================================================ */
+
+.navbar {
+  position: sticky; top: 0; z-index: 100;
+  backdrop-filter: blur(8px);
+  background-color: var(--bg-secondary);
+  border-bottom: 1px solid var(--border);
+  padding: 16px 32px;
+  display: flex; align-items: center; justify-content: space-between;
+  gap: 24px;
+}
+
+.navLeft { display: flex; align-items: center; gap: 16px; flex-shrink: 0; }
+.hamburgerBtn {
+  background: none; border: none; cursor: pointer;
+  color: var(--text); padding: 6px; display: flex; align-items: center;
+  border-radius: 6px; transition: background 0.15s;
+}
+.hamburgerBtn:hover { background: var(--accent-bg); }
+
+.navLogo     { display: flex; align-items: center; gap: 10px; cursor: pointer; text-decoration: none; }
+.navLogoImg  { width: 32px; height: 32px; border-radius: 8px; object-fit: cover; }
+.navLogoText { font-size: 20px; font-weight: 700; color: var(--text); }
+
+.navLinks { display: flex; gap: 28px; flex-wrap: wrap; }
+.navLink {
+  font-size: 14px; font-weight: 500; color: var(--text-muted);
+  background: none; border: none; cursor: pointer;
+  font-family: inherit; transition: color 0.2s; white-space: nowrap;
+}
+.navLink:hover { color: var(--text); }
+
+.navRight { display: flex; align-items: center; gap: 14px; flex-shrink: 0; }
+.navIconBtn {
+  background: none; border: none; cursor: pointer;
+  padding: 8px; display: flex; align-items: center;
+  gap: 6px; color: var(--text); font-size: 13px; font-weight: 600;
+  font-family: inherit; border-radius: 6px; transition: background 0.15s;
+}
+.navIconBtn:hover { background: var(--accent-bg); }
+.navIconImg { width: 18px; height: 18px; }
+
+.navAvatar {
+  width: 36px; height: 36px; border-radius: 18px;
+  border: 2px solid var(--border); overflow: hidden;
+  padding: 0; background: none; cursor: pointer; flex-shrink: 0;
+}
+.navAvatarImg { width: 100%; height: 100%; object-fit: cover; }
+
+/* ── Menu déroulant du profil ── */
+.avatarMenuWrap { position: relative; }
+
+.avatarMenu {
+  position: absolute;
+  top: calc(100% + 10px);
+  right: 0;
+  width: 260px;
+  background: var(--bg-secondary);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  box-shadow: var(--card-shadow);
+  padding: 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  z-index: 150;
+  animation: fadeIn 0.15s ease;
+}
+
+.avatarMenuHeader {
+  padding: 10px 12px 12px;
+  margin-bottom: 4px;
+  border-bottom: 1px solid var(--border);
+}
+.avatarMenuName  { font-size: 14px; font-weight: 700; color: var(--text); }
+.avatarMenuEmail { font-size: 12px; color: var(--text-muted); margin-top: 2px; }
+
+.avatarMenuItem {
+  display: flex; align-items: center; gap: 10px;
+  width: 100%; text-align: left;
+  background: none; border: none; cursor: pointer;
+  padding: 9px 12px; border-radius: 8px;
+  font-size: 14px; color: var(--text);
+  font-family: inherit; transition: background 0.15s;
+}
+.avatarMenuItem:hover { background: var(--accent-bg); }
+
+.avatarMenuLogout { color: var(--error); }
+.avatarMenuLogout:hover { background: rgba(248,113,113,0.1); }
+
+.avatarMenuDivider { height: 1px; background: var(--border); margin: 4px 0; }
+
+.avatarMenuSocial { padding: 8px 12px 4px; }
+.avatarMenuSocialLabel { font-size: 12px; color: var(--text-muted); }
+.avatarMenuSocialIcons { display: flex; gap: 8px; margin-top: 8px; }
+.avatarMenuSocialIcon {
+  width: 32px; height: 32px; border-radius: 8px;
+  display: flex; align-items: center; justify-content: center;
+  background: var(--bg-tertiary); border: 1px solid var(--border);
+  color: var(--text-muted); cursor: not-allowed;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(-4px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+@media (max-width: 860px) {
+  .navLinks { display: none; }
+  .navbar { padding: 14px 16px; }
+}

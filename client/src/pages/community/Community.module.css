@@ -23,9 +23,9 @@
 
 .sidebarColumn {
   position: sticky;
-  top: 20px;
+  top: 90px;
   align-self: flex-start;
-  max-height: calc(100vh - 40px);
+  max-height: calc(100vh - 110px);
   overflow-y: auto;
   scrollbar-width: thin;
 }

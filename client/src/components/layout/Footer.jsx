@@ -1,8 +1,7 @@
 import { Link } from "react-router-dom";
 import styles from "./Footer.module.css";
-
-const imgLogo  = "https://www.figma.com/api/mcp/asset/d93104aa-ce16-42fe-b9cd-8bbe43f0929d";
-const imgGlobe = "https://www.figma.com/api/mcp/asset/ce67d7c1-e338-4383-8ae7-5ea7ae0b31e4";
+import imgLogo from "../../assets/logos/logo.png";
+import imgGlobe from "../../assets/icons/icon-globe-light.png";
 
 const COLS = [
   { title: "Explorer",    links: ["Destinations", "Communauté", "Vols & Hôtels"] },

@@ -1,7 +1,9 @@
 import { useParams, useNavigate } from "react-router-dom";
 import styles from "./AgencyDetail.module.css";
 import { Badge, Button } from "../../components/ui";
+import AppNavbar from "../../components/layout/AppNavbar";
 import { getAgencyById } from "../../mocks/agencyData";
+import imgAgencyPlaceholder from "../../assets/images/community/avatar.png";
 
 const svgProps = { width: 16, height: 16, viewBox: "0 0 24 24", fill: "none", stroke: "currentColor", strokeWidth: "2", strokeLinecap: "round", strokeLinejoin: "round" };
 const IconCheck  = (p) => <svg {...svgProps} strokeWidth="2.5" {...p}><polyline points="20 6 9 17 4 12"/></svg>;
@@ -12,8 +14,6 @@ const IconMail   = (p) => <svg {...svgProps} {...p}><rect width="20" height="16"
 const IconGlobe  = (p) => <svg {...svgProps} {...p}><circle cx="12" cy="12" r="10"/><path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20"/><path d="M2 12h20"/></svg>;
 const IconClock  = (p) => <svg {...svgProps} {...p}><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>;
 
-const imgAgencyPlaceholder = "https://www.figma.com/api/mcp/asset/0926e5cc-1f5e-4862-a22b-22daa1cef4d7";
-
 export default function AgencyDetail() {
   const { id } = useParams();
   const navigate = useNavigate();
@@ -22,6 +22,7 @@ export default function AgencyDetail() {
   if (!agency) {
     return (
       <div className={styles.page}>
+        <AppNavbar />
         <div className={styles.main}>
           <div className={styles.section}>
             <h1 className={styles.heroName}>Agence introuvable</h1>
@@ -37,6 +38,7 @@ export default function AgencyDetail() {
 
   return (
     <div className={styles.page}>
+      <AppNavbar />
       <div className={styles.main}>
 
         {/* ── Hero agence ── */}

@@ -8,11 +8,9 @@ import {
   isGoogleConfigured, isFacebookConfigured,
 } from "../../utils/oauth";
 import imgIllustration from "../../assets/images/backgrounds/TravelerIllustration.png";
-// ── Assets Figma ──────────────────────────────────────────────
 import imgLogo      from "../../assets/logos/logo.png";
-//const imgHero      = "https://www.figma.com/api/mcp/asset/2d1d879d-a4d2-4bc2-98bf-7842a9327598";
-const imgSpaceBg   = "https://www.figma.com/api/mcp/asset/d42b2bd3-40e7-4c81-9e00-2f6037d84ee4";
-const imgGlobe     = "https://www.figma.com/api/mcp/asset/ce67d7c1-e338-4383-8ae7-5ea7ae0b31e4";
+import imgSpaceBg   from "../../assets/images/backgrounds/space-bg.png";
+import imgGlobe     from "../../assets/icons/icon-globe-light.png";
 
 const IconGoogle = (p) => (
   <svg viewBox="0 0 24 24" width="20" height="20" {...p}>

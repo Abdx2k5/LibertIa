@@ -3,6 +3,7 @@ export const ROUTES = {
   LOGIN:        "/login",
   REGISTER:     "/register",
   COMMUNITY:    "/community",
+  MESSAGES:     "/messages",
   DASHBOARD:    "/dashboard",
   VOYAGE_DETAIL: "/voyage/:id",
   PROFILE:      "/profile",
@@ -19,6 +20,9 @@ export const ROUTES = {
 
 // Génère le lien vers la page détail d'une agence (ex: agencyDetailPath("1"))
 export const agencyDetailPath = (id) => `/agence/${id}`;
+
+// Génère le lien vers une conversation privée (ex: messageThreadPath("64f..."))
+export const messageThreadPath = (userId) => `/messages/${userId}`;
 
 export const ROLES = {
   USER:  "user",

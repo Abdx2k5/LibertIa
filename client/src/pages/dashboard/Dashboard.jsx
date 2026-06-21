@@ -1,33 +1,23 @@
-import { useState, useEffect, useCallback, useRef } from "react";
-import { useNavigate, Link } from "react-router-dom";
+import { useState, useEffect, useCallback } from "react";
+import { useNavigate, useLocation } from "react-router-dom";
 import styles from "./Dashboard.module.css";
 import { useAuthStore } from "../../store/authStore";
-import { useUiStore, useUIStore } from "../../store/uiStore";
+import { useUiStore } from "../../store/uiStore";
 import { useVoyage } from "../../hooks/useVoyage";
 import { FREEMIUM , ROUTES} from "../../utils/constants";
-import { ProgressBar, ShareButton, DeleteButton, StreamingOutput, ItineraireJourJour, VolCard, HotelCard, ActiviteCard, MicroAnimated, BudgetChart, RechercheVoyages, NotificationBell, PaymentModal } from "../../components/ui";
+import { ProgressBar, ShareButton, DeleteButton, StreamingOutput, ItineraireJourJour, VolCard, HotelCard, ActiviteCard, MicroAnimated, BudgetChart, RechercheVoyages, PaymentModal } from "../../components/ui";
 import ShareModal from "../../components/modals/ShareModal";
 import DeleteConfirmModal from "../../components/modals/DeleteConfirmModal";
-import HamburgerSidebar from "../../components/layout/HamburgerSidebar";
-
-const IconMenu = (p) => (
-  <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...p}>
-    <line x1="4" y1="6" x2="20" y2="6"/><line x1="4" y1="12" x2="20" y2="12"/><line x1="4" y1="18" x2="20" y2="18"/>
-  </svg>
-);
+import AppNavbar from "../../components/layout/AppNavbar";
 import seoulImg from "../../assets/images/destinations/seoul-1.jpg";
 import lisbonneImg from "../../assets/images/destinations/lisbonne-1.jpg";
 import { useTranslation } from "../../hooks/useTranslation";
 
-const imgProfile      = "https://www.figma.com/api/mcp/asset/0926e5cc-1f5e-4862-a22b-22daa1cef4d7";
-const imgLogo         = "https://www.figma.com/api/mcp/asset/d93104aa-ce16-42fe-b9cd-8bbe43f0929d";
-const imgMoon         = "https://www.figma.com/api/mcp/asset/a418505c-a505-4ba9-896b-219cc8be6ab1";
-const imgGlobe        = "https://www.figma.com/api/mcp/asset/13bb7fda-e931-4924-85b4-1f7753f52556";
-const imgIconCalendar = "https://www.figma.com/api/mcp/asset/b038d18f-b513-43cf-bec5-084801418108";
-const imgIconHistory  = "https://www.figma.com/api/mcp/asset/3fa574be-7875-4154-9644-e254d1207162";
-const imgIconSuggests = "https://www.figma.com/api/mcp/asset/03afb187-49b3-467b-a113-1d28212aa74d";
-const imgIconStar     = "https://www.figma.com/api/mcp/asset/03c56ae0-a2fe-4cd1-a8c1-7a98c835b6fe";
-const imgIconAssistant= "https://www.figma.com/api/mcp/asset/da457562-2f7c-406b-9c8f-af640f84933e";
+const smallIconProps = { width: "16", height: "16", viewBox: "0 0 24 24", fill: "none", stroke: "currentColor", strokeWidth: "2", strokeLinecap: "round", strokeLinejoin: "round" };
+const IconCalendarSmall = (p) => <svg {...smallIconProps} {...p}><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>;
+const IconHistoryClock  = (p) => <svg {...smallIconProps} {...p}><path d="M3 3v5h5"/><path d="M3.05 13a9 9 0 1 0 .5-4.5"/><path d="M12 7v5l4 2"/></svg>;
+const IconLightbulb     = (p) => <svg {...smallIconProps} {...p}><path d="M9 18h6"/><path d="M10 22h4"/><path d="M12 2a7 7 0 0 0-4 12.7c.4.3.7.8.7 1.3v.5h6.6v-.5c0-.5.3-1 .7-1.3A7 7 0 0 0 12 2Z"/></svg>;
+const IconStarFilled    = (p) => <svg {...smallIconProps} fill="currentColor" stroke="none" {...p}><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>;
 
 const IconPlane = (p) => (
   <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...p}>
@@ -54,15 +44,6 @@ const IconRocket = (p) => (
     <path d="M4.5 16.5c-1.5 1.26-2 5-2 5s3.74-.5 5-2c.71-.84.7-2.13-.09-2.91a2.18 2.18 0 0 0-2.91-.09z"/><path d="m12 15-3-3a22 22 0 0 1 2-3.95A12.88 12.88 0 0 1 22 2c0 2.72-.78 7.5-6 11a22.35 22.35 0 0 1-4 2z"/><path d="M9 12H4s.55-3.03 2-4c1.62-1.08 5 0 5 0"/><path d="M12 15v5s3.03-.55 4-2c1.08-1.62 0-5 0-5"/>
   </svg>
 );
-
-const menuSvgProps = { width: 16, height: 16, viewBox: "0 0 24 24", fill: "none", stroke: "currentColor", strokeWidth: "2", strokeLinecap: "round", strokeLinejoin: "round" };
-const IconUser       = (p) => <svg {...menuSvgProps} {...p}><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>;
-const IconSettingsGear = (p) => <svg {...menuSvgProps} {...p}><path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"/><circle cx="12" cy="12" r="3"/></svg>;
-const IconCreditCard = (p) => <svg {...menuSvgProps} {...p}><rect width="20" height="14" x="2" y="5" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/></svg>;
-const IconLogOut     = (p) => <svg {...menuSvgProps} {...p}><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>;
-const IconInstagram  = (p) => <svg {...menuSvgProps} {...p}><rect width="20" height="20" x="2" y="2" rx="5"/><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/></svg>;
-const IconTwitter    = (p) => <svg {...menuSvgProps} {...p}><path d="M22 4s-.7 2.1-2 3.4c1.6 10-9.4 17.3-18 11.6 2.2.1 4.4-.6 6-2C3 15.5 1.8 9.1 2 6c2.2 2.6 5.6 4.1 9 4-.9-4.2 4-6.6 7-3.8 1.1 0 3-1.2 3-1.2z"/></svg>;
-const IconFacebook   = (p) => <svg {...menuSvgProps} {...p}><path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"/></svg>;
 
 const FILTERS = [
   { id: "vol",    icon: IconPlane,    label: "Vol uniquement" },
@@ -190,35 +171,11 @@ const MOCK_BUDGET = {
 
 export default function Dashboard() {
   const navigate = useNavigate();
-  const { theme, toggleTheme } = useUiStore();
-  const { toggleSidebar } = useUIStore();
-  const { t, language, toggleLanguage } = useTranslation();
-  const { user, logout } = useAuthStore();
+  const location = useLocation();
+  const { theme } = useUiStore();
+  const { t } = useTranslation();
+  const { user } = useAuthStore();
   const { getMesVoyages, voyages } = useVoyage();
-
-  // ── Menu déroulant du profil (avatar navbar) ──
-  const [avatarMenuOpen, setAvatarMenuOpen] = useState(false);
-  const avatarMenuRef = useRef(null);
-
-  useEffect(() => {
-    if (!avatarMenuOpen) return undefined;
-    const onClickOutside = (e) => {
-      if (avatarMenuRef.current && !avatarMenuRef.current.contains(e.target)) setAvatarMenuOpen(false);
-    };
-    const onKey = (e) => { if (e.key === "Escape") setAvatarMenuOpen(false); };
-    document.addEventListener("mousedown", onClickOutside);
-    document.addEventListener("keydown", onKey);
-    return () => {
-      document.removeEventListener("mousedown", onClickOutside);
-      document.removeEventListener("keydown", onKey);
-    };
-  }, [avatarMenuOpen]);
-
-  const handleLogout = () => {
-    setAvatarMenuOpen(false);
-    logout();
-    navigate(ROUTES.HOME);
-  };
 
   // ── Selected items state ──
   const [selectedVol, setSelectedVol] = useState(null);
@@ -235,7 +192,8 @@ export default function Dashboard() {
   const [streamPrompt, setStreamPrompt] = useState("");
   const [streamId, setStreamId] = useState(0);
 
-  const [activeFilter, setActiveFilter]     = useState(null);
+  // Filtre demandé depuis la navbar d'une autre page (ex: clic sur "Vols" hors Dashboard)
+  const [activeFilter, setActiveFilter]     = useState(() => location.state?.filter || null);
   const [showLimitModal, setShowLimitModal] = useState(false);
   const [shareModalOpen, setShareModalOpen] = useState(false);
   const [deleteModalOpen, setDeleteModalOpen] = useState(false);
@@ -317,88 +275,7 @@ export default function Dashboard() {
   return (
     <div className={`${styles.page} ${theme === "dark" ? styles.dark : ""}`}>
 
-      <HamburgerSidebar />
-
-      {/* ── NAVBAR ── */}
-      <nav className={styles.navbar}>
-        <div className={styles.navLeft}>
-          <button type="button" className={styles.hamburgerBtn} onClick={toggleSidebar} aria-label="Ouvrir le menu">
-            <IconMenu />
-          </button>
-          <Link to="/" className={styles.navLogo}>
-            <img src={imgLogo} alt="Libertia" className={styles.navLogoImg} />
-            <span className={styles.navLogoText}>Libertia</span>
-          </Link>
-        </div>
-        <div className={styles.navLinks}>
-          {[
-            { key: "navHome", action: () => navigate(ROUTES.DASHBOARD) },
-            { key: "navFlights", action: () => setActiveFilter("vol") },
-            { key: "navHotels", action: () => setActiveFilter("hotel") },
-            { key: "navActivities", action: () => setActiveFilter("activ") },
-            { key: "navCommunity", action: () => navigate(ROUTES.COMMUNITY) },
-          ].map((item) => (
-            <button key={item.key} className={styles.navLink} onClick={item.action}>{t(item.key)}</button>
-          ))}
-        </div>
-        <div className={styles.navRight}>
-          <button className={styles.navIconBtn} onClick={toggleTheme}><img src={imgMoon} alt="" className={styles.navIconImg} /></button>
-          <button className={styles.navIconBtn} onClick={toggleLanguage}><img src={imgGlobe} alt="" className={styles.navIconImg} />{language.toUpperCase()}</button>
-          <NotificationBell />
-          <div className={styles.avatarMenuWrap} ref={avatarMenuRef}>
-            <button
-              type="button"
-              className={styles.navAvatar}
-              onClick={() => setAvatarMenuOpen((v) => !v)}
-              aria-haspopup="menu"
-              aria-expanded={avatarMenuOpen}
-              aria-label="Menu du profil"
-            >
-              <img src={user?.profilePhoto || imgProfile} alt={user?.nom || "Profil"} className={styles.navAvatarImg} />
-            </button>
-
-            {avatarMenuOpen && (
-              <div className={styles.avatarMenu} role="menu">
-                <div className={styles.avatarMenuHeader}>
-                  <div className={styles.avatarMenuName}>{user?.nom || "Utilisateur"}</div>
-                  <div className={styles.avatarMenuEmail}>{user?.email || ""}</div>
-                </div>
-
-                <button type="button" role="menuitem" className={styles.avatarMenuItem} onClick={() => { setAvatarMenuOpen(false); navigate(ROUTES.PROFILE); }}>
-                  <IconUser /> Voir le profil
-                </button>
-                <button type="button" role="menuitem" className={styles.avatarMenuItem} onClick={() => { setAvatarMenuOpen(false); navigate(ROUTES.SETTINGS); }}>
-                  <IconSettingsGear /> Paramètres
-                </button>
-                <button type="button" role="menuitem" className={styles.avatarMenuItem} onClick={() => { setAvatarMenuOpen(false); navigate(ROUTES.SUBSCRIPTION); }}>
-                  <IconCreditCard /> Abonnement
-                </button>
-
-                <div className={styles.avatarMenuDivider} />
-
-                <div className={styles.avatarMenuSocial}>
-                  <span className={styles.avatarMenuSocialLabel}>Suivez-nous</span>
-                  <div className={styles.avatarMenuSocialIcons}>
-                    <button type="button" className={styles.avatarMenuSocialIcon} disabled title="Bientôt disponible" aria-label="Instagram"><IconInstagram /></button>
-                    <button type="button" className={styles.avatarMenuSocialIcon} disabled title="Bientôt disponible" aria-label="Twitter"><IconTwitter /></button>
-                    <button type="button" className={styles.avatarMenuSocialIcon} disabled title="Bientôt disponible" aria-label="Facebook"><IconFacebook /></button>
-                  </div>
-                </div>
-
-                <div className={styles.avatarMenuDivider} />
-
-                <button type="button" role="menuitem" className={`${styles.avatarMenuItem} ${styles.avatarMenuLogout}`} onClick={handleLogout}>
-                  <IconLogOut /> Se déconnecter
-                </button>
-              </div>
-            )}
-          </div>
-          <div className={styles.navBadge}>
-            <img src={imgIconAssistant} alt="" style={{ width: 13, height: 13 }} />
-            <span className={styles.navBadgeText}>{t("assistantBadge")}</span>
-          </div>
-        </div>
-      </nav>
+      <AppNavbar onFilterSelect={setActiveFilter} />
 
       <div className={styles.main}>
 
@@ -550,7 +427,7 @@ export default function Dashboard() {
           {/* Colonne gauche — Historique */}
           <div>
             <div className={styles.sectionHeader}>
-              <img src={imgIconHistory} alt="" className={styles.sectionIcon} />
+              <IconHistoryClock className={styles.sectionIcon} />
               <h2 className={styles.sectionTitle}>Mes demandes récentes</h2>
             </div>
             <p className={styles.sectionSub}>Retrouvez vos dernières conversations et recherches.</p>
@@ -560,7 +437,7 @@ export default function Dashboard() {
               <div key={v.id || v._id} className={styles.historyCard}>
                 <div>
                   <div className={styles.historyDate}>
-                    <img src={imgIconCalendar} alt="" className={styles.historyDateIcon} />
+                    <IconCalendarSmall className={styles.historyDateIcon} />
                     <span className={styles.historyDateText}>
                       {v.date || new Date(v.createdAt).toLocaleDateString("fr-FR")}
                     </span>
@@ -606,7 +483,7 @@ export default function Dashboard() {
           {/* Colonne droite — Suggestions */}
           <div>
             <div className={styles.sectionHeader}>
-              <img src={imgIconSuggests} alt="" className={styles.sectionIcon} />
+              <IconLightbulb className={styles.sectionIcon} />
               <h2 className={styles.sectionTitle}>Suggestions pour vous</h2>
             </div>
             <p className={styles.sectionSub}>Basé sur votre historique et vos préférences.</p>
@@ -617,7 +494,7 @@ export default function Dashboard() {
                   {dest.img ? <img src={dest.img} alt={dest.city} className={styles.suggestImg} /> : <div className={styles.suggestPlaceholder} />}
                   <div className={styles.suggestBody}>
                     <div className={styles.suggestTag}>
-                      <img src={imgIconStar} alt="" className={styles.suggestTagIcon} />
+                      <IconStarFilled className={styles.suggestTagIcon} />
                       <span className={styles.suggestTagText}>{dest.tag}</span>
                     </div>
                     <h3 className={styles.suggestCity}>{dest.city}</h3>
@@ -637,7 +514,7 @@ export default function Dashboard() {
                 <img src={lisbonneImg} alt="Lisbonne" className={styles.suggestWideImg} />
                 <div className={styles.suggestWideBody}>
                   <div className={styles.suggestTag}>
-                    <img src={imgIconStar} alt="" className={styles.suggestTagIcon} />
+                    <IconStarFilled className={styles.suggestTagIcon} />
                     <span className={styles.suggestTagText}>Budget 1500€ respecté</span>
                   </div>
                   <h3 className={styles.suggestCity}>Lisbonne, Portugal</h3>

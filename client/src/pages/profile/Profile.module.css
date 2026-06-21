@@ -37,7 +37,7 @@
 /* ── Sidebar de navigation des sections ── */
 .sideNav {
   width: 240px; flex-shrink: 0;
-  position: sticky; top: 24px;
+  position: sticky; top: 94px;
   display: flex; flex-direction: column; gap: 16px;
 }
 

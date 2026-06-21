@@ -1,9 +1,8 @@
 import { useNavigate, useLocation, Link } from "react-router-dom";
 import styles from "./Sidebar.module.css";
 import { useAuthStore } from "../../store/authStore";
-
-const imgLogo   = "https://www.figma.com/api/mcp/asset/d93104aa-ce16-42fe-b9cd-8bbe43f0929d";
-const imgAvatar = "https://www.figma.com/api/mcp/asset/0926e5cc-1f5e-4862-a22b-22daa1cef4d7";
+import imgLogo from "../../assets/logos/logo.png";
+import imgAvatar from "../../assets/images/community/avatar.png";
 
 const svgProps = { width: 18, height: 18, viewBox: "0 0 24 24", fill: "none", stroke: "currentColor", strokeWidth: "2", strokeLinecap: "round", strokeLinejoin: "round" };
 const IconBot      = (p) => <svg {...svgProps} {...p}><path d="M12 8V4H8"/><rect width="16" height="12" x="4" y="8" rx="2"/><path d="M2 14h2"/><path d="M20 14h2"/><path d="M15 13v2"/><path d="M9 13v2"/></svg>;

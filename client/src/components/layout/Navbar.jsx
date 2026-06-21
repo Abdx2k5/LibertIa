@@ -3,8 +3,8 @@ import styles from "./Navbar.module.css";
 import { useAuthStore } from "../../store/authStore";
 import { LogoutButton } from "../../components/ui";
 import imgLogo from "../../assets/logos/logo.png";
-const imgGlobe  = "https://www.figma.com/api/mcp/asset/ce67d7c1-e338-4383-8ae7-5ea7ae0b31e4";
-const imgAvatar = "https://www.figma.com/api/mcp/asset/0926e5cc-1f5e-4862-a22b-22daa1cef4d7";
+import imgGlobe from "../../assets/icons/icon-globe-light.png";
+import imgAvatar from "../../assets/images/community/avatar.png";
 
 const NAV_LINKS = [
   { label: "Accueil",       to: "/" },

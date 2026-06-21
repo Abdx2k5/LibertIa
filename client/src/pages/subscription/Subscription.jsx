@@ -4,6 +4,7 @@ import styles from "./Subscription.module.css";
 import { useAuthStore } from "../../store/authStore";
 import { Badge, Button, Modal } from "../../components/ui";
 import FindFriendsModal from "../../components/modals/FindFriendsModal";
+import AppNavbar from "../../components/layout/AppNavbar";
 import { FREEMIUM, ROUTES } from "../../utils/constants";
 
 const IconCheck      = (p) => <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" {...p}><polyline points="20 6 9 17 4 12"/></svg>;
@@ -68,6 +69,7 @@ export default function Subscription() {
 
   return (
     <div className={styles.page}>
+      <AppNavbar />
       <div className={styles.main}>
         <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", gap: 16 }}>
           <div>
@@ -80,13 +82,14 @@ export default function Subscription() {
             title="Trouver des amis"
             aria-label="Trouver des amis"
             style={{
-              display: "flex", alignItems: "center", justifyContent: "center",
-              width: 40, height: 40, borderRadius: 10, flexShrink: 0,
+              display: "flex", alignItems: "center", justifyContent: "center", gap: 8,
+              padding: "0 16px", height: 40, borderRadius: 10, flexShrink: 0,
               background: "var(--bg-secondary)", border: "1px solid var(--border)",
-              color: "var(--text)", cursor: "pointer",
+              color: "var(--text)", cursor: "pointer", fontSize: 14, fontWeight: 600,
+              fontFamily: "inherit", whiteSpace: "nowrap",
             }}
           >
-            <IconUserPlus />
+            <IconUserPlus /> Trouver des amis
           </button>
         </div>
 
