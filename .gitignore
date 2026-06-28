@@ -8,3 +8,6 @@ server/.env
 ai/chroma_db/
 .claude
 .github
+ai/colibri_lora/
+ai/colibri_merged/
+colibri_output/

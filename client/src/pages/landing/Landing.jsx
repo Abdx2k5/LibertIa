@@ -1,572 +1,397 @@
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import styles from "./Landing.module.css";
-import { useTranslation } from "../../hooks/useTranslation";
 
-// DESTINATIONS
-import imgParis from "../../assets/images/destinations/paris.png";
-import imgTokyo from "../../assets/images/destinations/tokyo.png";
-import imgNewYork from "../../assets/images/destinations/new-york.png";
-import imgMarrakech from "../../assets/images/destinations/marrakech.png";
-import imgBarcelone from "../../assets/images/destinations/barcelone-1.jpg";
-import imgRio from "../../assets/images/destinations/bresil-1.jpg";
+// ── Icônes SVG inline ──────────────────────────────────────────
+const IconPlane = () => <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M17.8 19.2 16 11l3.5-3.5C21 6 21.5 4 21 3c-1-.5-3 0-4.5 1.5L13 8 4.8 6.2c-.5-.1-1 .1-1.3.5l-.7.8c-.4.5-.2 1.2.3 1.5L9 12l-2 3H4l-1 1 3 2 2 3 1-1v-3l3-2 3.5 5.3c.3.5 1 .7 1.5.3l.8-.7c.4-.3.6-.8.5-1.3Z"/></svg>;
+const IconMap  = () => <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polygon points="3 6 9 3 15 6 21 3 21 18 15 21 9 18 3 21"/><line x1="9" y1="3" x2="9" y2="18"/><line x1="15" y1="6" x2="15" y2="21"/></svg>;
+const IconUsers = () => <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>;
+const IconStar  = () => <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" stroke="none"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>;
+const IconMic   = () => <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 2a3 3 0 0 1 3 3v7a3 3 0 0 1-6 0V5a3 3 0 0 1 3-3Z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="22"/></svg>;
+const IconSend  = () => <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="13 6 19 12 13 18"/></svg>;
+const IconShield = () => <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>;
+const IconZap   = () => <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>;
+const IconGlobe = () => <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>;
+const IconBot   = () => <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 8V4H8"/><rect width="16" height="12" x="4" y="8" rx="2"/><path d="M2 14h2"/><path d="M20 14h2"/><path d="M15 13v2"/><path d="M9 13v2"/></svg>;
+const IconMenu  = () => <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>;
+const IconX     = () => <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>;
 
-// BACKGROUND
-import imgSpaceBg from "../../assets/images/backgrounds/space-bg.png";
-
-// COMMUNITY
-import imgAvatar from "../../assets/images/community/avatar.png";
-import imgAvatar1 from "../../assets/images/community/avatar-1.png";
-import imgAvatar2 from "../../assets/images/community/avatar-2.png";
-import imgAvatar3 from "../../assets/images/community/avatar-3.png";
-import imgTrip from "../../assets/images/community/trip-mark.png";
-import imgTrip1 from "../../assets/images/community/trip-sarah.png";
-
-// LOGO
-import imgLogoGroup from "../../assets/logos/logo.png";
-import imgFooterLogo from "../../assets/logos/logo-light.png";
-
-// ICONS
-import imgIconAI from "../../assets/icons/icon-ai.png";
-import imgIconCommunity from "../../assets/icons/icon-community.png";
-import imgIconVoice from "../../assets/icons/icon-voice.png";
-import imgIconAll from "../../assets/icons/icon-all-in-one.png";
-import imgIconDark from "../../assets/icons/icon-dark-mode.png";
-import ImgIconLight from "../../assets/icons/icon-dark-mode-light.png";
-
-import imgIconTranslate from "../../assets/icons/icon-translate.png";
-import imgGlobLight from "../../assets/icons/icon-globe-light.png";
-import imgGlobe from "../../assets/icons/icon-globe.png";
-import imgIconHeart from "../../assets/icons/Icon_heart.png";
-import imgIconComment from "../../assets/icons/Icon_comments.png";
-
-const IconRocket = (p) => (
-  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ marginLeft: 4, verticalAlign: -2 }} {...p}>
-    <path d="M4.5 16.5c-1.5 1.26-2 5-2 5s3.74-.5 5-2c.71-.84.7-2.13-.09-2.91a2.18 2.18 0 0 0-2.91-.09z"/><path d="m12 15-3-3a22 22 0 0 1 2-3.95A12.88 12.88 0 0 1 22 2c0 2.72-.78 7.5-6 11a22.35 22.35 0 0 1-4 2z"/><path d="M9 12H4s.55-3.03 2-4c1.62-1.08 5 0 5 0"/><path d="M12 15v5s3.03-.55 4-2c1.08-1.62 0-5 0-5"/>
-  </svg>
-);
-const IconBot = (p) => (
-  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ marginRight: 6, verticalAlign: -2 }} {...p}>
-    <path d="M12 8V4H8"/><rect width="16" height="12" x="4" y="8" rx="2"/><path d="M2 14h2"/><path d="M20 14h2"/><path d="M15 13v2"/><path d="M9 13v2"/>
-  </svg>
-);
-const IconX = (p) => (
-  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...p}>
-    <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
-  </svg>
-);
-// Donneee ────────────────────────────────────────────────────────
-const DESTINATIONS = [
-  { img: imgParis,     name: "Paris",     country: "France",     price: "~450€",  count: "1.2k intéressés", tags: ["Culture", "Gastronomie"] },
-  { img: imgTokyo,     name: "Tokyo",     country: "Japon",      price: "~1200€", count: "3.4k intéressés", tags: ["Technologie", "Cuisine"] },
-  { img: imgNewYork,   name: "New York",  country: "États-Unis", price: "~850€",  count: "2.1k intéressés", tags: ["Shopping", "Culture"] },
-  { img: imgMarrakech, name: "Marrakech", country: "Maroc",      price: "~320€",  count: "950 intéressés",  tags: ["Aventure", "Gastronomie"] },
-  { img: imgBarcelone, name: "Barcelone", country: "Espagne",    price: "~450€",  count: "1.8k intéressés", tags: ["Plage", "Nightlife"] },
-  { img: imgRio,       name: "Rio de Janeiro", country: "Brésil", price: "~900€",  count: "1.6k intéressés", tags: ["Plage", "Culture"] },
-  { img: null,         name: "Dubai",     country: "Émirats",    price: "~700€",  count: "2.5k intéressés", tags: ["Luxe", "Shopping"] },
+// ── Données ─────────────────────────────────────────────────────
+const SUGGESTIONS = [
+  "5 jours à Tokyo, budget 1500€ 🇯🇵",
+  "Voyage romantique à Paris pour 2 ❤️",
+  "Aventure au Maroc, 7 jours 🌙",
+  "Road trip en Espagne, 10 jours 🚗",
+  "Séjour culturel à Istanbul 🕌",
 ];
 
-const AI_EXAMPLES = [
-  "Je veux 5 jours à Tokyo, budget 1500€",
-  "Voyage romantique à Paris pour 2",
-  "Aventure au Maroc, 7 jours",
+const FEATURES = [
+  { icon: <IconZap />,    title: "Ultra rapide",       desc: "Votre itinéraire complet généré en moins de 60 secondes avec de vrais prix en temps réel." },
+  { icon: <IconBot />,    title: "IA conversationnelle", desc: "Décrivez votre voyage en langage naturel, par texte ou par voix. L'IA comprend vos envies." },
+  { icon: <IconGlobe />,  title: "Destinations du monde", desc: "Maroc, France, Japon, Espagne... Couverture mondiale avec données locales enrichies." },
+  { icon: <IconUsers />,  title: "Communauté active",  desc: "Partagez, commentez et collaborez avec des voyageurs du monde entier." },
+  { icon: <IconShield />, title: "Données sécurisées", desc: "Vos informations sont chiffrées (AES-256) et protégées. Conformité RGPD garantie." },
+  { icon: <IconMap />,    title: "Cartes interactives", desc: "Visualisez votre itinéraire sur une carte Mapbox avec tous vos points d'intérêt." },
 ];
 
-const navItems = [
-  { tKey: "navHome",       to: "/" },
-  { tKey: "navFlights" },
-  { tKey: "navHotels" },
-  { tKey: "navActivities" },
-  { tKey: "navCommunity",  to: "/community" },
-  { tKey: "navPricing",    to: "/tarifs" },
+const TESTIMONIALS = [
+  { name: "Sarah M.", location: "Kyoto, Japon", text: "L'itinéraire IA était parfait. Le temple d'or au lever du soleil, je n'oublierai jamais.", rating: 5 },
+  { name: "Marc T.",  location: "Marrakech, Maroc", text: "Super recommandation pour le Riad. La communauté LibertIa m'a sauvé la mise !", rating: 5 },
+  { name: "Léa R.",   location: "Barcelone, Espagne", text: "J'ai décrit mon voyage en 2 lignes et j'ai eu un planning complet. Bluffant.", rating: 5 },
 ];
 
-const howItWorks = [
-  { icon: imgIconAI,        title: "1. Exprimez votre voyage", text: "Parlez ou écrivez vos envies. Pas besoin de formulaires complexes." },
-  { icon: imgIconAI,        title: "2. L'IA organise tout",    text: "Notre assistant génère des itinéraires complets : vols, hôtels, et activités." },
-  { icon: imgIconCommunity, title: "3. La communauté valide",  text: "Consultez les avis des membres et ajustez vos choix en toute confiance." },
+const STATS = [
+  { value: "50k+", label: "Voyageurs" },
+  { value: "120+", label: "Destinations" },
+  { value: "< 60s", label: "Génération" },
+  { value: "4.9★", label: "Note moyenne" },
 ];
 
-const whyCards = [
-  { icon: imgIconVoice,     title: "Texte & Voix",      text: "Recherchez et planifiez simplement en parlant à l'application." },
-  { icon: imgIconAI,        title: "IA Personnalisée",  text: "Apprend vos préférences pour proposer des séjours sur-mesure." },
-  { icon: imgIconCommunity, title: "Communauté",        text: "Des voyageurs bienveillants prêts à partager leurs astuces." },
-  { icon: imgIconAll,       title: "Tout-en-un",        text: "Vols, hôtels, et activités combinés en un seul panier flexible." },
-  { icon: imgIconDark,      title: "Dark & Light Mode", text: "Profitez de notre ambiance nocturne ou basculez en mode jour." },
-  { icon: imgIconTranslate, title: "Traduction Auto",   text: "Parcourez les avis et interagissez dans votre langue." },
-];
-
-const communityPosts = [
-  { img: imgTrip,  name: "Sarah M.", location: "à Kyoto, Japon",     text: "L'itinéraire IA était parfait. Le temple d'or au lever du soleil ! 🌸", likes: 124, comments: 12 },
-  { img: imgTrip1, name: "Marc T.",  location: "à Marrakech, Maroc", text: "Super recommandation pour le Riad. Merci la communauté Libertia ! 🐪",  likes: 89,  comments: 5  },
-];
-
-const footerCols = [
-  { title: "Explorer",    links: ["Destinations", "Communauté", "Vols & Hôtels"] },
-  { title: "Légal",       links: ["Conditions d'utilisation", "Confidentialité", "Cookies"] },
-  { title: "Suivez-nous", links: ["Instagram", "Twitter", "TikTok"] },
-];
-
-
-// ── Composant ──────────────────────────────────────────────────────
+// ── Composant principal ──────────────────────────────────────────
 export default function Landing() {
   const navigate = useNavigate();
-  const { t } = useTranslation();
+  const [query, setQuery]           = useState("");
+  const [suggIdx, setSuggIdx]       = useState(0);
+  const [typed, setTyped]           = useState("");
+  const [mobileOpen, setMobileOpen] = useState(false);
+  const [scrolled, setScrolled]     = useState(false);
+  const inputRef = useRef(null);
+  const isAuth = !!localStorage.getItem("libertia_token");
 
-  const isAuthenticated = !!localStorage.getItem("libertia_token");
+  // ── Animation suggestion typewriter ──
+  useEffect(() => {
+    const sugg = SUGGESTIONS[suggIdx];
+    let i = 0;
+    setTyped("");
+    const interval = setInterval(() => {
+      i++;
+      setTyped(sugg.slice(0, i));
+      if (i >= sugg.length) {
+        clearInterval(interval);
+        setTimeout(() => {
+          setSuggIdx(s => (s + 1) % SUGGESTIONS.length);
+        }, 2000);
+      }
+    }, 45);
+    return () => clearInterval(interval);
+  }, [suggIdx]);
 
-  // State
-  const [isAiMode, setIsAiMode]       = useState(false);
-  const [query, setQuery]             = useState("");
-  const [panelOpen, setPanelOpen]     = useState(false);
-  const [isListening, setIsListening] = useState(false);
-  const [micError, setMicError]       = useState(null);
-  const [menuOpen, setMenuOpen]       = useState(false); // ← menu hamburger
-  const [theme, setTheme] = useState("dark");
-  // Filtrage destinations
-  const filtered = query.trim().length >= 1
-    ? DESTINATIONS.filter((d) =>
-        d.name.toLowerCase().includes(query.toLowerCase()) ||
-        d.country.toLowerCase().includes(query.toLowerCase()) ||
-        d.tags.some((t) => t.toLowerCase().includes(query.toLowerCase()))
-      )
-    : DESTINATIONS;
+  // ── Navbar scroll ──
+  useEffect(() => {
+    const onScroll = () => setScrolled(window.scrollY > 20);
+    window.addEventListener("scroll", onScroll);
+    return () => window.removeEventListener("scroll", onScroll);
+  }, []);
 
-  // Submit
+  // ── Submit ──
   const handleSubmit = (e) => {
     e.preventDefault();
-    if (!query.trim()) return;
-    if (isAiMode) {
-      sessionStorage.setItem("libertia_prompt", query.trim());
-      navigate(isAuthenticated ? "/dashboard" : "/register");
+    const q = query.trim() || typed;
+    if (!q) return;
+    if (isAuth) {
+      sessionStorage.setItem("libertia_prompt", q);
+      navigate("/dashboard");
     } else {
-      setPanelOpen(true);
+      sessionStorage.setItem("libertia_prompt", q);
+      navigate("/register");
     }
   };
-  
-  const toggleTheme = () => {
-  setTheme((prev) => (prev === "dark" ? "light" : "dark"));
-  };
-  // Clic destination
-  const handleDestClick = (dest) => {
-    sessionStorage.setItem("libertia_prompt", `Je veux visiter ${dest.name}, ${dest.country}`);
-    navigate(isAuthenticated ? "/dashboard" : "/register");
-  };
 
-  // Switch mode
-  const handleModeSwitch = (aiMode) => {
-    setIsAiMode(aiMode);
-    setQuery("");
-    setPanelOpen(false);
-    setMicError(null);
-  };
-
-  // Microphone
-  const handleMic = () => {
-    if (!("webkitSpeechRecognition" in window || "SpeechRecognition" in window)) {
-      setMicError("Microphone non supporté par ce navigateur");
-      return;
-    }
-    const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
-    const recognition = new SR();
-    recognition.lang = "fr-FR";
-    recognition.interimResults = false;
-    recognition.onstart  = () => setIsListening(true);
-    recognition.onend    = () => setIsListening(false);
-    recognition.onerror  = () => { setIsListening(false); setMicError("Accès micro refusé"); };
-    recognition.onresult = (e) => { setQuery(e.results[0][0].transcript); setMicError(null); };
-    recognition.start();
+  const handleSuggClick = (s) => {
+    const clean = s.replace(/[\u{1F000}-\u{1FFFF}]/gu, "").trim();
+    setQuery(clean);
+    inputRef.current?.focus();
   };
 
   return (
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.13.1/font/bootstrap-icons.min.css"></link>,
-    <div className={styles.page} data-theme={theme}>
-      <div className={styles.background}>
+    <div className={styles.page}>
 
-        {/* ── NAVBAR ── */}
-        <nav className={styles.navbar}>
-          <Link to="/" className={styles.navLogo}>
-            <img src={imgLogoGroup} alt="Libertia" className={styles.navLogoImg} />
-            <span className={styles.navLogoText}>Libertia</span>
+      {/* ── NAVBAR ── */}
+      <nav className={`${styles.nav} ${scrolled ? styles.navScrolled : ""}`}>
+        <div className={styles.navInner}>
+          <Link to="/" className={styles.logo}>
+            <div className={styles.logoIcon}>L</div>
+            <span className={styles.logoText}>LibertIa</span>
           </Link>
 
-          {/* Links desktop */}
           <div className={styles.navLinks}>
-            {navItems.map((item) => (
-              <button
-                key={item.tKey}
-                className={styles.navLink}
-                onClick={item.to ? () => navigate(item.to) : undefined}
-              >
-                {t(item.tKey)}
+            <Link to="/"          className={styles.navLink}>Accueil</Link>
+            <Link to="/community" className={styles.navLink}>Communauté</Link>
+            <Link to="/tarifs"    className={styles.navLink}>Tarifs</Link>
+          </div>
+
+          <div className={styles.navActions}>
+            {isAuth ? (
+              <button className={styles.btnPrimary} onClick={() => navigate("/dashboard")}>
+                Mon espace →
               </button>
+            ) : (
+              <>
+                <Link to="/login"    className={styles.btnGhost}>Connexion</Link>
+                <Link to="/register" className={styles.btnPrimary}>Commencer gratuitement</Link>
+              </>
+            )}
+          </div>
+
+          <button className={styles.burger} onClick={() => setMobileOpen(o => !o)}>
+            {mobileOpen ? <IconX /> : <IconMenu />}
+          </button>
+        </div>
+
+        {/* Mobile menu */}
+        {mobileOpen && (
+          <div className={styles.mobileMenu}>
+            <Link to="/"          className={styles.mobileLink} onClick={() => setMobileOpen(false)}>Accueil</Link>
+            <Link to="/community" className={styles.mobileLink} onClick={() => setMobileOpen(false)}>Communauté</Link>
+            <Link to="/tarifs"    className={styles.mobileLink} onClick={() => setMobileOpen(false)}>Tarifs</Link>
+            <div className={styles.mobileDivider}/>
+            {isAuth ? (
+              <button className={styles.btnPrimary} onClick={() => navigate("/dashboard")}>Mon espace</button>
+            ) : (
+              <>
+                <Link to="/login"    className={styles.btnGhost}   onClick={() => setMobileOpen(false)}>Connexion</Link>
+                <Link to="/register" className={styles.btnPrimary} onClick={() => setMobileOpen(false)}>Commencer gratuitement</Link>
+              </>
+            )}
+          </div>
+        )}
+      </nav>
+
+      {/* ── HERO ── */}
+      <section className={styles.hero}>
+        {/* Orbs de fond */}
+        <div className={styles.orb1}/>
+        <div className={styles.orb2}/>
+        <div className={styles.orb3}/>
+
+        <div className={styles.heroContent}>
+          <div className={styles.badge}>
+            <IconZap /> IA générative • Données temps réel
+          </div>
+
+          <h1 className={styles.heroTitle}>
+            Planifiez votre voyage<br/>
+            <span className={styles.heroAccent}>en 60 secondes</span>
+          </h1>
+
+          <p className={styles.heroSub}>
+            Décrivez votre voyage en langage naturel. LibertIa génère un itinéraire
+            complet avec de vrais prix d'hôtels et de vols, en moins d'une minute.
+          </p>
+
+          {/* ── Search box ── */}
+          <form onSubmit={handleSubmit} className={styles.searchBox}>
+            <div className={styles.searchInner}>
+              <input
+                ref={inputRef}
+                className={styles.searchInput}
+                placeholder={typed || "Décrivez votre voyage idéal..."}
+                value={query}
+                onChange={e => setQuery(e.target.value)}
+                onFocus={() => setTyped("")}
+              />
+              <div className={styles.searchActions}>
+                <button type="button" className={styles.micBtn} title="Recherche vocale">
+                  <IconMic />
+                </button>
+                <button type="submit" className={styles.sendBtn}>
+                  <IconSend />
+                  <span>Générer</span>
+                </button>
+              </div>
+            </div>
+
+            {/* Suggestions */}
+            <div className={styles.suggestions}>
+              {SUGGESTIONS.slice(0, 4).map((s, i) => (
+                <button
+                  key={i}
+                  type="button"
+                  className={styles.suggPill}
+                  onClick={() => handleSuggClick(s)}
+                >
+                  {s}
+                </button>
+              ))}
+            </div>
+          </form>
+
+          <p className={styles.heroNote}>
+            Gratuit • Sans carte bancaire • 10 itinéraires offerts
+          </p>
+        </div>
+      </section>
+
+      {/* ── STATS ── */}
+      <section className={styles.stats}>
+        <div className={styles.statsInner}>
+          {STATS.map((s, i) => (
+            <div key={i} className={styles.statCard}>
+              <div className={styles.statValue}>{s.value}</div>
+              <div className={styles.statLabel}>{s.label}</div>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      {/* ── DEMO CARD ── */}
+      <section className={styles.demo}>
+        <div className={styles.demoInner}>
+          <div className={styles.demoLeft}>
+            <h2 className={styles.sectionTitle}>
+              Votre assistant voyage<br/>personnel, disponible 24h/24
+            </h2>
+            <p className={styles.sectionDesc}>
+              Tapez simplement ce que vous voulez faire. LibertIa comprend le langage naturel,
+              recherche les meilleures offres en temps réel et génère un planning complet jour par jour.
+            </p>
+            <div className={styles.demoSteps}>
+              {[
+                { n:"1", t:"Décrivez votre voyage", d:"En texte libre ou par commande vocale" },
+                { n:"2", t:"L'IA génère votre plan", d:"Hôtels, vols, activités avec vrais prix" },
+                { n:"3", t:"Personnalisez & partagez", d:"Modifiez, exportez en PDF ou partagez" },
+              ].map((step, i) => (
+                <div key={i} className={styles.step}>
+                  <div className={styles.stepNum}>{step.n}</div>
+                  <div>
+                    <div className={styles.stepTitle}>{step.t}</div>
+                    <div className={styles.stepDesc}>{step.d}</div>
+                  </div>
+                </div>
+              ))}
+            </div>
+            <Link to="/register" className={styles.btnPrimary} style={{ display:"inline-flex", marginTop:24 }}>
+              Essayer gratuitement →
+            </Link>
+          </div>
+
+          <div className={styles.demoRight}>
+            <div className={styles.demoCard}>
+              <div className={styles.demoCardHeader}>
+                <div className={styles.demoCardDot} style={{ background:"#f87171" }}/>
+                <div className={styles.demoCardDot} style={{ background:"#fbbf24" }}/>
+                <div className={styles.demoCardDot} style={{ background:"#4ade80" }}/>
+                <span style={{ marginLeft:8, fontSize:12, color:"var(--text-muted)" }}>LibertIa IA</span>
+              </div>
+              <div className={styles.demoCardBody}>
+                <div className={styles.demoMsg} style={{ alignSelf:"flex-end", background:"var(--accent)", color:"white" }}>
+                  Je veux 5 jours à Marrakech, budget 1200€
+                </div>
+                <div className={styles.demoMsg}>
+                  <div style={{ fontWeight:600, color:"var(--accent)", marginBottom:6 }}>✈️ Marrakech — 5 jours</div>
+                  <div style={{ fontSize:13, lineHeight:1.7 }}>
+                    📅 <strong>Jour 1</strong> — Arrivée, médina, place Jemaa el-Fna<br/>
+                    📅 <strong>Jour 2</strong> — Jardins Majorelle, souks<br/>
+                    📅 <strong>Jour 3</strong> — Excursion Atlas<br/>
+                    🏨 <strong>Hôtel :</strong> Riad Yasmine — 85€/nuit<br/>
+                    ✈️ <strong>Vol :</strong> Air Arabia — 210€ A/R<br/>
+                    💰 <strong>Total estimé :</strong> 890€
+                  </div>
+                </div>
+                <div className={styles.demoTyping}>
+                  <span/>
+                  <span/>
+                  <span/>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* ── FEATURES ── */}
+      <section className={styles.features}>
+        <div className={styles.featuresInner}>
+          <div className={styles.sectionHead}>
+            <h2 className={styles.sectionTitle}>Tout ce dont vous avez besoin</h2>
+            <p className={styles.sectionDesc}>Une plateforme complète pour planifier, partager et vivre vos voyages.</p>
+          </div>
+          <div className={styles.featuresGrid}>
+            {FEATURES.map((f, i) => (
+              <div key={i} className={styles.featureCard}>
+                <div className={styles.featureIcon}>{f.icon}</div>
+                <div className={styles.featureTitle}>{f.title}</div>
+                <div className={styles.featureDesc}>{f.desc}</div>
+              </div>
             ))}
           </div>
+        </div>
+      </section>
 
-
-          {/* Actions desktop */}
-          <div className={styles.navActions}>
-        <button className={styles.themeBtn} onClick={toggleTheme}>
-            <img src={theme === "dark" ? imgIconDark : ImgIconLight} alt="theme" style={{ width: 20, height: 20 }} />
-          </button>
-            <button className={styles.langBtn}>
-              <img src={theme === "dark" ? imgGlobe : imgGlobLight }  alt="" style={{ width: 18, height: 18 }} />
-              FR
-            </button>
-            <Link to="/login">
-              <button className={styles.btnOutline}>{t("btnLogin")}</button>
-            </Link>
-            <Link to="/register">
-              <button className={styles.btnPurple}>{t("btnRegister")}</button>
-            </Link>
+      {/* ── TESTIMONIALS ── */}
+      <section className={styles.testimonials}>
+        <div className={styles.testimonialsInner}>
+          <div className={styles.sectionHead}>
+            <h2 className={styles.sectionTitle}>Ils ont voyagé avec LibertIa</h2>
+            <p className={styles.sectionDesc}>Des milliers de voyageurs font confiance à LibertIa chaque mois.</p>
           </div>
-
-          {/* Bouton hamburger (mobile) */}
-          <button
-            className={`${styles.hamburger} ${menuOpen ? styles.hamburgerOpen : ""}`}
-            onClick={() => setMenuOpen(!menuOpen)}
-            aria-label="Menu"
-          >
-            <span className={styles.hamburgerLine} />
-            <span className={styles.hamburgerLine} />
-            <span className={styles.hamburgerLine} />
-          </button>
-        </nav>
-
-        {/* ── MENU MOBILE ── */}
-        <div className={`${styles.mobileMenu} ${menuOpen ? styles.mobileMenuOpen : ""}`}>
-          {navItems.map((item) => (
-            <button
-              key={item.tKey}
-              className={styles.mobileNavLink}
-              onClick={() => { setMenuOpen(false); if (item.to) navigate(item.to); }}
-            >
-              {t(item.tKey)}
-            </button>
-          ))}
-          <div className={styles.mobileActions}>
-            <Link to="/login" style={{ textDecoration: "none" }} onClick={() => setMenuOpen(false)}>
-              <button className={styles.mobileBtnOutline}>{t("btnLogin")}</button>
-            </Link>
-            <Link to="/register" style={{ textDecoration: "none" }} onClick={() => setMenuOpen(false)}>
-              <button className={styles.mobileBtnPurple}>{t("btnRegister")}</button>
-            </Link>
+          <div className={styles.testimonialsGrid}>
+            {TESTIMONIALS.map((t, i) => (
+              <div key={i} className={styles.testimonialCard}>
+                <div className={styles.testimonialStars}>
+                  {Array(t.rating).fill(0).map((_, j) => (
+                    <span key={j} style={{ color:"#fbbf24" }}><IconStar /></span>
+                  ))}
+                </div>
+                <p className={styles.testimonialText}>"{t.text}"</p>
+                <div className={styles.testimonialAuthor}>
+                  <div className={styles.testimonialAvatar}>{t.name[0]}</div>
+                  <div>
+                    <div className={styles.testimonialName}>{t.name}</div>
+                    <div className={styles.testimonialLocation}>{t.location}</div>
+                  </div>
+                </div>
+              </div>
+            ))}
           </div>
         </div>
+      </section>
 
-        {/* ── HERO ── */}
-        <section className={styles.hero}>
-          <div className={styles.heroBg}>
-            <img src={imgSpaceBg} alt="" className={styles.heroBgImg} />
-          </div>
-          <div className={styles.heroContent}>
-            <h1 className={styles.heroTitle}>
-              {t("landingHeroTitle")}
-            </h1>
-            <p className={styles.heroSubtitle}>
-              {t("landingHeroSubtitle")}
-            </p>
-
-            {/* Toggle */}
-            <div className={styles.toggleWrap}>
-              <button
-                type="button"
-                className={`${styles.toggleBtn} ${!isAiMode ? styles.toggleBtnActive : ""}`}
-                onClick={() => handleModeSwitch(false)}
-              >
-                 <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
-  <path d="M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398h-.001q.044.06.098.115l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.85-3.85a1 1 0 0 0-.115-.1zM12 6.5a5.5 5.5 0 1 1-11 0 5.5 5.5 0 0 1 11 0"/>
-</svg> {t("toggleSearch")}
-              </button>
-              <button
-                type="button"
-                className={`${styles.toggleBtn} ${isAiMode ? styles.toggleBtnActive : ""}`}
-                onClick={() => handleModeSwitch(true)}
-              >
-      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
-      <path d="M6 12.5a.5.5 0 0 1 .5-.5h3a.5.5 0 0 1 0 1h-3a.5.5 0 0 1-.5-.5M3 8.062C3 6.76 4.235 5.765 5.53 5.886a26.6 26.6 0 0 0 4.94 0C11.765 5.765 13 6.76 13 8.062v1.157a.93.93 0 0 1-.765.935c-.845.147-2.34.346-4.235.346s-3.39-.2-4.235-.346A.93.93 0 0 1 3 9.219zm4.542-.827a.25.25 0 0 0-.217.068l-.92.9a25 25 0 0 1-1.871-.183.25.25 0 0 0-.068.495c.55.076 1.232.149 2.02.193a.25.25 0 0 0 .189-.071l.754-.736.847 1.71a.25.25 0 0 0 .404.062l.932-.97a25 25 0 0 0 1.922-.188.25.25 0 0 0-.068-.495c-.538.074-1.207.145-1.98.189a.25.25 0 0 0-.166.076l-.754.785-.842-1.7a.25.25 0 0 0-.182-.135"/>
-      <path d="M8.5 1.866a1 1 0 1 0-1 0V3h-2A4.5 4.5 0 0 0 1 7.5V8a1 1 0 0 0-1 1v2a1 1 0 0 0 1 1v1a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-1a1 1 0 0 0 1-1V9a1 1 0 0 0-1-1v-.5A4.5 4.5 0 0 0 10.5 3h-2zM14 7.5V13a1 1 0 0 1-1 1H3a1 1 0 0 1-1-1V7.5A3.5 3.5 0 0 1 5.5 4h5A3.5 3.5 0 0 1 14 7.5"/>
-      </svg>
-                 {t("assistantBadge")}
-              </button>
-            </div>
-
-            {/* Barre de recherche */}
-            <form onSubmit={handleSubmit} className={styles.searchForm}>
-              <div className={`${styles.searchBox} ${isListening ? styles.searchBoxListening : ""}`}>
-                {/* Icône gauche SVG */}
-                {isAiMode ? (
-                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--accent-secondary)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ flexShrink: 0 }}>
-                    <path d="M12 2l2.4 7.4H22l-6.2 4.5 2.4 7.4L12 17l-6.2 4.3 2.4-7.4L2 9.4h7.6z"/>
-                  </svg>
-                ) : (
-                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#a1a1aa" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ flexShrink: 0 }}>
-                    <circle cx="11" cy="11" r="8"/>
-                    <line x1="21" y1="21" x2="16.65" y2="16.65"/>
-                  </svg>
-                )}
-
-                <input
-                  className={styles.searchInput}
-                  placeholder={
-                    isListening ? "Je vous écoute..."
-                    : isAiMode  ? "Décrivez votre voyage : destination, durée, budget..."
-                                : "Rechercher une destination, un pays..."
-                  }
-                  value={query}
-                  onChange={(e) => setQuery(e.target.value)}
-                />
-
-                {/* Bouton mic — mode IA uniquement */}
-                {isAiMode && (
-                  <button
-                    type="button"
-                    onClick={handleMic}
-                    className={`${styles.micBtn} ${isListening ? styles.micBtnActive : ""}`}
-                    title={isListening ? "Écoute en cours..." : "Activer le microphone"}
-                  >
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none"
-                      stroke={isListening ? "#8b5cf6" : "#a1a1aa"}
-                      strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"
-                    >
-                      <rect x="9" y="2" width="6" height="12" rx="3"/>
-                      <path d="M5 10a7 7 0 0 0 14 0"/>
-                      <line x1="12" y1="17" x2="12" y2="21"/>
-                    </svg>
-                  </button>
-                )}
-
-                {/* Bouton envoi */}
-                <button type="submit" className={styles.searchSubmitBtn}>
-                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-                    <line x1="5" y1="12" x2="19" y2="12"/>
-                    <polyline points="13 6 19 12 13 18"/>
-                  </svg>
-                </button>
-              </div>
-            </form>
-
-            {/* Exemples IA */}
-            {isAiMode && (
-              <div className={styles.aiExamples}>
-                {AI_EXAMPLES.map((ex) => (
-                  <button key={ex} className={styles.aiExample} onClick={() => setQuery(ex)}>
-                    {ex}
-                  </button>
-                ))}
-              </div>
-            )}
-
-            <p className={styles.searchHint}>
-              {isAiMode
-                ? isAuthenticated
-                  ? <>Appuyez sur Entrée pour générer votre itinéraire<IconRocket /></>
-                  : "Vous serez invité à vous inscrire pour utiliser l'assistant IA"
-                : "Tapez une destination pour voir les suggestions"}
-            </p>
-
-            {micError && <p className={styles.micError}>{micError}</p>}
-          </div>
-        </section>
-
-        {/* ── COMMENT ÇA MARCHE ── */}
-        <section className={styles.sectionWrap}>
-          <div className={styles.sectionInner}>
-            <div className={styles.sectionHead}>
-              <h2 className={styles.sectionTitle}>Comment ça marche</h2>
-              <p className={styles.sectionSub}>Trois étapes simples vers votre prochaine aventure</p>
-            </div>
-            <div className={styles.howCards}>
-              {howItWorks.map((item) => (
-                <div key={item.title} className={styles.glassCard}>
-                  <div className={styles.howIconWrap}>
-                    <img src={item.icon} alt="" className={styles.howIcon} />
-                  </div>
-                  <h3 className={styles.howCardTitle}>{item.title}</h3>
-                  <p className={styles.howCardText}>{item.text}</p>
-                </div>
-              ))}
-            </div>
-          </div>
-        </section>
-
-        {/* ── COMMUNAUTÉ ── */}
-        <section className={styles.commWrap}>
-          <div className={styles.commInner}>
-            <div className={styles.commLeft}>
-              <h2 className={styles.commTitle}>Des voyageurs comme vous</h2>
-              <p className={styles.commText}>
-                Rejoignez des milliers d'explorateurs. Partagez vos carnets de bord,
-                trouvez l'inspiration et réservez des itinéraires approuvés par la communauté.
-              </p>
-              <div className={styles.commAvatars}>
-                {[imgAvatar, imgAvatar1, imgAvatar2, imgAvatar3].map((src, i) => (
-                  <img key={i} src={src} alt="" className={styles.commAvatar} />
-                ))}
-                <div className={styles.commAvatarMore}>+2k</div>
-              </div>
-              <Link to="/register">
-                <button className={styles.btnPurple} style={{ fontSize: 15, padding: "12px 22px" }}>
-                  Rejoindre la communauté
-                </button>
-              </Link>
-            </div>
-            <div className={styles.commRight}>
-              {communityPosts.map((post) => (
-                <div key={post.name} className={styles.commCard}>
-                  <img src={post.img} alt="" className={styles.commCardImg} />
-                  <div className={styles.commCardBody}>
-                    <div className={styles.commCardHeader}>
-                      <span className={styles.commCardName}>{post.name}</span>
-                      <span className={styles.commCardLoc}>• {post.location}</span>
-                    </div>
-                    <p className={styles.commCardText}>{post.text}</p>
-                    <div className={styles.commCardActions}>
-                      <div className={styles.commCardAction}>
-                        <img src={imgIconHeart} alt="" className={styles.commCardActionImg} />
-                        <span className={styles.commCardActionCount}>{post.likes}</span>
-                      </div>
-                      <div className={styles.commCardAction}>
-                        <img src={imgIconComment} alt="" className={styles.commCardActionImg} />
-                        <span className={styles.commCardActionCount}>{post.comments}</span>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-        </section>
-
-        {/* ── DESTINATIONS ── */}
-        <section className={styles.sectionWrap}>
-          <div className={styles.sectionInner}>
-            <div className={styles.sectionHead}>
-              <h2 className={styles.sectionTitle}>Destinations Populaires</h2>
-              <p className={styles.sectionSub}>Les lieux les plus demandés cette semaine par notre IA</p>
-            </div>
-            <div className={styles.destCards}>
-              {DESTINATIONS.slice(0, 6).map((dest) => (
-                <div key={dest.name} className={styles.destCard} onClick={() => handleDestClick(dest)}>
-                  {dest.img
-                    ? <img src={dest.img} alt={dest.name} className={styles.destImg} />
-                    : <div className={styles.destImgPlaceholder} />
-                  }
-                  <div className={styles.destBody}>
-                    <div className={styles.destRow}>
-                      <span className={styles.destName}>{dest.name}</span>
-                      <span className={styles.destPrice}>{dest.price}</span>
-                    </div>
-                    <div className={styles.destMeta}>
-                      {/* <img src={imgIconPin} alt="" className={styles.destMetaIcon} /> */}
-                      <span className={styles.destMetaText}>{dest.count}</span>
-                    </div>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-        </section>
-
-        {/* ── POURQUOI LIBERTIA ── */}
-        <section className={styles.sectionWrap}>
-          <div className={styles.sectionInner}>
-            <div className={styles.sectionHead}>
-              <h2 className={styles.sectionTitle}>Pourquoi Libertia ?</h2>
-              <p className={styles.sectionSub}>Tout ce dont vous avez besoin pour un voyage sans friction</p>
-            </div>
-            <div className={styles.whyGrid}>
-              {whyCards.map((card) => (
-                <div key={card.title} className={styles.whyCard}>
-                  <img src={card.icon} alt="" className={styles.whyIcon} />
-                  <div className={styles.whyBody}>
-                    <h4 className={styles.whyTitle}>{card.title}</h4>
-                    <p className={styles.whyText}>{card.text}</p>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-        </section>
-
-        {/* ── FOOTER ── */}
-        <footer className={styles.footer}>
-          <div className={styles.footerInner}>
-            <div className={styles.footerTop}>
-              <div className={styles.footerBrand}>
-                <div className={styles.footerBrandLogo}>
-                  <img src={imgFooterLogo} alt="" className={styles.footerBrandLogoImg} />
-                  <p className={styles.footerBrandName}>Libertia</p>
-                </div>
-                <p className={styles.footerBrandText}>
-                  L'assistant de voyage nouvelle génération propulsé par l'IA
-                  et validé par une communauté d'explorateurs passionnés.
-                </p>
-              </div>
-              {footerCols.map((col) => (
-                <div key={col.title} className={styles.footerCol}>
-                  <p className={styles.footerColTitle}>{col.title}</p>
-                  <div className={styles.footerColLinks}>
-                    {col.links.map((link) => (
-                      <button key={link} className={styles.footerColLink}>{link}</button>
-                    ))}
-                  </div>
-                </div>
-              ))}
-            </div>
-            <div className={styles.footerBottom}>
-              <span className={styles.footerCopy}>© 2025 Libertia. Tous droits réservés.</span>
-              <div className={styles.footerLang}>
-                <img src={imgGlobe} alt="" className={styles.footerLangIcon} />
-                <span className={styles.footerLangText}>Français (FR)</span>
-              </div>
-            </div>
-          </div>
-        </footer>
-
-      </div>
-
-      {/* ── PANNEAU LATÉRAL (Recherche) ── */}
-      {panelOpen && !isAiMode && (
-        <div className={styles.panelOverlay}>
-          <div className={styles.panelBackdrop} onClick={() => setPanelOpen(false)} />
-          <div className={styles.panel}>
-            <div className={styles.panelHeader}>
-              <span className={styles.panelTitle}>Résultats pour "{query}"</span>
-              <button className={styles.panelClose} onClick={() => setPanelOpen(false)}><IconX /></button>
-            </div>
-            <div className={styles.panelContent}>
-              <p className={styles.panelCount}>
-                {filtered.length} destination{filtered.length > 1 ? "s" : ""} trouvée{filtered.length > 1 ? "s" : ""}
-              </p>
-              {filtered.map((dest) => (
-                <div key={dest.name} className={styles.panelDestCard} onClick={() => handleDestClick(dest)}>
-                  {dest.img
-                    ? <img src={dest.img} alt={dest.name} className={styles.panelDestImg} />
-                    : <div className={styles.panelDestImg} />
-                  }
-                  <div className={styles.panelDestInfo}>
-                    <div className={styles.panelDestName}>{dest.name}</div>
-                    <div className={styles.panelDestCountry}>{dest.country}</div>
-                    <div className={styles.panelDestTags}>
-                      {dest.tags.map((t) => (
-                        <span key={t} className={styles.panelDestTag}>{t}</span>
-                      ))}
-                    </div>
-                  </div>
-                  <span className={styles.panelDestPrice}>{dest.price}</span>
-                </div>
-              ))}
-              <button
-                className={styles.panelAiBtn}
-                onClick={() => { setIsAiMode(true); setPanelOpen(false); setQuery(`Je veux visiter ${query}`); }}
-              >
-<IconBot />Générer un itinéraire IA pour "{query}"
-              </button>
-            </div>
+      {/* ── CTA FINAL ── */}
+      <section className={styles.cta}>
+        <div className={styles.ctaInner}>
+          <div className={styles.orb4}/>
+          <h2 className={styles.ctaTitle}>Prêt à voyager différemment ?</h2>
+          <p className={styles.ctaDesc}>Rejoignez 50 000+ voyageurs qui planifient avec l'IA.</p>
+          <div className={styles.ctaBtns}>
+            <Link to="/register" className={styles.btnPrimary}>Commencer gratuitement</Link>
+            <Link to="/tarifs"   className={styles.btnGhost}>Voir les tarifs</Link>
           </div>
         </div>
-      )}
+      </section>
+
+      {/* ── FOOTER ── */}
+      <footer className={styles.footer}>
+        <div className={styles.footerInner}>
+          <div className={styles.footerBrand}>
+            <div className={styles.logo}>
+              <div className={styles.logoIcon}>L</div>
+              <span className={styles.logoText}>LibertIa</span>
+            </div>
+            <p className={styles.footerTagline}>
+              Planification de voyages propulsée par l'IA.
+            </p>
+          </div>
+          <div className={styles.footerCols}>
+            {[
+              { title:"Explorer",    links:[{l:"Accueil",href:"/"},{l:"Communauté",href:"/community"},{l:"Tarifs",href:"/tarifs"}] },
+              { title:"Compte",      links:[{l:"Connexion",href:"/login"},{l:"Inscription",href:"/register"},{l:"Mon espace",href:"/dashboard"}] },
+              { title:"Légal",       links:[{l:"Confidentialité",href:"#"},{l:"Conditions",href:"#"},{l:"Cookies",href:"#"}] },
+            ].map((col, i) => (
+              <div key={i} className={styles.footerCol}>
+                <div className={styles.footerColTitle}>{col.title}</div>
+                {col.links.map((link, j) => (
+                  <Link key={j} to={link.href} className={styles.footerLink}>{link.l}</Link>
+                ))}
+              </div>
+            ))}
+          </div>
+        </div>
+        <div className={styles.footerBottom}>
+          <span>© 2026 LibertIa — ESISA Fès</span>
+          <span>Fait avec ❤️ et de l'IA</span>
+        </div>
+      </footer>
 
     </div>
   );
