@@ -7,7 +7,7 @@ import {
   triggerGoogleLogin, triggerFacebookLogin, preloadOAuthScripts,
   isGoogleConfigured, isFacebookConfigured,
 } from "../../utils/oauth";
-import imgIllustration from "../../assets/images/backgrounds/TravelerIllustration.png";
+import imgIllustration from "../../assets/images/backgrounds/TravelerIllustration.jpeg";
 import imgLogo      from "../../assets/logos/logo.png";
 import imgSpaceBg   from "../../assets/images/backgrounds/space-bg.png";
 import imgGlobe     from "../../assets/icons/icon-globe-light.png";
