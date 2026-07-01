@@ -76,3 +76,30 @@
   color: #94a3b8;
 }
 .actionBtn:hover { background-color: rgba(255,255,255,0.06); color: #fff; }
+
+/* ============================================================
+   RESPONSIVE — Mobile
+   ============================================================ */
+
+@media (max-width: 900px) {
+  .kpiGrid { grid-template-columns: repeat(2, 1fr); }
+}
+
+@media (max-width: 600px) {
+  .main { padding: 24px 12px; }
+
+  .pageTitle { font-size: 22px; }
+
+  .kpiGrid { grid-template-columns: repeat(2, 1fr); gap: 10px; }
+  .kpiNum  { font-size: 24px; }
+
+  /* Table scrollable horizontalement */
+  .tableWrap { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+  .table     { min-width: 600px; }
+
+  .tableHeader { flex-direction: column; align-items: flex-start; gap: 12px; padding: 16px; }
+}
+
+@media (max-width: 400px) {
+  .kpiGrid { grid-template-columns: 1fr 1fr; }
+}

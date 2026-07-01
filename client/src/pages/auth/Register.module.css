@@ -142,3 +142,32 @@
 }
 .oauthBtn:hover { border-color: rgba(255,255,255,0.2); }
 .oauthIcon { width: 20px; height: 20px; }
+
+/* ============================================================
+   RESPONSIVE — Mobile
+   ============================================================ */
+
+@media (max-width: 600px) {
+  .container { padding: 0 16px; }
+
+  .header { padding: 16px 0; }
+  .logoText { font-size: 20px; }
+  .headerLink { display: none; }
+
+  .body { padding: 20px 0 32px; }
+
+  .card {
+    width: 100%;
+    padding: 28px 20px;
+    border-radius: 12px;
+  }
+
+  .title    { font-size: 26px; }
+  .subtitle { font-size: 14px; }
+
+  /* Nom + Prénom empilés sur mobile */
+  .grid2 { grid-template-columns: 1fr; gap: 0; }
+
+  .oauthRow { gap: 8px; }
+  .oauthBtn { padding: 10px; }
+}

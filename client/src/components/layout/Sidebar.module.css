@@ -45,3 +45,11 @@
 .userAvatarImg { width: 100%; height: 100%; object-fit: cover; }
 .userName  { font-size: 13px; font-weight: 500; color: #e7f0ff; }
 .userEmail { font-size: 11px; color: #71717a; }
+
+/* ============================================================
+   RESPONSIVE — Masquée sur mobile (HamburgerSidebar prend le relai)
+   ============================================================ */
+
+@media (max-width: 768px) {
+  .sidebar { display: none; }
+}
