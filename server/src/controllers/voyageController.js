@@ -18,6 +18,125 @@ const DS_API_URL = 'https://api.groq.com/openai/v1/chat/completions';
 const DS_MODEL = 'llama-3.3-70b-versatile';
 
 // ─────────────────────────────────────────────
+//  LIENS DE REDIRECTION
+// ─────────────────────────────────────────────
+function genererLienBooking(destination, checkin, checkout, adultes = 2) {
+    const dest = encodeURIComponent(destination || '');
+    const ci = (checkin || '').replace(/-/g, '');
+    const co = (checkout || '').replace(/-/g, '');
+    return `https://www.booking.com/search.html?ss=${dest}&checkin=${ci}&checkout=${co}&group_adults=${adultes}&no_rooms=1&lang=fr`;
+}
+
+function genererLienKiwi(origine, destination, checkin, checkout) {
+    const q = encodeURIComponent(`vols ${origine || 'Casablanca'} ${destination} ${checkin || ''}`);
+    return `https://www.kiwi.com/fr/search?q=${q}`;
+}
+
+function genererLienKayak(origine, destination, checkin, checkout) {
+    const q = encodeURIComponent(`${destination} ${checkin || ''}`);
+    return `https://www.kayak.fr/flights?q=${q}`;
+}
+
+function genererLienSkyscanner(origine, destination, checkin, checkout) {
+    const orig = (origine || 'CMN').toUpperCase();
+    const dest = encodeURIComponent(destination || '');
+    const ci = (checkin || '').replace(/-/g, '');
+    const co = (checkout || '').replace(/-/g, '');
+    return `https://www.skyscanner.fr/transport/vols/${orig}/${dest}/${ci}/${co}/?adults=1&adultsv2=1&cabinclass=economy`;
+}
+
+function genererLienGoogleFlights(origine, destination, checkin, checkout) {
+    const q = encodeURIComponent(`vols ${origine || 'Casablanca'} ${destination} ${checkin || ''}`);
+    return `https://www.google.com/travel/flights?q=${q}`;
+}
+
+function genererLienViator(destination) {
+    const dest = encodeURIComponent(destination || '');
+    return `https://www.viator.com/fr-FR/search?text=${dest}`;
+}
+
+function genererLienGoogleMaps(lieu, destination) {
+    const q = encodeURIComponent(`${lieu || ''} ${destination || ''}`);
+    return `https://www.google.com/maps/search/${q}`;
+}
+
+function genererLienTripAdvisor(nom, destination) {
+    const q = encodeURIComponent(`${nom || ''} ${destination || ''}`);
+    return `https://www.tripadvisor.fr/Search?q=${q}`;
+}
+
+function enrichirItineraire(itineraire, checkin, checkout, origine) {
+    if (!itineraire) return itineraire;
+    const dest = itineraire.destination || '';
+
+    // Hébergement
+    if (itineraire.hebergement_recommande) {
+        const h = itineraire.hebergement_recommande;
+        h.lien_booking = genererLienBooking(dest, checkin, checkout);
+        if (!h.lien || h.lien === '' || h.lien === 'N/A') {
+            h.lien = h.lien_booking;
+        }
+    }
+
+    // Vol
+    if (itineraire.vol_recommande) {
+        const v = itineraire.vol_recommande;
+        v.lien_kiwi = genererLienKiwi(origine, dest, checkin, checkout);
+        v.lien_kayak = genererLienKayak(origine, dest, checkin, checkout);
+        v.lien_skyscanner = genererLienSkyscanner(origine, dest, checkin, checkout);
+        v.lien_google_flights = genererLienGoogleFlights(origine, dest, checkin, checkout);
+        if (!v.lien || v.lien === '' || v.lien === 'N/A') {
+            v.lien = v.lien_skyscanner;
+        }
+    }
+
+    // Activités dans chaque jour
+    if (Array.isArray(itineraire.jours)) {
+        itineraire.jours = itineraire.jours.map(jour => {
+            ['matin', 'apres_midi', 'soir'].forEach(moment => {
+                if (jour[moment]) {
+                    jour[moment].lien_maps = genererLienGoogleMaps(
+                        jour[moment].lieu || jour[moment].activite, dest
+                    );
+                }
+            });
+            return jour;
+        });
+    }
+
+    // Restaurants
+    if (Array.isArray(itineraire.restaurants_recommandes)) {
+        itineraire.restaurants_recommandes = itineraire.restaurants_recommandes.map(r => {
+            if (typeof r === 'string') {
+                return {
+                    nom: r,
+                    lien_maps: genererLienGoogleMaps(r, dest),
+                    lien_tripadvisor: genererLienTripAdvisor(r, dest)
+                };
+            }
+            return {
+                ...r,
+                lien_maps: genererLienGoogleMaps(r.nom || r, dest),
+                lien_tripadvisor: genererLienTripAdvisor(r.nom || r, dest)
+            };
+        });
+    }
+
+    // Liens globaux
+    itineraire.liens = {
+        hotels_booking: genererLienBooking(dest, checkin, checkout),
+        vols_kiwi: genererLienKiwi(origine, dest, checkin, checkout),
+        vols_kayak: genererLienKayak(origine, dest, checkin, checkout),
+        vols_skyscanner: genererLienSkyscanner(origine, dest, checkin, checkout),
+        vols_google_flights: genererLienGoogleFlights(origine, dest, checkin, checkout),
+        activites_viator: genererLienViator(dest),
+        destination_tripadvisor: genererLienTripAdvisor(dest, ''),
+    };
+
+    return itineraire;
+}
+
+// ─────────────────────────────────────────────
 //  HELPER — Appel Groq
 // ─────────────────────────────────────────────
 async function appelIA(systemPrompt, userPrompt, opts = {}) {
@@ -129,9 +248,6 @@ function getDateIn(jours) {
     return d.toISOString().split('T')[0];
 }
 
-// ─────────────────────────────────────────────
-//  HELPER — Extraire un nombre depuis "120€", "85.50 €", etc.
-// ─────────────────────────────────────────────
 function parseNumber(value) {
     if (typeof value === 'number') return value;
     if (!value) return 0;
@@ -140,14 +256,8 @@ function parseNumber(value) {
     return parseFloat(match[0].replace(',', '.'));
 }
 
-// ─────────────────────────────────────────────
-//  HELPER T50 — Niveaux de visibilité autorisés
-// ─────────────────────────────────────────────
 const VISIBILITES = ['prive', 'amis', 'public'];
 
-// ─────────────────────────────────────────────
-//  HELPER — Extraire infos du prompt
-// ─────────────────────────────────────────────
 async function extraireInfosPrompt(prompt) {
     try {
         const text = await appelIA(
@@ -221,10 +331,7 @@ const genererVoyage = async (req, res) => {
         const userId = req.user._id;
 
         if (!prompt || prompt.trim().length < 5) {
-            return res.status(400).json({
-                success: false,
-                message: 'Le prompt doit contenir au moins 5 caractères'
-            });
+            return res.status(400).json({ success: false, message: 'Le prompt doit contenir au moins 5 caractères' });
         }
 
         const user = await User.findById(userId);
@@ -238,15 +345,12 @@ const genererVoyage = async (req, res) => {
             });
         }
 
-        console.log('🔍 Extraction infos prompt via Groq...');
         const infos = await extraireInfosPrompt(prompt);
         const destination = infos.destination || 'Paris';
         const checkin = infos.checkin || getDateIn(7);
         const checkout = infos.checkout || getDateIn(10);
         const origine = infos.origine || 'CMN';
-        console.log(`📍 ${destination} | ${checkin} → ${checkout}`);
 
-        console.log('🔄 RAG + Scraping + Géocodage en parallèle...');
         const scrapingTimeout = new Promise(r => setTimeout(() => r(null), 120000));
         const [ragContexte, scraping, coordonnees] = await Promise.all([
             getRAGContexte(prompt, destination),
@@ -256,45 +360,16 @@ const genererVoyage = async (req, res) => {
 
         const donneesScraping = formaterDonneesScraping(scraping);
 
-        console.log('🤖 Génération itinéraire via Groq...');
-        const systemPrompt = `Tu es LibertIa, un expert en voyage personnalisé.
-Tu génères des itinéraires complets et personnalisés en JSON.
-Réponds UNIQUEMENT en JSON valide, sans texte avant ou après.`;
-
-        const userPrompt = `DEMANDE :
-"${prompt}"
-
-INFORMATIONS :
+        const systemPrompt = `Tu es LibertIa, un expert en voyage personnalisé. Réponds UNIQUEMENT en JSON valide, sans texte avant ou après.`;
+        const userPrompt = `DEMANDE : "${prompt}"
 - Destination : ${destination}
 - Dates : ${checkin} au ${checkout}
 - Budget : ${infos.budget || 'moyen'}
 - Préférences : ${(infos.preferences || []).join(', ') || 'non spécifiées'}
-
 ${ragContexte}
 ${donneesScraping}
-
-Génère un itinéraire complet avec les vraies données fournies.
 Structure JSON requise :
-{
-  "destination": "",
-  "duree_jours": 0,
-  "budget_estime": "",
-  "checkin": "",
-  "checkout": "",
-  "jours": [
-    {
-      "jour": 1,
-      "matin":      {"activite": "", "lieu": "", "duree": ""},
-      "apres_midi": {"activite": "", "lieu": "", "duree": ""},
-      "soir":       {"activite": "", "lieu": "", "duree": ""}
-    }
-  ],
-  "hebergement_recommande": {"nom": "", "prix_nuit": "", "lien": ""},
-  "vol_recommande": {"compagnie": "", "prix": "", "duree": ""},
-  "restaurants_recommandes": [],
-  "conseils": [],
-  "budget_detail": {"hotel": "", "transport": "", "repas": "", "activites": "", "total": ""}
-}`;
+{"destination":"","duree_jours":0,"budget_estime":"","checkin":"","checkout":"","jours":[{"jour":1,"matin":{"activite":"","lieu":"","duree":""},"apres_midi":{"activite":"","lieu":"","duree":""},"soir":{"activite":"","lieu":"","duree":""}}],"hebergement_recommande":{"nom":"","prix_nuit":"","lien":""},"vol_recommande":{"compagnie":"","prix":"","duree":"","lien":""},"restaurants_recommandes":[{"nom":"","cuisine":"","prix":""}],"conseils":[],"budget_detail":{"hotel":"","transport":"","repas":"","activites":"","total":""}}`;
 
         const responseText = await appelIA(systemPrompt, userPrompt, { temperature: 0.7, max_tokens: 2000 });
 
@@ -305,33 +380,22 @@ Structure JSON requise :
             if (!itineraireData.destination || !itineraireData.jours) throw new Error('Structure incomplète');
         } catch {
             itineraireData = {
-                destination,
-                duree_jours: 3,
-                budget_estime: 'À définir',
-                checkin, checkout,
-                jours: [{
-                    jour: 1,
-                    matin: { activite: 'Exploration', lieu: 'Centre-ville', duree: '3h' },
-                    apres_midi: { activite: 'Visites', lieu: 'À découvrir', duree: '3h' },
-                    soir: { activite: 'Dîner', lieu: 'Restaurant local', duree: '2h' }
-                }],
+                destination, duree_jours: 3, budget_estime: 'À définir', checkin, checkout,
+                jours: [{ jour: 1, matin: { activite: 'Exploration', lieu: 'Centre-ville', duree: '3h' }, apres_midi: { activite: 'Visites', lieu: 'À découvrir', duree: '3h' }, soir: { activite: 'Dîner', lieu: 'Restaurant local', duree: '2h' } }],
                 conseils: ['Vérifiez les conditions locales'],
                 budget_detail: { hotel: 'À définir', transport: 'À définir', repas: 'À définir', activites: 'À définir', total: 'À définir' }
             };
         }
 
+        // ── Enrichir avec les liens de redirection ──
+        itineraireData = enrichirItineraire(itineraireData, checkin, checkout, origine);
+
         await User.findByIdAndUpdate(userId, { $inc: { promptsUtilises: 1 } });
 
         const voyage = await Voyage.create({
-            user: userId,
-            prompt,
-            itineraire: itineraireData,
-            titre: `${destination} — ${checkin}`,
-            destination,
-            dates: {
-                start: new Date(checkin),
-                end: new Date(checkout)
-            },
+            user: userId, prompt, itineraire: itineraireData,
+            titre: `${destination} — ${checkin}`, destination,
+            dates: { start: new Date(checkin), end: new Date(checkout) },
             coordonnees: coordonnees || { lat: null, lng: null },
             scraping_utilise: !!scraping
         });
@@ -341,15 +405,7 @@ Structure JSON requise :
             promptsRestants: user.promptsRestants() - 1,
             voyageId: voyage._id,
             itineraire: itineraireData,
-            meta: {
-                destination, checkin, checkout,
-                modele: DS_MODEL,
-                rag_utilise: !!ragContexte,
-                scraping_utilise: !!scraping,
-                hotels_trouves: scraping?.hotels?.length || 0,
-                vols_trouves: scraping?.vols?.length || 0,
-                restos_trouves: scraping?.restos?.length || 0,
-            }
+            meta: { destination, checkin, checkout, modele: DS_MODEL, rag_utilise: !!ragContexte, scraping_utilise: !!scraping }
         });
 
     } catch (err) {
@@ -368,44 +424,20 @@ const getMesVoyages = async (req, res) => {
     }
 };
 
-// ─────────────────────────────────────────────
-//  @GET /api/voyages/carte
-//  T44 — Données pour la carte interactive des voyages
-//  de l'utilisateur connecté. Géocode à la volée (et persiste)
-//  les anciens voyages qui n'ont pas encore de coordonnées.
-// ─────────────────────────────────────────────
+// @GET /api/voyages/carte
 const getCarteVoyages = async (req, res) => {
     try {
         const voyages = await Voyage.find({ user: req.user._id }).sort({ createdAt: -1 });
-
         const data = [];
         for (const voyage of voyages) {
             let { lat, lng } = voyage.coordonnees || {};
-
             if (lat == null || lng == null) {
                 const coords = await geocoderDestination(voyage.destination);
-                if (coords) {
-                    voyage.coordonnees = coords;
-                    await voyage.save();
-                    lat = coords.lat;
-                    lng = coords.lng;
-                }
+                if (coords) { voyage.coordonnees = coords; await voyage.save(); lat = coords.lat; lng = coords.lng; }
             }
-
-            // Voyage sans localisation connue — on l'ignore sur la carte
             if (lat == null || lng == null) continue;
-
-            data.push({
-                id: voyage._id,
-                titre: voyage.titre,
-                destination: voyage.destination,
-                dates: voyage.dates,
-                partage: voyage.partage,
-                budget: voyage.budget,
-                coordonnees: { lat, lng }
-            });
+            data.push({ id: voyage._id, titre: voyage.titre, destination: voyage.destination, dates: voyage.dates, partage: voyage.partage, budget: voyage.budget, coordonnees: { lat, lng } });
         }
-
         res.json({ success: true, data });
     } catch (err) {
         res.status(500).json({ success: false, message: err.message });
@@ -417,9 +449,7 @@ const getVoyage = async (req, res) => {
     try {
         const voyage = await Voyage.findById(req.params.id);
         if (!voyage) return res.status(404).json({ message: 'Voyage non trouvé' });
-        if (!(await estVoyageVisiblePour(voyage, req.user))) {
-            return res.status(403).json({ success: false, message: 'Non autorisé' });
-        }
+        if (!(await estVoyageVisiblePour(voyage, req.user))) return res.status(403).json({ success: false, message: 'Non autorisé' });
         res.json(voyage);
     } catch (err) {
         res.status(500).json({ message: err.message });
@@ -431,13 +461,8 @@ const supprimerVoyage = async (req, res) => {
     try {
         const voyage = await Voyage.findById(req.params.id);
         if (!voyage) return res.status(404).json({ success: false, message: 'Voyage non trouvé' });
-        if (voyage.user.toString() !== req.user._id.toString()) {
-            return res.status(403).json({ success: false, message: 'Non autorisé' });
-        }
-        await Promise.all([
-            Comment.deleteMany({ voyage: voyage._id }),
-            Dossier.deleteOne({ voyage: voyage._id })
-        ]);
+        if (voyage.user.toString() !== req.user._id.toString()) return res.status(403).json({ success: false, message: 'Non autorisé' });
+        await Promise.all([Comment.deleteMany({ voyage: voyage._id }), Dossier.deleteOne({ voyage: voyage._id })]);
         await voyage.deleteOne();
         res.json({ success: true, message: 'Voyage supprimé' });
     } catch (err) {
@@ -450,9 +475,7 @@ const togglePartage = async (req, res) => {
     try {
         const voyage = await Voyage.findById(req.params.id);
         if (!voyage) return res.status(404).json({ success: false, message: 'Voyage non trouvé' });
-        if (voyage.user.toString() !== req.user._id.toString()) {
-            return res.status(403).json({ success: false, message: 'Non autorisé' });
-        }
+        if (voyage.user.toString() !== req.user._id.toString()) return res.status(403).json({ success: false, message: 'Non autorisé' });
         voyage.partage = !voyage.partage;
         await voyage.save();
         res.json({ success: true, partage: voyage.partage });
@@ -466,20 +489,9 @@ const ajouterLike = async (req, res) => {
     try {
         const voyage = await Voyage.findById(req.params.id);
         if (!voyage) return res.status(404).json({ success: false, message: 'Voyage non trouvé' });
-        if (voyage.user.toString() === req.user._id.toString()) {
-            return res.status(400).json({ success: false, message: 'Vous ne pouvez pas liker votre propre voyage' });
-        }
+        if (voyage.user.toString() === req.user._id.toString()) return res.status(400).json({ success: false, message: 'Vous ne pouvez pas liker votre propre voyage' });
         await voyage.ajouterLike(req.user._id);
-
-        // T71 — notifie le propriétaire du voyage
-        await creerNotification({
-            destinataire: voyage.user,
-            expediteur: req.user._id,
-            type: 'like',
-            contenu: `${req.user.nom} a aimé votre voyage "${voyage.titre}"`,
-            lien: `/voyage/${voyage._id}`
-        });
-
+        await creerNotification({ destinataire: voyage.user, expediteur: req.user._id, type: 'like', contenu: `${req.user.nom} a aimé votre voyage "${voyage.titre}"`, lien: `/voyage/${voyage._id}` });
         res.json({ success: true, likeCount: voyage.likeCount });
     } catch (err) {
         res.status(500).json({ success: false, message: err.message });
@@ -503,14 +515,8 @@ const getBudget = async (req, res) => {
     try {
         const voyage = await Voyage.findById(req.params.id);
         if (!voyage) return res.status(404).json({ success: false, message: 'Voyage non trouvé' });
-        if (voyage.user.toString() !== req.user._id.toString()) {
-            return res.status(403).json({ success: false, message: 'Non autorisé' });
-        }
-        res.json({
-            success: true,
-            budget: voyage.budget,
-            budget_detail: voyage.itineraire?.budget_detail || null
-        });
+        if (voyage.user.toString() !== req.user._id.toString()) return res.status(403).json({ success: false, message: 'Non autorisé' });
+        res.json({ success: true, budget: voyage.budget, budget_detail: voyage.itineraire?.budget_detail || null });
     } catch (err) {
         res.status(500).json({ success: false, message: err.message });
     }
@@ -521,29 +527,13 @@ const updateBudget = async (req, res) => {
     try {
         const voyage = await Voyage.findById(req.params.id);
         if (!voyage) return res.status(404).json({ success: false, message: 'Voyage non trouvé' });
-        if (voyage.user.toString() !== req.user._id.toString()) {
-            return res.status(403).json({ success: false, message: 'Non autorisé' });
-        }
-
+        if (voyage.user.toString() !== req.user._id.toString()) return res.status(403).json({ success: false, message: 'Non autorisé' });
         const { total, currency, budget_detail } = req.body;
-
         if (total !== undefined) voyage.budget.total = total;
         if (currency !== undefined) voyage.budget.currency = currency;
-
-        if (budget_detail && typeof budget_detail === 'object') {
-            voyage.itineraire.budget_detail = {
-                ...(voyage.itineraire.budget_detail || {}),
-                ...budget_detail
-            };
-            voyage.markModified('itineraire');
-        }
-
+        if (budget_detail && typeof budget_detail === 'object') { voyage.itineraire.budget_detail = { ...(voyage.itineraire.budget_detail || {}), ...budget_detail }; voyage.markModified('itineraire'); }
         await voyage.save();
-        res.json({
-            success: true,
-            budget: voyage.budget,
-            budget_detail: voyage.itineraire?.budget_detail || null
-        });
+        res.json({ success: true, budget: voyage.budget, budget_detail: voyage.itineraire?.budget_detail || null });
     } catch (err) {
         res.status(500).json({ success: false, message: err.message });
     }
@@ -554,30 +544,18 @@ const recalculerBudget = async (req, res) => {
     try {
         const voyage = await Voyage.findById(req.params.id);
         if (!voyage) return res.status(404).json({ success: false, message: 'Voyage non trouvé' });
-        if (voyage.user.toString() !== req.user._id.toString()) {
-            return res.status(403).json({ success: false, message: 'Non autorisé' });
-        }
-
+        if (voyage.user.toString() !== req.user._id.toString()) return res.status(403).json({ success: false, message: 'Non autorisé' });
         const itineraire = voyage.itineraire || {};
         const nuits = Math.max(1, Math.round((new Date(voyage.dates.end) - new Date(voyage.dates.start)) / 86400000));
-
         const transport = parseNumber(itineraire.vol_recommande?.prix);
         const hotel = parseNumber(itineraire.hebergement_recommande?.prix_nuit) * nuits;
         const repas = parseNumber(itineraire.budget_detail?.repas);
         const activites = parseNumber(itineraire.budget_detail?.activites);
         const total = transport + hotel + repas + activites;
-
         itineraire.budget_detail = { ...itineraire.budget_detail, transport, hotel, repas, activites, total };
-        voyage.itineraire = itineraire;
-        voyage.budget.total = total;
-        voyage.markModified('itineraire');
-
+        voyage.itineraire = itineraire; voyage.budget.total = total; voyage.markModified('itineraire');
         await voyage.save();
-        res.json({
-            success: true,
-            budget: voyage.budget,
-            budget_detail: itineraire.budget_detail
-        });
+        res.json({ success: true, budget: voyage.budget, budget_detail: itineraire.budget_detail });
     } catch (err) {
         res.status(500).json({ success: false, message: err.message });
     }
@@ -588,9 +566,7 @@ const getConseils = async (req, res) => {
     try {
         const voyage = await Voyage.findById(req.params.id);
         if (!voyage) return res.status(404).json({ success: false, message: 'Voyage non trouvé' });
-        if (!(await estVoyageVisiblePour(voyage, req.user))) {
-            return res.status(403).json({ success: false, message: 'Non autorisé' });
-        }
+        if (!(await estVoyageVisiblePour(voyage, req.user))) return res.status(403).json({ success: false, message: 'Non autorisé' });
         res.json({ success: true, conseils: voyage.itineraire?.conseils || [] });
     } catch (err) {
         res.status(500).json({ success: false, message: err.message });
@@ -602,33 +578,17 @@ const regenererConseils = async (req, res) => {
     try {
         const voyage = await Voyage.findById(req.params.id);
         if (!voyage) return res.status(404).json({ success: false, message: 'Voyage non trouvé' });
-        if (voyage.user.toString() !== req.user._id.toString()) {
-            return res.status(403).json({ success: false, message: 'Non autorisé' });
-        }
-
-        const systemPrompt = `Tu es LibertIa, un expert en voyage. Réponds UNIQUEMENT en JSON valide, sans texte avant ou après.`;
-        const userPrompt = `Donne 5 conseils pratiques et utiles pour un voyage à ${voyage.destination}.
-JSON attendu :
-{
-  "conseils": ["conseil 1", "conseil 2", "conseil 3", "conseil 4", "conseil 5"]
-}`;
-
-        const responseText = await appelIA(systemPrompt, userPrompt, { temperature: 0.6, max_tokens: 500 });
-
+        if (voyage.user.toString() !== req.user._id.toString()) return res.status(403).json({ success: false, message: 'Non autorisé' });
+        const responseText = await appelIA(
+            'Tu es LibertIa, un expert en voyage. Réponds UNIQUEMENT en JSON valide, sans texte avant ou après.',
+            `Donne 5 conseils pratiques pour un voyage à ${voyage.destination}. JSON : {"conseils":["conseil 1","conseil 2","conseil 3","conseil 4","conseil 5"]}`,
+            { temperature: 0.6, max_tokens: 500 }
+        );
         let conseils;
-        try {
-            const jsonMatch = responseText.match(/\{[\s\S]*\}/);
-            const parsed = JSON.parse(jsonMatch[0]);
-            if (!Array.isArray(parsed.conseils)) throw new Error('Format invalide');
-            conseils = parsed.conseils;
-        } catch {
-            return res.status(502).json({ success: false, message: 'Réponse IA invalide, réessayez' });
-        }
-
-        voyage.itineraire = { ...voyage.itineraire, conseils };
-        voyage.markModified('itineraire');
+        try { const parsed = JSON.parse(responseText.match(/\{[\s\S]*\}/)[0]); if (!Array.isArray(parsed.conseils)) throw new Error(); conseils = parsed.conseils; }
+        catch { return res.status(502).json({ success: false, message: 'Réponse IA invalide, réessayez' }); }
+        voyage.itineraire = { ...voyage.itineraire, conseils }; voyage.markModified('itineraire');
         await voyage.save();
-
         res.json({ success: true, conseils });
     } catch (err) {
         res.status(500).json({ success: false, message: err.message });
@@ -640,9 +600,7 @@ const getPrivacite = async (req, res) => {
     try {
         const voyage = await Voyage.findById(req.params.id);
         if (!voyage) return res.status(404).json({ success: false, message: 'Voyage non trouvé' });
-        if (voyage.user.toString() !== req.user._id.toString()) {
-            return res.status(403).json({ success: false, message: 'Non autorisé' });
-        }
+        if (voyage.user.toString() !== req.user._id.toString()) return res.status(403).json({ success: false, message: 'Non autorisé' });
         res.json({ success: true, visibilite: voyage.visibilite, partage: voyage.partage });
     } catch (err) {
         res.status(500).json({ success: false, message: err.message });
@@ -654,21 +612,10 @@ const updatePrivacite = async (req, res) => {
     try {
         const voyage = await Voyage.findById(req.params.id);
         if (!voyage) return res.status(404).json({ success: false, message: 'Voyage non trouvé' });
-        if (voyage.user.toString() !== req.user._id.toString()) {
-            return res.status(403).json({ success: false, message: 'Non autorisé' });
-        }
-
+        if (voyage.user.toString() !== req.user._id.toString()) return res.status(403).json({ success: false, message: 'Non autorisé' });
         const { visibilite } = req.body;
-        if (!VISIBILITES.includes(visibilite)) {
-            return res.status(400).json({
-                success: false,
-                message: `visibilite doit être l'une de : ${VISIBILITES.join(', ')}`
-            });
-        }
-
-        voyage.visibilite = visibilite;
-        await voyage.save();
-
+        if (!VISIBILITES.includes(visibilite)) return res.status(400).json({ success: false, message: `visibilite doit être l'une de : ${VISIBILITES.join(', ')}` });
+        voyage.visibilite = visibilite; await voyage.save();
         res.json({ success: true, visibilite: voyage.visibilite, partage: voyage.partage });
     } catch (err) {
         res.status(500).json({ success: false, message: err.message });
@@ -676,34 +623,21 @@ const updatePrivacite = async (req, res) => {
 };
 
 // ─────────────────────────────────────────────
-//  T24 — @POST /api/voyages/generer/stream
-//  Génération en streaming SSE — tokens envoyés un par un
+//  @POST /api/voyages/generer/stream  (SSE)
 // ─────────────────────────────────────────────
 const genererVoyageStream = async (req, res) => {
-    const sendEvent = (event, data) => {
-        res.write(`event: ${event}\ndata: ${JSON.stringify(data)}\n\n`);
-    };
+    const sendEvent = (event, data) => res.write(`event: ${event}\ndata: ${JSON.stringify(data)}\n\n`);
 
     try {
         const { prompt } = req.body;
         const userId = req.user._id;
 
-        if (!prompt || prompt.trim().length < 5) {
-            return res.status(400).json({ success: false, message: 'Le prompt doit contenir au moins 5 caractères' });
-        }
+        if (!prompt || prompt.trim().length < 5) return res.status(400).json({ success: false, message: 'Le prompt doit contenir au moins 5 caractères' });
 
         const user = await User.findById(userId);
         if (!user) return res.status(404).json({ success: false, message: 'Utilisateur non trouvé' });
-        if (!user.peutGenerer()) {
-            return res.status(403).json({
-                success: false,
-                message: 'Limite atteinte — passez en premium',
-                code: 'QUOTA_EXCEEDED',
-                promptsRestants: user.promptsRestants()
-            });
-        }
+        if (!user.peutGenerer()) return res.status(403).json({ success: false, message: 'Limite atteinte — passez en premium', code: 'QUOTA_EXCEEDED', promptsRestants: user.promptsRestants() });
 
-        // SSE headers
         res.setHeader('Content-Type', 'text/event-stream');
         res.setHeader('Cache-Control', 'no-cache');
         res.setHeader('Connection', 'keep-alive');
@@ -726,29 +660,22 @@ const genererVoyageStream = async (req, res) => {
         sendEvent('status', { message: 'Génération de votre itinéraire...' });
 
         const systemPrompt = `Tu es LibertIa, un expert en voyage personnalisé. Réponds UNIQUEMENT en JSON valide, sans texte avant ou après.`;
-        const userPrompt = `DEMANDE : "${prompt}"\nDestination : ${destination}\nDates : ${checkin} au ${checkout}\nBudget : ${infos.budget || 'moyen'}\n${ragContexte}\n\nStructure JSON requise :\n{"destination":"","duree_jours":0,"budget_estime":"","checkin":"","checkout":"","jours":[{"jour":1,"matin":{"activite":"","lieu":"","duree":""},"apres_midi":{"activite":"","lieu":"","duree":""},"soir":{"activite":"","lieu":"","duree":""}}],"hebergement_recommande":{"nom":"","prix_nuit":"","lien":""},"vol_recommande":{"compagnie":"","prix":"","duree":""},"restaurants_recommandes":[],"conseils":[],"budget_detail":{"hotel":"","transport":"","repas":"","activites":"","total":""}}`;
+        const userPrompt = `DEMANDE : "${prompt}"
+Destination : ${destination} | Dates : ${checkin} au ${checkout} | Budget : ${infos.budget || 'moyen'}
+${ragContexte}
+Structure JSON :
+{"destination":"","duree_jours":0,"budget_estime":"","checkin":"","checkout":"","jours":[{"jour":1,"matin":{"activite":"","lieu":"","duree":""},"apres_midi":{"activite":"","lieu":"","duree":""},"soir":{"activite":"","lieu":"","duree":""}}],"hebergement_recommande":{"nom":"","prix_nuit":"","lien":""},"vol_recommande":{"compagnie":"","prix":"","duree":"","lien":""},"restaurants_recommandes":[{"nom":"","cuisine":"","prix":""}],"conseils":[],"budget_detail":{"hotel":"","transport":"","repas":"","activites":"","total":""}}`;
 
         const groqResponse = await axios.post(DS_API_URL, {
             model: DS_MODEL,
-            messages: [
-                { role: 'system', content: systemPrompt },
-                { role: 'user', content: userPrompt }
-            ],
-            temperature: 0.7,
-            max_tokens: 2000,
-            stream: true
+            messages: [{ role: 'system', content: systemPrompt }, { role: 'user', content: userPrompt }],
+            temperature: 0.7, max_tokens: 2000, stream: true
         }, {
-            headers: {
-                'Authorization': `Bearer ${process.env.GROQ_API_KEY}`,
-                'Content-Type': 'application/json',
-                'Accept': 'text/event-stream'
-            },
-            responseType: 'stream',
-            timeout: 60000
+            headers: { 'Authorization': `Bearer ${process.env.GROQ_API_KEY}`, 'Content-Type': 'application/json', 'Accept': 'text/event-stream' },
+            responseType: 'stream', timeout: 60000
         });
 
         let fullText = '';
-
         await new Promise((resolve, reject) => {
             let buffer = '';
             groqResponse.data.on('data', (chunk) => {
@@ -763,11 +690,8 @@ const genererVoyageStream = async (req, res) => {
                     try {
                         const parsed = JSON.parse(jsonStr);
                         const token = parsed.choices?.[0]?.delta?.content;
-                        if (token) {
-                            fullText += token;
-                            sendEvent('token', { token });
-                        }
-                    } catch { /* chunk partiel */ }
+                        if (token) { fullText += token; sendEvent('token', { token }); }
+                    } catch { }
                 }
             });
             groqResponse.data.on('end', resolve);
@@ -781,22 +705,21 @@ const genererVoyageStream = async (req, res) => {
             if (!itineraireData.destination || !itineraireData.jours) throw new Error('Structure incomplète');
         } catch {
             itineraireData = {
-                destination, duree_jours: 3, budget_estime: 'À définir',
-                checkin, checkout,
+                destination, duree_jours: 3, budget_estime: 'À définir', checkin, checkout,
                 jours: [{ jour: 1, matin: { activite: 'Exploration', lieu: 'Centre-ville', duree: '3h' }, apres_midi: { activite: 'Visites', lieu: 'À découvrir', duree: '3h' }, soir: { activite: 'Dîner', lieu: 'Restaurant local', duree: '2h' } }],
                 conseils: ['Vérifiez les conditions locales'],
                 budget_detail: { hotel: 'À définir', transport: 'À définir', repas: 'À définir', activites: 'À définir', total: 'À définir' }
             };
         }
 
+        // ── Enrichir avec les liens de redirection ──
+        itineraireData = enrichirItineraire(itineraireData, checkin, checkout, origine);
+
         await User.findByIdAndUpdate(userId, { $inc: { promptsUtilises: 1 } });
 
         const voyage = await Voyage.create({
-            user: userId,
-            prompt,
-            itineraire: itineraireData,
-            titre: `${destination} — ${checkin}`,
-            destination,
+            user: userId, prompt, itineraire: itineraireData,
+            titre: `${destination} — ${checkin}`, destination,
             dates: { start: new Date(checkin), end: new Date(checkout) },
             coordonnees: coordonnees || { lat: null, lng: null },
             scraping_utilise: false
@@ -807,50 +730,40 @@ const genererVoyageStream = async (req, res) => {
 
     } catch (err) {
         console.error('❌ Erreur genererVoyageStream:', err);
-        if (!res.headersSent) {
-            return res.status(500).json({ success: false, message: err.message });
-        }
+        if (!res.headersSent) return res.status(500).json({ success: false, message: err.message });
         sendEvent('error', { message: err.message });
         res.end();
     }
 };
 
 // ─────────────────────────────────────────────
-//  T107 — @GET /api/voyages/:id/export-pdf
-//  Génère et télécharge le PDF de l'itinéraire
+//  @GET /api/voyages/:id/export-pdf
 // ─────────────────────────────────────────────
 const exportPDF = async (req, res) => {
     try {
         const voyage = await Voyage.findById(req.params.id);
         if (!voyage) return res.status(404).json({ success: false, message: 'Voyage non trouvé' });
-        if (voyage.user.toString() !== req.user._id.toString()) {
-            return res.status(403).json({ success: false, message: 'Non autorisé' });
-        }
+        if (voyage.user.toString() !== req.user._id.toString()) return res.status(403).json({ success: false, message: 'Non autorisé' });
 
         const doc = new PDFDocument({ margin: 50, size: 'A4' });
         const filename = `libertia-voyage-${voyage._id}.pdf`;
-
         res.setHeader('Content-Type', 'application/pdf');
         res.setHeader('Content-Disposition', `attachment; filename="${filename}"`);
         doc.pipe(res);
 
         const itin = voyage.itineraire || {};
 
-        // En-tête
         doc.fontSize(24).fillColor('#1B4F72').text('LibertIa', { align: 'center' });
         doc.fontSize(16).fillColor('#333').text(voyage.titre, { align: 'center' });
         doc.moveDown(0.5);
         doc.fontSize(11).fillColor('#666').text(`Destination : ${voyage.destination}`, { align: 'center' });
         if (voyage.dates?.start && voyage.dates?.end) {
-            const start = new Date(voyage.dates.start).toLocaleDateString('fr-FR');
-            const end = new Date(voyage.dates.end).toLocaleDateString('fr-FR');
-            doc.text(`Dates : ${start} → ${end}`, { align: 'center' });
+            doc.text(`Dates : ${new Date(voyage.dates.start).toLocaleDateString('fr-FR')} → ${new Date(voyage.dates.end).toLocaleDateString('fr-FR')}`, { align: 'center' });
         }
         doc.moveDown();
         doc.moveTo(50, doc.y).lineTo(545, doc.y).strokeColor('#1B4F72').stroke();
         doc.moveDown();
 
-        // Budget
         if (itin.budget_estime || itin.budget_detail) {
             doc.fontSize(14).fillColor('#1B4F72').text('Budget estimé');
             doc.moveDown(0.3);
@@ -864,57 +777,57 @@ const exportPDF = async (req, res) => {
             doc.moveDown();
         }
 
-        // Itinéraire jour par jour
+        if (itin.hebergement_recommande?.nom) {
+            doc.fontSize(14).fillColor('#1B4F72').text('Hébergement recommandé');
+            doc.moveDown(0.3);
+            const h = itin.hebergement_recommande;
+            doc.fontSize(11).fillColor('#333').text(`${h.nom}${h.prix_nuit ? ' — ' + h.prix_nuit + '/nuit' : ''}`);
+            if (h.lien_booking) doc.text(`Réserver : ${h.lien_booking}`, { link: h.lien_booking, underline: true, color: '#1B4F72' });
+            doc.moveDown();
+        }
+
+        if (itin.vol_recommande?.compagnie) {
+            doc.fontSize(14).fillColor('#1B4F72').text('Vol recommandé');
+            doc.moveDown(0.3);
+            const v = itin.vol_recommande;
+            doc.fontSize(11).fillColor('#333').text(`${v.compagnie}${v.prix ? ' — ' + v.prix : ''}${v.duree ? ' (' + v.duree + ')' : ''}`);
+            if (v.lien_skyscanner) doc.text(`Réserver : ${v.lien_skyscanner}`, { link: v.lien_skyscanner, underline: true, color: '#1B4F72' });
+            doc.moveDown();
+        }
+
         if (Array.isArray(itin.jours) && itin.jours.length > 0) {
             doc.fontSize(14).fillColor('#1B4F72').text('Programme');
             doc.moveDown(0.3);
             itin.jours.forEach((j) => {
                 doc.fontSize(12).fillColor('#1B4F72').text(`Jour ${j.jour}`);
                 doc.fontSize(10).fillColor('#333');
-                const periodes = [
-                    { label: 'Matin', data: j.matin },
-                    { label: 'Après-midi', data: j.apres_midi },
-                    { label: 'Soir', data: j.soir }
-                ];
-                periodes.forEach(({ label, data }) => {
-                    if (data?.activite) {
-                        doc.text(`  ${label} : ${data.activite}${data.lieu ? ' — ' + data.lieu : ''}${data.duree ? ' (' + data.duree + ')' : ''}`);
-                    }
+                [{ label: 'Matin', data: j.matin }, { label: 'Après-midi', data: j.apres_midi }, { label: 'Soir', data: j.soir }].forEach(({ label, data }) => {
+                    if (data?.activite) doc.text(`  ${label} : ${data.activite}${data.lieu ? ' — ' + data.lieu : ''}${data.duree ? ' (' + data.duree + ')' : ''}`);
                 });
                 doc.moveDown(0.5);
             });
         }
 
-        // Hébergement recommandé
-        if (itin.hebergement_recommande?.nom) {
-            doc.fontSize(14).fillColor('#1B4F72').text('Hébergement recommandé');
-            doc.moveDown(0.3);
-            const h = itin.hebergement_recommande;
-            doc.fontSize(11).fillColor('#333').text(`${h.nom}${h.prix_nuit ? ' — ' + h.prix_nuit + '/nuit' : ''}`);
-            doc.moveDown();
-        }
-
-        // Conseils
         if (Array.isArray(itin.conseils) && itin.conseils.length > 0) {
             doc.fontSize(14).fillColor('#1B4F72').text('Conseils');
             doc.moveDown(0.3);
             doc.fontSize(11).fillColor('#333');
-            itin.conseils.forEach((c) => doc.text(`• ${c}`));
+            itin.conseils.forEach((c) => doc.text(`• ${typeof c === 'string' ? c : c?.texte || JSON.stringify(c)}`));
             doc.moveDown();
         }
 
-        // Pied de page
         doc.moveDown();
         doc.fontSize(9).fillColor('#aaa').text('Généré par LibertIa — www.libertia.com', { align: 'center' });
-
         doc.end();
+
     } catch (err) {
         res.status(500).json({ success: false, message: err.message });
     }
 };
 
 module.exports = {
-    genererVoyage, genererVoyageStream, getMesVoyages, getVoyage, getCarteVoyages, supprimerVoyage, togglePartage, ajouterLike, retirerLike,
+    genererVoyage, genererVoyageStream, getMesVoyages, getVoyage, getCarteVoyages,
+    supprimerVoyage, togglePartage, ajouterLike, retirerLike,
     getBudget, updateBudget, recalculerBudget, getConseils, regenererConseils,
     getPrivacite, updatePrivacite, exportPDF
 };

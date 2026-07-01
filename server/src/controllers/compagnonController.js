@@ -1,90 +1,104 @@
 // compagnonController.js
-// Colibri utilise le modèle fine-tuné Abdx2k5/Colibri via HuggingFace Inference API
+// Colibri — Groq LLaMA 3.3 70B + RAG ChromaDB + personnalité fine-tunée
 
 const Compagnon = require('../models/Compagnon');
+const { execFile } = require('child_process');
+const path = require('path');
 
-const HF_API_URL = "https://api-inference.huggingface.co/models/Abdx2k5/Colibri";
-const HF_TOKEN   = process.env.HF_TOKEN;
+const GROQ_API_KEY = process.env.GROQ_API_KEY;
+const GROQ_URL = "https://api.groq.com/openai/v1/chat/completions";
 
-const SYSTEM_PROMPT = `Tu es Colibri, le compagnon de voyage de LibertIa. Tu es chaleureux, enthousiaste et passionné de voyage. Tu parles avec naturel et bienveillance, parfois avec une touche d'humour léger. Tu connais très bien les destinations du monde entier et tu aides les voyageurs à préparer leurs aventures avec des conseils précis et personnalisés. Tu ne génères jamais d'itinéraires complets (c'est le rôle du moteur IA de LibertIa), mais tu réponds à toutes les questions pratiques, culturelles et de conseils voyage. Tu utilises parfois des emojis avec modération. Tu t'exprimes en français.`;
+// ── Personnalité Colibri (encodée depuis le fine-tuning dataset) ──
+const SYSTEM_PROMPT = `Tu es Colibri 🐦, le compagnon de voyage intelligent de LibertIa.
 
-// Niveaux et humeurs
+PERSONNALITÉ :
+- Chaleureux, enthousiaste et passionné de voyage
+- Tu parles avec naturel et bienveillance, parfois avec une touche d'humour léger
+- Tu utilises des emojis avec modération (1-2 max par réponse)
+- Tu t'exprimes toujours en français
+- Tu es curieux et tu poses des questions pour mieux aider
+
+TON RÔLE :
+- Répondre aux questions pratiques sur les voyages, la culture, les destinations
+- Donner des conseils personnalisés basés sur les données de LibertIa
+- Aider à choisir une destination selon le budget et les préférences
+- NE PAS générer d'itinéraires complets (c'est le moteur IA de LibertIa qui fait ça)
+- Pour les itinéraires : dire "utilise le générateur LibertIa juste au-dessus !"
+
+CONTEXTE LIBERTIA :
+- LibertIa génère des itinéraires complets en moins de 60 secondes
+- Le système utilise du RAG (données réelles) + scraping temps réel
+- Destinations couvertes : Maroc (Marrakech, Fès, Casablanca, Agadir, Chefchaouen), France (Paris, Nice, Lyon), Japon (Tokyo, Kyoto, Osaka)
+- Système de points : +5 pts par message, +10 pts par photo partagée
+
+IMPORTANT : Si l'utilisateur dit bonjour, présente-toi et demande où il veut aller. Ne génère JAMAIS d'itinéraire toi-même.`;
+
+// ── Niveaux ──
 const NIVEAUX = [
-  { min: 0,   max: 99,   label: "Explorateur débutant",  humeur: "curieux" },
-  { min: 100, max: 299,  label: "Voyageur confirmé",     humeur: "enthousiaste" },
-  { min: 300, max: 599,  label: "Globe-trotter",         humeur: "passionné" },
-  { min: 600, max: 999,  label: "Aventurier chevronné",  humeur: "inspiré" },
-  { min: 1000, max: Infinity, label: "Maître voyageur",  humeur: "légendaire" },
+  { min:0,    max:99,        label:"Explorateur débutant",  humeur:"curieux" },
+  { min:100,  max:299,       label:"Voyageur confirmé",     humeur:"enthousiaste" },
+  { min:300,  max:599,       label:"Globe-trotter",         humeur:"passionné" },
+  { min:600,  max:999,       label:"Aventurier chevronné",  humeur:"inspiré" },
+  { min:1000, max:Infinity,  label:"Maître voyageur",       humeur:"légendaire" },
 ];
+const calculerNiveau = (pts) => NIVEAUX.findIndex(n => pts >= n.min && pts <= n.max) + 1;
+const calculerHumeur = (pts) => (NIVEAUX.find(n => pts >= n.min && pts <= n.max) || NIVEAUX[1]).humeur;
 
-function calculerNiveau(points) {
-  return NIVEAUX.findIndex(n => points >= n.min && points <= n.max) + 1;
+// ── RAG : interroger ChromaDB via Python ──
+async function getRAGContext(query) {
+  return new Promise((resolve) => {
+    const scriptPath = path.join(process.cwd(), '..', 'ai', 'rag_query.py');
+    execFile('python', [scriptPath, query], { timeout: 8000 }, (err, stdout) => {
+      if (err || !stdout) {
+        resolve(""); // RAG optionnel — pas bloquant
+        return;
+      }
+      resolve(stdout.trim());
+    });
+  });
 }
 
-function calculerHumeur(points) {
-  const niveau = NIVEAUX.find(n => points >= n.min && points <= n.max);
-  return niveau ? niveau.humeur : "enthousiaste";
-}
+// ── Appel Groq ──
+async function appelColibri(historique, messageUser, ragContext) {
+  // System prompt + contexte RAG si disponible
+  const systemContent = ragContext
+    ? `${SYSTEM_PROMPT}\n\n${ragContext}`
+    : SYSTEM_PROMPT;
 
-// ── Appel HuggingFace Inference API ──
-async function appelColibri(historique, messageUser) {
-  // Construire le prompt ChatML
-  let prompt = `<|im_start|>system\n${SYSTEM_PROMPT}<|im_end|>\n`;
+  // Construire les messages
+  const messages = [{ role: "system", content: systemContent }];
 
-  // Ajouter les 10 derniers messages de l'historique
+  // Historique (max 10 derniers)
   const recent = historique.slice(-10);
   for (const msg of recent) {
-    prompt += `<|im_start|>${msg.role}\n${msg.content}<|im_end|>\n`;
+    if (msg.role === "user" || msg.role === "assistant") {
+      messages.push({ role: msg.role, content: msg.content });
+    }
   }
-  prompt += `<|im_start|>user\n${messageUser}<|im_end|>\n<|im_start|>assistant\n`;
+  messages.push({ role: "user", content: messageUser });
 
-  const response = await fetch(HF_API_URL, {
+  const response = await fetch(GROQ_URL, {
     method: "POST",
     headers: {
-      "Authorization": `Bearer ${HF_TOKEN}`,
+      "Authorization": `Bearer ${GROQ_API_KEY}`,
       "Content-Type": "application/json",
     },
     body: JSON.stringify({
-      inputs: prompt,
-      parameters: {
-        max_new_tokens: 300,
-        temperature: 0.7,
-        top_p: 0.9,
-        do_sample: true,
-        return_full_text: false,      // retourne seulement la réponse générée
-        stop: ["<|im_end|>", "<|im_start|>"],
-      },
-      options: {
-        wait_for_model: true,         // attend que le modèle soit chargé si cold start
-      }
+      model: "llama-3.3-70b-versatile",
+      messages,
+      max_tokens: 400,
+      temperature: 0.75,
+      top_p: 0.9,
     })
   });
 
   if (!response.ok) {
     const err = await response.text();
-    throw new Error(`HuggingFace API error ${response.status}: ${err}`);
+    throw new Error(`Groq API error ${response.status}: ${err}`);
   }
 
   const data = await response.json();
-
-  // Extraire le texte généré
-  let texte = "";
-  if (Array.isArray(data) && data[0]?.generated_text) {
-    texte = data[0].generated_text;
-  } else if (data.generated_text) {
-    texte = data.generated_text;
-  } else {
-    throw new Error("Format de réponse HuggingFace inattendu");
-  }
-
-  // Nettoyer les tokens spéciaux
-  texte = texte
-    .replace(/<\|im_end\|>/g, "")
-    .replace(/<\|im_start\|>/g, "")
-    .replace(/^(assistant|system|user)\n/g, "")
-    .trim();
-
-  return texte;
+  return data.choices?.[0]?.message?.content?.trim() || "Je suis là pour t'aider ! 😊";
 }
 
 // ════════════════════════════════════════════
@@ -93,20 +107,17 @@ async function appelColibri(historique, messageUser) {
 exports.getMonCompagnon = async (req, res) => {
   try {
     let compagnon = await Compagnon.findOne({ user: req.user.id });
-
-    if (!compagnon) {
-      compagnon = await Compagnon.create({ user: req.user.id });
-    }
+    if (!compagnon) compagnon = await Compagnon.create({ user: req.user.id });
 
     res.json({
       success: true,
       data: {
-        points:   compagnon.points,
-        niveau:   calculerNiveau(compagnon.points),
-        humeur:   calculerHumeur(compagnon.points),
-        niveaux:  NIVEAUX,
-        nbMessages: compagnon.historique_chat.length,
-        nbPhotos:   compagnon.photos.length,
+        points:     compagnon.points,
+        niveau:     calculerNiveau(compagnon.points),
+        humeur:     calculerHumeur(compagnon.points),
+        niveaux:    NIVEAUX,
+        nbMessages: compagnon.historique_chat?.length || 0,
+        nbPhotos:   compagnon.photos?.length || 0,
       }
     });
   } catch (err) {
@@ -125,24 +136,28 @@ exports.chat = async (req, res) => {
     }
 
     let compagnon = await Compagnon.findOne({ user: req.user.id });
-    if (!compagnon) {
-      compagnon = await Compagnon.create({ user: req.user.id });
-    }
+    if (!compagnon) compagnon = await Compagnon.create({ user: req.user.id });
 
-    // Appel au modèle Colibri sur HuggingFace
-    const reponse = await appelColibri(compagnon.historique_chat, message);
+    // RAG en parallèle (non bloquant)
+    const ragContext = await getRAGContext(message).catch(() => "");
 
-    // Mettre à jour l'historique et les points
+    // Appel Colibri via Groq
+    const reponse = await appelColibri(
+      compagnon.historique_chat || [],
+      message,
+      ragContext
+    );
+
+    // Sauvegarder l'historique
+    if (!compagnon.historique_chat) compagnon.historique_chat = [];
     compagnon.historique_chat.push(
       { role: "user",      content: message,  date: new Date() },
       { role: "assistant", content: reponse,  date: new Date() }
     );
-
-    // Limiter l'historique à 100 messages pour ne pas surcharger MongoDB
+    // Limiter à 100 messages
     if (compagnon.historique_chat.length > 100) {
       compagnon.historique_chat = compagnon.historique_chat.slice(-100);
     }
-
     compagnon.points += 5;
     await compagnon.save();
 
@@ -157,7 +172,7 @@ exports.chat = async (req, res) => {
     });
   } catch (err) {
     console.error("Erreur chat Colibri:", err.message);
-    res.status(500).json({ success: false, message: "Colibri est momentanément indisponible. Réessaie dans quelques secondes !" });
+    res.status(500).json({ success: false, message: "Colibri est momentanément indisponible. Réessaie !" });
   }
 };
 
@@ -167,15 +182,12 @@ exports.chat = async (req, res) => {
 exports.ajouterPhoto = async (req, res) => {
   try {
     const { url } = req.body;
-    if (!url) {
-      return res.status(400).json({ success: false, message: "URL de photo requise" });
-    }
+    if (!url) return res.status(400).json({ success: false, message: "URL requise" });
 
     let compagnon = await Compagnon.findOne({ user: req.user.id });
-    if (!compagnon) {
-      compagnon = await Compagnon.create({ user: req.user.id });
-    }
+    if (!compagnon) compagnon = await Compagnon.create({ user: req.user.id });
 
+    if (!compagnon.photos) compagnon.photos = [];
     compagnon.photos.push(url);
     compagnon.points += 10;
     await compagnon.save();
@@ -183,10 +195,10 @@ exports.ajouterPhoto = async (req, res) => {
     res.json({
       success: true,
       data: {
-        message: "Belle photo ! +10 points pour toi 📸",
-        points:  compagnon.points,
-        niveau:  calculerNiveau(compagnon.points),
-        humeur:  calculerHumeur(compagnon.points),
+        message:  "Belle photo ! +10 points 📸",
+        points:   compagnon.points,
+        niveau:   calculerNiveau(compagnon.points),
+        humeur:   calculerHumeur(compagnon.points),
         nbPhotos: compagnon.photos.length,
       }
     });
@@ -208,11 +220,11 @@ exports.getClassement = async (req, res) => {
     res.json({
       success: true,
       data: top10.map((c, i) => ({
-        rang:    i + 1,
-        user:    c.user,
-        points:  c.points,
-        niveau:  calculerNiveau(c.points),
-        humeur:  calculerHumeur(c.points),
+        rang:   i + 1,
+        user:   c.user,
+        points: c.points,
+        niveau: calculerNiveau(c.points),
+        humeur: calculerHumeur(c.points),
       }))
     });
   } catch (err) {
