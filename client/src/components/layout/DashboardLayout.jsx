@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { Outlet, useNavigate, useLocation } from 'react-router-dom';
 import { useAuthStore } from '../../store/authStore';
 import imgAvatar from '../../assets/images/community/avatar.png';
+import imgLogo from '../../assets/logos/logo.png';
 
 const sv = { width:18, height:18, viewBox:"0 0 24 24", fill:"none", stroke:"currentColor", strokeWidth:"2", strokeLinecap:"round", strokeLinejoin:"round" };
 const IconHome     = () => <svg {...sv}><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>;
@@ -96,7 +97,7 @@ export default function DashboardLayout() {
         {/* Logo + bouton fermer */}
         <div style={{ display:"flex", alignItems:"center", justifyContent:"space-between", padding:"16px 14px", borderBottom:"1px solid var(--border)" }}>
           <a href="/dashboard" style={{ display:"flex", alignItems:"center", gap:9, textDecoration:"none" }}>
-            <div style={{ width:30, height:30, borderRadius:8, background:"var(--accent)", color:"white", fontSize:14, fontWeight:800, display:"flex", alignItems:"center", justifyContent:"center" }}>L</div>
+            <img src={imgLogo} alt="Logo" style={{ width:30, height:30 }} />
             <span style={{ fontSize:16, fontWeight:700, color:"var(--text)" }}>LibertIa</span>
           </a>
           <button className="lib-close" onClick={() => setOpen(false)} style={{ display:"none", background:"none", border:"none", color:"var(--text-muted)", cursor:"pointer", padding:4 }}>

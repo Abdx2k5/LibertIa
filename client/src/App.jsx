@@ -50,8 +50,8 @@ export default function App() {
               <Route path={ROUTES.HOME}     element={<Landing />} />
               <Route path={ROUTES.LOGIN}    element={<Login />} />
               <Route path={ROUTES.REGISTER} element={<Register />} />
-              <Route path={ROUTES.COMMUNITY} element={<Community />} />
-              <Route path={ROUTES.GROUPS}    element={<Groups />} />
+              
+              
               <Route path={ROUTES.PUBLIC_PROFILE} element={<PublicProfile />} />
               <Route path={ROUTES.PRICING}   element={<Pricing />} />
               <Route path={ROUTES.DESIGN_SYSTEM} element={<DesignSystem />} />
@@ -69,6 +69,8 @@ export default function App() {
                 <Route path={ROUTES.SUBSCRIPTION} element={<Subscription />} />
                 <Route path={ROUTES.AGENCY_DETAIL} element={<AgencyDetail />} />
                 <Route path={ROUTES.MY_TRIPS} element={<MesVoyages />} />
+                <Route path={ROUTES.COMMUNITY} element={<Community />} />
+                <Route path={ROUTES.GROUPS}    element={<Groups />} />
               </Route>
             </Route>
 

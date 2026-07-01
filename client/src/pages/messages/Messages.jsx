@@ -1,7 +1,6 @@
 import { useState, useEffect, useRef, useCallback } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import styles from "./Messages.module.css";
-import AppNavbar from "../../components/layout/AppNavbar";
 import messagePriveService from "../../services/messagePrive.service";
 import { useAuthStore } from "../../store/authStore";
 import { connectSocket, getSocket } from "../../services/socket.service";
@@ -151,7 +150,7 @@ export default function Messages() {
 
   return (
     <div className={styles.page}>
-      <AppNavbar />
+      
       <div className={styles.layout}>
         <aside className={styles.list}>
           <h1 className={styles.listTitle}>Messages</h1>
@@ -240,3 +239,4 @@ export default function Messages() {
     </div>
   );
 }
+

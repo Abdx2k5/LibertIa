@@ -4,7 +4,6 @@ import styles from "./Subscription.module.css";
 import { useAuthStore } from "../../store/authStore";
 import { Badge, Button, Modal } from "../../components/ui";
 import FindFriendsModal from "../../components/modals/FindFriendsModal";
-import AppNavbar from "../../components/layout/AppNavbar";
 import { FREEMIUM, ROUTES } from "../../utils/constants";
 
 const IconCheck      = (p) => <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" {...p}><polyline points="20 6 9 17 4 12"/></svg>;
@@ -69,7 +68,7 @@ export default function Subscription() {
 
   return (
     <div className={styles.page}>
-      <AppNavbar />
+      
       <div className={styles.main}>
         <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", gap: 16 }}>
           <div>
@@ -248,3 +247,4 @@ export default function Subscription() {
     </div>
   );
 }
+

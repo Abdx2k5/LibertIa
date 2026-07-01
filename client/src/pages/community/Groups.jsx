@@ -1,7 +1,6 @@
 import { useState, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 import styles from "./Groups.module.css";
-import AppNavbar from "../../components/layout/AppNavbar";
 import { GROUP_CATEGORIES, getAllGroups } from "../../mocks/groupsData";
 import { ROUTES } from "../../utils/constants";
 
@@ -40,7 +39,7 @@ export default function Groups() {
 
   return (
     <main className={styles.page}>
-      <AppNavbar />
+      
       <div className={styles.container}>
 
         {/* ── HERO ── */}
@@ -136,3 +135,4 @@ export default function Groups() {
     </main>
   );
 }
+

@@ -4,7 +4,6 @@ import styles from "./PublicProfile.module.css";
 import { useAuthStore } from "../../store/authStore";
 import authService from "../../services/auth.service";
 import communityService from "../../services/community.service";
-import AppNavbar from "../../components/layout/AppNavbar";
 import { FollowButton, PostCard, Spinner } from "../../components/ui";
 import { ROUTES } from "../../utils/constants";
 import { MOCK_POSTS } from "../../mocks/communityPosts";
@@ -74,7 +73,7 @@ export default function PublicProfile() {
   if (loading) {
     return (
       <div className={styles.page}>
-        {isAuthenticated ? <AppNavbar /> : <PublicTopBar />}
+        {!isAuthenticated && <PublicTopBar />}
         <div className={styles.centered}><Spinner size={32} color="var(--accent)" label="Chargement du profil..." /></div>
       </div>
     );
@@ -83,7 +82,7 @@ export default function PublicProfile() {
   if (notFound || !profile) {
     return (
       <div className={styles.page}>
-        {isAuthenticated ? <AppNavbar /> : <PublicTopBar />}
+        {!isAuthenticated && <PublicTopBar />}
         <div className={styles.centered}>
           <p className={styles.notFoundText}>Ce profil n'existe pas ou n'est pas accessible.</p>
           <button type="button" className={styles.btnBack} onClick={() => navigate(ROUTES.COMMUNITY)}>
@@ -98,7 +97,7 @@ export default function PublicProfile() {
 
   return (
     <div className={styles.page}>
-      {isAuthenticated ? <AppNavbar /> : <PublicTopBar />}
+      {!isAuthenticated && <PublicTopBar />}
 
       <div className={styles.main}>
         {/* ── Cover + avatar + identité (lecture seule) ── */}
@@ -225,3 +224,5 @@ function PublicTopBar() {
     </nav>
   );
 }
+
+

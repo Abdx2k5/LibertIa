@@ -1,6 +1,5 @@
 import { useState } from "react";
 import styles from "./Settings.module.css";
-import AppNavbar from "../../components/layout/AppNavbar";
 
 const TABS = ["Général", "Notifications", "Confidentialité", "Sécurité"];
 const Toggle = ({ on, onToggle }) => (
@@ -38,7 +37,7 @@ export default function Settings() {
 
   return (
     <div className={styles.page}>
-      <AppNavbar />
+      
       <div className={styles.main}>
         <h1 className={styles.pageTitle}>Paramètres</h1>
         <p className={styles.pageSub}>Gérez vos préférences et votre compte.</p>

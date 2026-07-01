@@ -1,7 +1,6 @@
 import { useParams, useNavigate } from "react-router-dom";
 import styles from "./AgencyDetail.module.css";
 import { Badge, Button } from "../../components/ui";
-import AppNavbar from "../../components/layout/AppNavbar";
 import { getAgencyById } from "../../mocks/agencyData";
 import imgAgencyPlaceholder from "../../assets/images/community/avatar.png";
 
@@ -22,7 +21,7 @@ export default function AgencyDetail() {
   if (!agency) {
     return (
       <div className={styles.page}>
-        <AppNavbar />
+        
         <div className={styles.main}>
           <div className={styles.section}>
             <h1 className={styles.heroName}>Agence introuvable</h1>
@@ -38,7 +37,7 @@ export default function AgencyDetail() {
 
   return (
     <div className={styles.page}>
-      <AppNavbar />
+      
       <div className={styles.main}>
 
         {/* ── Hero agence ── */}
@@ -145,3 +144,4 @@ export default function AgencyDetail() {
     </div>
   );
 }
+

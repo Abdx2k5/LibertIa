@@ -3,7 +3,6 @@ import { useNavigate } from "react-router-dom";
 import styles from "./MesVoyages.module.css";
 import { useVoyage } from "../../hooks/useVoyage";
 import { Button, VisibilityToggle, VoyageActionsMenu, CarteMapbox } from "../../components/ui";
-import AppNavbar from "../../components/layout/AppNavbar";
 import { ROUTES } from "../../utils/constants";
 
 // ── Icônes inline (T44) ──
@@ -148,7 +147,7 @@ export default function MesVoyages() {
 
   return (
     <div className={styles.page}>
-      <AppNavbar />
+      
       <div className={styles.main}>
 
         <div className={styles.headerRow}>
@@ -280,3 +279,4 @@ export default function MesVoyages() {
     </div>
   );
 }
+

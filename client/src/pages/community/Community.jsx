@@ -3,7 +3,6 @@ import { useNavigate, Link } from "react-router-dom";
 import styles from "./Community.module.css";
 import PostCard from "../../components/ui/PostCard";
 import FollowButton from "../../components/ui/FollowButton";
-import AppNavbar from "../../components/layout/AppNavbar";
 import FindFriendsModal from "../../components/modals/FindFriendsModal";
 import { ROUTES, publicProfilePath } from "../../utils/constants";
 import { useTranslation } from "../../hooks/useTranslation";
@@ -47,7 +46,7 @@ export default function Community() {
 
   return (
     <main className={styles.page}>
-      <AppNavbar />
+      
       <div className={styles.container}>
         <section className={styles.mainColumn}>
           <header className={styles.heroCard}>

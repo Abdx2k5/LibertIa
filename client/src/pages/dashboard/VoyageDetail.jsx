@@ -6,7 +6,6 @@ import voyageService from "../../services/voyage.service";
 import { Spinner, Button, Badge, ShareButton, DeleteButton, ExportPdfButton } from "../../components/ui";
 import ShareModal from "../../components/modals/ShareModal";
 import DeleteConfirmModal from "../../components/modals/DeleteConfirmModal";
-import AppNavbar from "../../components/layout/AppNavbar";
 import { formatDate } from "../../utils/helpers";
 import { ROUTES } from "../../utils/constants";
 
@@ -51,7 +50,7 @@ export default function VoyageDetail() {
   if (loading) {
     return (
       <div className={styles.page}>
-        <AppNavbar />
+        
         <div className={styles.centered}>
           <Spinner size={32} color="var(--accent)" label="Chargement du voyage..." />
         </div>
@@ -62,7 +61,7 @@ export default function VoyageDetail() {
   if (error || !voyage) {
     return (
       <div className={styles.page}>
-        <AppNavbar />
+        
         <div className={styles.centered}>
           <p className={styles.errorText}>{error || "Voyage introuvable."}</p>
           <Link to={ROUTES.DASHBOARD} className={styles.backLink}>← Retour au tableau de bord</Link>
@@ -81,7 +80,7 @@ export default function VoyageDetail() {
 
   return (
     <div className={styles.page}>
-      <AppNavbar />
+      
       <div className={styles.container}>
 
         <Link to={ROUTES.DASHBOARD} className={styles.backLink}>← Retour au tableau de bord</Link>
@@ -247,3 +246,4 @@ export default function VoyageDetail() {
     </div>
   );
 }
+

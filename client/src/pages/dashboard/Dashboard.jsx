@@ -4,6 +4,7 @@ import { useAuthStore } from "../../store/authStore";
 import { useVoyage } from "../../hooks/useVoyage";
 import voyageService from "../../services/voyage.service";
 import api from "../../services/api";
+import imgLogo from '../../assets/logos/logo.png';
 
 // ── Icons ──
 const sv = { width:18, height:18, viewBox:"0 0 24 24", fill:"none", stroke:"currentColor", strokeWidth:"2", strokeLinecap:"round", strokeLinejoin:"round" };

@@ -5,7 +5,6 @@ import { useAuthStore } from "../../store/authStore";
 import authService from "../../services/auth.service";
 import dossierService from "../../services/dossier.service";
 import { GaleriePhoto, CarteMapbox, LogoutButton, Modal, UploadMultiplePhotos } from "../../components/ui";
-import AppNavbar from "../../components/layout/AppNavbar";
 import { FREEMIUM, ROUTES } from "../../utils/constants";
 import imgAvatar from "../../assets/images/community/avatar.png";
 
@@ -420,7 +419,7 @@ export default function Profile() {
 
   return (
     <div className={styles.page}>
-      <AppNavbar />
+      
 
       <div className={styles.layout}>
 
@@ -1013,3 +1012,4 @@ export default function Profile() {
     </div>
   );
 }
+
