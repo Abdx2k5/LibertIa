@@ -725,7 +725,8 @@ Structure JSON :
             scraping_utilise: false
         });
 
-        sendEvent('done', { voyageId: voyage._id, itineraire: itineraireData });
+        const promptsRestants = Math.max(0, user.promptsRestants() - 1);
+        sendEvent('done', { voyageId: voyage._id, itineraire: itineraireData, promptsRestants });
         res.end();
 
     } catch (err) {

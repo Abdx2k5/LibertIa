@@ -6,9 +6,17 @@
 import avatar1 from "../assets/images/community/avatar-1.png";
 import avatar2 from "../assets/images/community/avatar-2.png";
 import avatar3 from "../assets/images/community/avatar-3.png";
-import tripMark from "../assets/images/community/trip-mark.png";
-import tripSarah from "../assets/images/community/trip-sarah.png";
-import composerAvatar from "../assets/images/community/profile.png";
+import destTokyo     from "../assets/images/destinations/tokyo.png";
+import destParis     from "../assets/images/destinations/paris.png";
+import destMarrakech from "../assets/images/destinations/marrakech.png";
+import destNewYork   from "../assets/images/destinations/new-york.png";
+import destLisbonne1 from "../assets/images/destinations/lisbonne-1.jpg";
+import destLisbonne2 from "../assets/images/destinations/lisbonne-2.jpg";
+import destBarcelone1 from "../assets/images/destinations/barcelone-1.jpg";
+import destBarcelone2 from "../assets/images/destinations/barcelone-2.jpg";
+import destBresil1   from "../assets/images/destinations/bresil-1.jpg";
+import destBresil2   from "../assets/images/destinations/bresil-2.jpg";
+import destSeoul     from "../assets/images/destinations/seoul-1.jpg";
 
 export const MOCK_POSTS = [
   {
@@ -22,7 +30,7 @@ export const MOCK_POSTS = [
     },
     temps: "il y a 2 heures",
     contenu: "Ma première expérience avec Libertia a été impeccable. J’ai trouvé un vol, un hôtel et même des activités adaptées à mon budget en quelques minutes.",
-    images: [tripMark, tripSarah],
+    images: [destTokyo, destParis],
     tags: ["#Japon", "#voyage", "#solo"],
     likes: 234,
     commentaires: 45,
@@ -58,7 +66,7 @@ export const MOCK_POSTS = [
     },
     temps: "hier",
     contenu: "Découvrez comment organiser un voyage lent à Bali sans exploser votre budget ni rater les meilleurs spots au lever du soleil.",
-    images: [tripSarah],
+    images: [destBresil1, destBresil2],
     tags: ["#article", "#budget", "#inspiration"],
     likes: 412,
     commentaires: 66,
@@ -76,7 +84,7 @@ export const MOCK_POSTS = [
     },
     temps: "il y a 6 heures",
     contenu: "Nous organisons une semaine ski et coworking avec des activités le soir. Débutants bienvenus, ambiance détendue.",
-    images: [tripMark, tripSarah, composerAvatar],
+    images: [destBarcelone1, destBarcelone2, destNewYork],
     tags: ["#groupe", "#alpines", "#coworking"],
     likes: 156,
     commentaires: 18,
@@ -94,7 +102,7 @@ export const MOCK_POSTS = [
     },
     temps: "il y a 1 jour",
     contenu: "Libertia m’a évité trois heures de recherche. J’ai pu comparer les activités, réserver rapidement et garder une vraie marge pour profiter sur place.",
-    images: [tripSarah, tripMark],
+    images: [destSeoul, destTokyo],
     tags: ["#avis", "#gaindetemps"],
     likes: 12400,
     commentaires: 318,

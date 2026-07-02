@@ -280,7 +280,7 @@ const SUGGESTIONS = [
 // ── Dashboard principal ──
 export default function Dashboard() {
   const navigate  = useNavigate();
-  const { user }  = useAuthStore();
+  const { user, updateUser } = useAuthStore();
   const { getMesVoyages, voyages } = useVoyage();
 
   const [messages, setMessages] = useState([]);
@@ -334,6 +334,9 @@ export default function Dashboard() {
         onDone: (payload) => {
           const itin = payload?.itineraire || (() => { try { return JSON.parse(buffer); } catch { return null; } })();
           updateLast({ type:"voyage", content:"", status:"", itineraire:itin, loading:false, voyageId:payload?.voyageId });
+          if (payload?.promptsRestants !== undefined) {
+            updateUser({ ...user, promptsRestants: payload.promptsRestants });
+          }
           setLoading(false); getMesVoyages(); abortRef.current = null;
         },
         onError: (msg) => {
