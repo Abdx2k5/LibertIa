@@ -13,7 +13,7 @@ const Toggle = ({ on, onToggle }) => (
 );
 export default function Settings() {
   //const { } = useAuthStore();
-  // ✅ Pas d'import du store, juste un placeholder
+  // Pas d'import du store, juste un placeholder
 //const handleDeleteAccount = () => {
   // TODO : appeler authService.deleteAccount() + logout
   //console.log("Suppression compte...");

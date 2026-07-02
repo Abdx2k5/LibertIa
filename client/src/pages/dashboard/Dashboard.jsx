@@ -67,20 +67,20 @@ function ItineraireAffichage({ data }) {
       {/* En-tête + liens globaux */}
       <div style={{ borderBottom:"1px solid var(--border)", paddingBottom:12 }}>
         <div style={{ fontSize:18, fontWeight:700, color:"var(--text)", marginBottom:6 }}>
-          ✈️ {data.destination || "Destination"}
+          {data.destination || "Destination"}
         </div>
         <div style={{ display:"flex", gap:10, flexWrap:"wrap", marginBottom:10 }}>
-          {data.duree_jours && <span style={{ fontSize:12, color:"var(--text-muted)" }}>📅 {data.duree_jours} jour{data.duree_jours>1?"s":""}</span>}
-          {data.checkin && <span style={{ fontSize:12, color:"var(--text-muted)" }}>🗓️ {data.checkin} → {data.checkout}</span>}
+          {data.duree_jours && <span style={{ fontSize:12, color:"var(--text-muted)" }}>{data.duree_jours} jour{data.duree_jours>1?"s":""}</span>}
+          {data.checkin && <span style={{ fontSize:12, color:"var(--text-muted)" }}>{data.checkin} → {data.checkout}</span>}
         </div>
         {/* Liens globaux */}
         {data.liens && (
           <div style={{ display:"flex", gap:8, flexWrap:"wrap" }}>
-            {data.liens.hotels_booking && <BtnLien href={data.liens.hotels_booking} label="🏨 Hôtels Booking" color="#003580"/>}
-            {data.liens.vols_kiwi && <BtnLien href={data.liens.vols_kiwi} label="✈️ Kiwi.com" color="#e5432e"/> }
-            {data.liens.vols_kayak && <BtnLien href={data.liens.vols_kayak} label="✈️ Kayak" color="#ff690f"/>}
-            {data.liens.vols_google_flights && <BtnLien href={data.liens.vols_google_flights} label="🔍 Google Flights" color="#4285f4"/>}
-            {data.liens.activites_viator && <BtnLien href={data.liens.activites_viator} label="🎯 Activités Viator" color="#00b09c"/>}
+            {data.liens.hotels_booking && <BtnLien href={data.liens.hotels_booking} label="Hôtels Booking" color="#003580"/>}
+            {data.liens.vols_kiwi && <BtnLien href={data.liens.vols_kiwi} label="Kiwi.com" color="#e5432e"/> }
+            {data.liens.vols_kayak && <BtnLien href={data.liens.vols_kayak} label="Kayak" color="#ff690f"/>}
+            {data.liens.vols_google_flights && <BtnLien href={data.liens.vols_google_flights} label="Google Flights" color="#4285f4"/>}
+            {data.liens.activites_viator && <BtnLien href={data.liens.activites_viator} label="Activités Viator" color="#00b09c"/>}
           </div>
         )}
       </div>
@@ -92,7 +92,7 @@ function ItineraireAffichage({ data }) {
           {["matin","apres_midi","soir"].map(moment => {
             const m = j[moment];
             if (!m) return null;
-            const label = moment === "matin" ? "🌅 Matin" : moment === "apres_midi" ? "☀️ Après-midi" : "🌙 Soir";
+            const label = moment === "matin" ? "Matin" : moment === "apres_midi" ? "Après-midi" : "Soir";
             return (
               <div key={moment} style={{ fontSize:13, color:"var(--text)", marginBottom:4, lineHeight:1.6 }}>
                 <strong>{label} :</strong> {m.activite}
@@ -100,7 +100,7 @@ function ItineraireAffichage({ data }) {
                 {m.duree && <span style={{color:"#6b7280"}}> ({m.duree})</span>}
                 {m.lien_maps && (
                   <a href={m.lien_maps} target="_blank" rel="noreferrer" style={{ marginLeft:8, fontSize:11, color:"#60a5fa", textDecoration:"none" }}>
-                    📍 Maps
+                    Maps
                   </a>
                 )}
               </div>
@@ -112,7 +112,7 @@ function ItineraireAffichage({ data }) {
       {/* Hébergement */}
       {data.hebergement_recommande && (
         <div style={{ background:"rgba(167,139,250,0.08)", borderRadius:10, padding:"10px 14px" }}>
-          <div style={{ fontSize:12, fontWeight:600, color:"var(--accent)", marginBottom:6 }}>🏨 Hébergement recommandé</div>
+          <div style={{ fontSize:12, fontWeight:600, color:"var(--accent)", marginBottom:6 }}>Hébergement recommandé</div>
           <div style={{ fontSize:13, color:"var(--text)", marginBottom:8 }}>
             <strong>{data.hebergement_recommande.nom}</strong>
             {data.hebergement_recommande.prix_nuit && <span style={{color:"var(--text-muted)"}}> — {data.hebergement_recommande.prix_nuit}/nuit</span>}
@@ -127,7 +127,7 @@ function ItineraireAffichage({ data }) {
       {/* Vol */}
       {data.vol_recommande && (
         <div style={{ background:"rgba(59,130,246,0.08)", borderRadius:10, padding:"10px 14px" }}>
-          <div style={{ fontSize:12, fontWeight:600, color:"#60a5fa", marginBottom:6 }}>✈️ Vol recommandé</div>
+          <div style={{ fontSize:12, fontWeight:600, color:"#60a5fa", marginBottom:6 }}>Vol recommandé</div>
           <div style={{ fontSize:13, color:"var(--text)", marginBottom:8 }}>
             <strong>{data.vol_recommande.compagnie}</strong>
             {data.vol_recommande.prix && <span style={{color:"var(--text-muted)"}}> — {data.vol_recommande.prix}</span>}
@@ -144,7 +144,7 @@ function ItineraireAffichage({ data }) {
       {/* Restaurants */}
       {data.restaurants_recommandes?.length > 0 && (
         <div style={{ background:"rgba(34,197,94,0.07)", borderRadius:10, padding:"10px 14px" }}>
-          <div style={{ fontSize:12, fontWeight:600, color:"#4ade80", marginBottom:8 }}>🍽️ Restaurants recommandés</div>
+          <div style={{ fontSize:12, fontWeight:600, color:"#4ade80", marginBottom:8 }}>Restaurants recommandés</div>
           <div style={{ display:"flex", flexDirection:"column", gap:6 }}>
             {data.restaurants_recommandes.map((r,i) => {
               const nom = typeof r === "string" ? r : r?.nom || r?.name || "";
@@ -173,7 +173,7 @@ function ItineraireAffichage({ data }) {
       {/* Budget */}
       {data.budget_detail && (
         <div style={{ background:"rgba(251,191,36,0.07)", borderRadius:10, padding:"10px 14px" }}>
-          <div style={{ fontSize:12, fontWeight:600, color:"#fbbf24", marginBottom:6 }}>💰 Budget estimé</div>
+          <div style={{ fontSize:12, fontWeight:600, color:"#fbbf24", marginBottom:6 }}>Budget estimé</div>
           <div style={{ display:"flex", gap:12, flexWrap:"wrap" }}>
             {Object.entries(data.budget_detail).map(([k,v]) => (
               <div key={k} style={{ fontSize:12, color:"var(--text)" }}>
@@ -188,7 +188,7 @@ function ItineraireAffichage({ data }) {
       {/* Conseils */}
       {data.conseils?.length > 0 && (
         <div>
-          <div style={{ fontSize:12, fontWeight:600, color:"var(--text)", marginBottom:6 }}>💡 Conseils pratiques</div>
+          <div style={{ fontSize:12, fontWeight:600, color:"var(--text)", marginBottom:6 }}>Conseils pratiques</div>
           <ul style={{ margin:0, paddingLeft:16, display:"flex", flexDirection:"column", gap:3 }}>
             {data.conseils.map((c,i) => (
               <li key={i} style={{ fontSize:12, color:"var(--text-muted)" }}>
@@ -263,7 +263,7 @@ function MessageBubble({ msg }) {
       </div>
       {msg.voyageId && (
         <div style={{ marginTop:6, fontSize:11, color:"var(--accent-green)" }}>
-          ✅ Voyage enregistré
+          Voyage enregistré
         </div>
       )}
     </div>
@@ -316,7 +316,7 @@ export default function Dashboard() {
 
     if (isVoyageRequest(q)) {
       if (!canGenerate) {
-        addMsg({ role:"assistant", type:"chat", content:"Vous avez atteint votre quota de générations. Passez à Premium pour continuer ! 🚀" });
+        addMsg({ role:"assistant", type:"chat", content:"Vous avez atteint votre quota de générations. Passez à Premium pour continuer !" });
         setLoading(false); return;
       }
       addMsg({ role:"assistant", type:"streaming", content:"", status:"Analyse de votre demande...", loading:true });
@@ -337,12 +337,12 @@ export default function Dashboard() {
           setLoading(false); getMesVoyages(); abortRef.current = null;
         },
         onError: (msg) => {
-          updateLast({ type:"chat", content:`❌ ${msg || "Erreur lors de la génération"}`, loading:false, status:"" });
+          updateLast({ type:"chat", content:`${msg || "Erreur lors de la génération"}`, loading:false, status:"" });
           setLoading(false); abortRef.current = null;
         },
       }, controller.signal).catch(err => {
-        if (err?.name === "AbortError") updateLast({ type:"chat", content:"⏹️ Génération annulée.", loading:false, status:"" });
-        else updateLast({ type:"chat", content:`❌ ${err?.message || "Erreur réseau"}`, loading:false, status:"" });
+        if (err?.name === "AbortError") updateLast({ type:"chat", content:"Génération annulée.", loading:false, status:"" });
+        else updateLast({ type:"chat", content:`${err?.message || "Erreur réseau"}`, loading:false, status:"" });
         setLoading(false); abortRef.current = null;
       });
 
@@ -350,7 +350,7 @@ export default function Dashboard() {
       addMsg({ role:"assistant", type:"chat", content:"", loading:true });
       try {
         const res = await api.post("/api/compagnon/chat", { message:q });
-        const reponse = res.data?.data?.reponse || res.data?.reponse || "Je suis là pour t'aider ! 😊";
+        const reponse = res.data?.data?.reponse || res.data?.reponse || "Je suis là pour t'aider !";
         updateLast({ content:reponse, loading:false });
       } catch {
         updateLast({ content:"Désolé, Colibri est momentanément indisponible. Réessaie !", loading:false });
@@ -380,7 +380,7 @@ export default function Dashboard() {
             </div>
             <div style={{ textAlign:"center" }}>
               <h1 style={{ fontSize:"clamp(24px,4vw,40px)", fontWeight:800, color:"var(--text)", letterSpacing:"-1px", margin:"0 0 10px" }}>
-                Bonjour {user?.nom?.split(" ")[0] || ""} 👋
+                Bonjour {user?.nom?.split(" ")[0] || ""}
               </h1>
               <p style={{ fontSize:15, color:"var(--text-muted)", margin:0, lineHeight:1.6 }}>
                 Décrivez votre voyage ou discutez avec Colibri, votre compagnon IA.
@@ -391,7 +391,7 @@ export default function Dashboard() {
                 <button key={i} onClick={() => handleSend(s)} style={{ padding:"8px 16px", borderRadius:999, background:"var(--bg-secondary)", border:"1px solid var(--border)", color:"var(--text-muted)", fontSize:13, cursor:"pointer" }}
                   onMouseEnter={e=>{e.target.style.borderColor="var(--accent-border)";e.target.style.color="var(--accent)"}}
                   onMouseLeave={e=>{e.target.style.borderColor="var(--border)";e.target.style.color="var(--text-muted)"}}>
-                  ✈️ {s}
+                  {s}
                 </button>
               ))}
             </div>
@@ -405,7 +405,7 @@ export default function Dashboard() {
                     <div key={i} style={{ display:"flex", alignItems:"center", justifyContent:"space-between", padding:"10px 14px", background:"var(--bg-secondary)", border:"1px solid var(--border)", borderRadius:10, gap:10 }}>
                       <div style={{ flex:1, minWidth:0 }}>
                         <div style={{ fontSize:13, fontWeight:500, color:"var(--text)", overflow:"hidden", textOverflow:"ellipsis", whiteSpace:"nowrap" }}>{v.prompt || v.titre}</div>
-                        <div style={{ fontSize:11, color:"var(--text-muted)" }}>{v.destination && `📍 ${v.destination} · `}{new Date(v.createdAt).toLocaleDateString("fr-FR")}</div>
+                        <div style={{ fontSize:11, color:"var(--text-muted)" }}>{v.destination && `${v.destination} · `}{new Date(v.createdAt).toLocaleDateString("fr-FR")}</div>
                       </div>
                       <button onClick={() => navigate(`/voyage/${v._id}`)} style={{ padding:"5px 12px", borderRadius:7, border:"1px solid var(--border)", background:"none", color:"var(--text-muted)", fontSize:12, cursor:"pointer", display:"flex", alignItems:"center", gap:4 }}>
                         <IconEye /> Voir
@@ -451,7 +451,7 @@ export default function Dashboard() {
           <div style={{ display:"flex", justifyContent:"space-between", marginTop:8 }}>
             <span style={{ fontSize:11, color:"var(--text-muted)" }}>Entrée pour envoyer · Maj+Entrée pour nouvelle ligne</span>
             <span style={{ fontSize:11, color:isPremium?"var(--accent-green)":"var(--text-muted)" }}>
-              {isPremium ? "✨ Premium" : `${promptsLeft}/10 prompts`}
+              {isPremium ? "Premium" : `${promptsLeft}/10 prompts`}
             </span>
           </div>
         </div>

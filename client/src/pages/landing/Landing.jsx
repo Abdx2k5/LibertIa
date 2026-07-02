@@ -18,11 +18,11 @@ const IconX     = () => <svg width="22" height="22" viewBox="0 0 24 24" fill="no
 
 // ── Données ─────────────────────────────────────────────────────
 const SUGGESTIONS = [
-  "5 jours à Tokyo, budget 1500€ 🇯🇵",
-  "Voyage romantique à Paris pour 2 ❤️",
-  "Aventure au Maroc, 7 jours 🌙",
-  "Road trip en Espagne, 10 jours 🚗",
-  "Séjour culturel à Istanbul 🕌",
+  "5 jours à Tokyo, budget 1500€",
+  "Voyage romantique à Paris pour 2",
+  "Aventure au Maroc, 7 jours",
+  "Road trip en Espagne, 10 jours",
+  "Séjour culturel à Istanbul",
 ];
 
 const FEATURES = [
@@ -278,14 +278,14 @@ export default function Landing() {
                   Je veux 5 jours à Marrakech, budget 1200€
                 </div>
                 <div className={styles.demoMsg}>
-                  <div style={{ fontWeight:600, color:"var(--accent)", marginBottom:6 }}>✈️ Marrakech — 5 jours</div>
+                  <div style={{ fontWeight:600, color:"var(--accent)", marginBottom:6 }}>Marrakech — 5 jours</div>
                   <div style={{ fontSize:13, lineHeight:1.7 }}>
-                    📅 <strong>Jour 1</strong> — Arrivée, médina, place Jemaa el-Fna<br/>
-                    📅 <strong>Jour 2</strong> — Jardins Majorelle, souks<br/>
-                    📅 <strong>Jour 3</strong> — Excursion Atlas<br/>
-                    🏨 <strong>Hôtel :</strong> Riad Yasmine — 85€/nuit<br/>
-                    ✈️ <strong>Vol :</strong> Air Arabia — 210€ A/R<br/>
-                    💰 <strong>Total estimé :</strong> 890€
+                    <strong>Jour 1</strong> — Arrivée, médina, place Jemaa el-Fna<br/>
+                    <strong>Jour 2</strong> — Jardins Majorelle, souks<br/>
+                    <strong>Jour 3</strong> — Excursion Atlas<br/>
+                    <strong>Hôtel :</strong> Riad Yasmine — 85€/nuit<br/>
+                    <strong>Vol :</strong> Air Arabia — 210€ A/R<br/>
+                    <strong>Total estimé :</strong> 890€
                   </div>
                 </div>
                 <div className={styles.demoTyping}>
@@ -389,7 +389,7 @@ export default function Landing() {
         </div>
         <div className={styles.footerBottom}>
           <span>© 2026 LibertIa — ESISA Fès</span>
-          <span>Fait avec ❤️ et de l'IA</span>
+          <span>Fait avec passion et de l'IA</span>
         </div>
       </footer>
 

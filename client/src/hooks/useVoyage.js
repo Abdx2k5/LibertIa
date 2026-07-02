@@ -54,7 +54,7 @@ export function useVoyage() {
         onDone: (payload) => {
           if (abortRef.current) return;
           setVoyage(payload.itineraire);
-          setStreamStatus({ step: 'done', message: '✅ Itinéraire prêt !' });
+          setStreamStatus({ step: 'done', message: 'Itinéraire prêt !' });
           return payload; // exposé pour usage direct si besoin
         },
 

@@ -13,17 +13,17 @@ function ItineraireAffichage({ data }) {
       {/* En-tête */}
       <div style={{ borderBottom: "1px solid rgba(167,139,250,0.2)", paddingBottom: 12 }}>
         <div style={{ fontSize: 22, fontWeight: 700, color: "#e5e7eb", marginBottom: 4 }}>
-          ✈️ {data.destination || "Destination"}
+          {data.destination || "Destination"}
         </div>
         <div style={{ display: "flex", gap: 16, flexWrap: "wrap" }}>
           {data.duree_jours && (
             <span style={{ fontSize: 13, color: "#a1a1aa" }}>
-              📅 {data.duree_jours} jour{data.duree_jours > 1 ? "s" : ""}
+              {data.duree_jours} jour{data.duree_jours > 1 ? "s" : ""}
             </span>
           )}
           {data.checkin && data.checkout && (
             <span style={{ fontSize: 13, color: "#a1a1aa" }}>
-              🗓️ {data.checkin} → {data.checkout}
+              {data.checkin} → {data.checkout}
             </span>
           )}
         </div>
@@ -45,21 +45,21 @@ function ItineraireAffichage({ data }) {
               <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
                 {j.matin && (
                   <div style={{ fontSize: 13, color: "#e5e7eb" }}>
-                    🌅 <strong>Matin :</strong> {j.matin.activite}
+                    <strong>Matin :</strong> {j.matin.activite}
                     {j.matin.lieu && <span style={{ color: "#a1a1aa" }}> — {j.matin.lieu}</span>}
                     {j.matin.duree && <span style={{ color: "#6b7280" }}> ({j.matin.duree})</span>}
                   </div>
                 )}
                 {j.apres_midi && (
                   <div style={{ fontSize: 13, color: "#e5e7eb" }}>
-                    ☀️ <strong>Après-midi :</strong> {j.apres_midi.activite}
+                    <strong>Après-midi :</strong> {j.apres_midi.activite}
                     {j.apres_midi.lieu && <span style={{ color: "#a1a1aa" }}> — {j.apres_midi.lieu}</span>}
                     {j.apres_midi.duree && <span style={{ color: "#6b7280" }}> ({j.apres_midi.duree})</span>}
                   </div>
                 )}
                 {j.soir && (
                   <div style={{ fontSize: 13, color: "#e5e7eb" }}>
-                    🌙 <strong>Soir :</strong> {j.soir.activite}
+                    <strong>Soir :</strong> {j.soir.activite}
                     {j.soir.lieu && <span style={{ color: "#a1a1aa" }}> — {j.soir.lieu}</span>}
                     {j.soir.duree && <span style={{ color: "#6b7280" }}> ({j.soir.duree})</span>}
                   </div>
@@ -73,7 +73,7 @@ function ItineraireAffichage({ data }) {
       {/* Hébergement */}
       {data.hebergement_recommande && (
         <div style={{ background: "rgba(167,139,250,0.08)", borderRadius: 10, padding: "10px 14px" }}>
-          <div style={{ fontSize: 13, fontWeight: 600, color: "#a78bfa", marginBottom: 4 }}>🏨 Hébergement recommandé</div>
+          <div style={{ fontSize: 13, fontWeight: 600, color: "#a78bfa", marginBottom: 4 }}>Hébergement recommandé</div>
           <div style={{ fontSize: 13, color: "#e5e7eb" }}>
             {data.hebergement_recommande.nom}
             {data.hebergement_recommande.prix_nuit && (
@@ -86,7 +86,7 @@ function ItineraireAffichage({ data }) {
       {/* Vol */}
       {data.vol_recommande && (
         <div style={{ background: "rgba(59,130,246,0.08)", borderRadius: 10, padding: "10px 14px" }}>
-          <div style={{ fontSize: 13, fontWeight: 600, color: "#60a5fa", marginBottom: 4 }}>✈️ Vol recommandé</div>
+          <div style={{ fontSize: 13, fontWeight: 600, color: "#60a5fa", marginBottom: 4 }}>Vol recommandé</div>
           <div style={{ fontSize: 13, color: "#e5e7eb" }}>
             {data.vol_recommande.compagnie}
             {data.vol_recommande.prix && (
@@ -102,7 +102,7 @@ function ItineraireAffichage({ data }) {
       {/* Restaurants */}
       {data.restaurants_recommandes && data.restaurants_recommandes.length > 0 && (
         <div style={{ background: "rgba(34,197,94,0.07)", borderRadius: 10, padding: "10px 14px" }}>
-          <div style={{ fontSize: 13, fontWeight: 600, color: "#4ade80", marginBottom: 6 }}>🍽️ Restaurants recommandés</div>
+          <div style={{ fontSize: 13, fontWeight: 600, color: "#4ade80", marginBottom: 6 }}>Restaurants recommandés</div>
           <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
             {data.restaurants_recommandes.map((r, i) => (
               <span key={i} style={{
@@ -118,7 +118,7 @@ function ItineraireAffichage({ data }) {
       {/* Budget */}
       {data.budget_detail && (
         <div style={{ background: "rgba(251,191,36,0.07)", borderRadius: 10, padding: "10px 14px" }}>
-          <div style={{ fontSize: 13, fontWeight: 600, color: "#fbbf24", marginBottom: 6 }}>💰 Budget estimé</div>
+          <div style={{ fontSize: 13, fontWeight: 600, color: "#fbbf24", marginBottom: 6 }}>Budget estimé</div>
           <div style={{ display: "flex", gap: 16, flexWrap: "wrap" }}>
             {Object.entries(data.budget_detail).map(([k, v]) => (
               <div key={k} style={{ fontSize: 12, color: "#e5e7eb" }}>
@@ -133,7 +133,7 @@ function ItineraireAffichage({ data }) {
       {/* Conseils */}
       {data.conseils && data.conseils.length > 0 && (
         <div>
-          <div style={{ fontSize: 13, fontWeight: 600, color: "#e5e7eb", marginBottom: 6 }}>💡 Conseils pratiques</div>
+          <div style={{ fontSize: 13, fontWeight: 600, color: "#e5e7eb", marginBottom: 6 }}>Conseils pratiques</div>
           <ul style={{ margin: 0, paddingLeft: 18, display: "flex", flexDirection: "column", gap: 4 }}>
             {data.conseils.map((c, i) => (
               <li key={i} style={{ fontSize: 13, color: "#a1a1aa" }}>{c}</li>
@@ -266,7 +266,7 @@ export default function StreamingOutput({ prompt }) {
         </div>
       </div>
 
-      {status && <div className={styles.status}>⚙️ {status}</div>}
+      {status && <div className={styles.status}>{status}</div>}
 
       {error && (
         <div className={isCancelled ? styles.info : styles.error}>{errorText}</div>
@@ -287,7 +287,7 @@ export default function StreamingOutput({ prompt }) {
 
       {voyageId && !error && (
         <div className={styles.done}>
-          ✅ Voyage enregistré
+          Voyage enregistré
         </div>
       )}
     </div>

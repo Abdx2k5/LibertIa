@@ -9,6 +9,7 @@ const {
     forgotPassword,
     resetPassword,
     updateProfile,
+    getPublicProfile,
     supprimerCompte,
     refreshTokenHandler,
     logout
@@ -32,6 +33,9 @@ router.post('/reset-password/:token', resetPassword);
 
 // T12 — Modification profil
 router.put('/update-profile',         proteger, updateProfile);
+
+// Profil public — pas de `proteger`, consultable par n'importe qui (y compris déconnecté)
+router.get('/users/:userId/public',   getPublicProfile);
 
 // T16 — Suppression compte RGPD
 router.delete('/supprimer-compte',    proteger, supprimerCompte);

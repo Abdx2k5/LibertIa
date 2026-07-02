@@ -3,8 +3,8 @@
 // TÂCHE    : T129 — Bibliothèque composants UI (design system)
 //
 // USAGE :
-//   <Pill>Plutôt vol ✈️</Pill>
-//   <Pill active onClick={() => toggle('vol')}>Plutôt vol ✈️</Pill>
+//   <Pill>Plutôt vol</Pill>
+//   <Pill active onClick={() => toggle('vol')}>Plutôt vol</Pill>
 // =============================================================
 
 export default function Pill({ children, active = false, onClick, style = {} }) {

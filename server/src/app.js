@@ -11,6 +11,7 @@ const compagnonRoutes = require('./routes/compagnonRoutes');
 const communityRoutes = require('./routes/communityRoutes');
 const dossierRoutes = require('./routes/dossierRoutes');
 const boiteRoutes = require('./routes/boiteRoutes');
+const messagePriveRoutes = require('./routes/messagePriveRoutes');
 const notificationRoutes = require('./routes/notificationRoutes');
 const avisRoutes = require('./routes/avisRoutes');
 const forumRoutes = require('./routes/forumRoutes');
@@ -20,6 +21,7 @@ const meteoRoutes = require('./routes/meteoRoutes');
 const adminRoutes = require('./routes/adminRoutes');
 const { initBoiteSocket } = require('./sockets/boiteSocket');
 const { initNotificationSocket } = require('./sockets/notificationSocket');
+const { initDmSocket } = require('./sockets/dmSocket');
 
 const app = express();
 
@@ -56,6 +58,7 @@ app.use('/api/community', communityRoutes);
 app.use('/api/communaute', communityRoutes);
 app.use('/api/dossiers', dossierRoutes);
 app.use('/api/boites', boiteRoutes);
+app.use('/api/messages', messagePriveRoutes);
 app.use('/api/notifications', notificationRoutes);
 app.use('/api/avis', avisRoutes);
 // T61 — Forums
@@ -86,6 +89,7 @@ const io = new Server(server, {
 
 initBoiteSocket(io);
 initNotificationSocket(io);
+initDmSocket(io);
 
 server.listen(PORT, () => {
     console.log(` Serveur Libertia démarré sur le port ${PORT}`);

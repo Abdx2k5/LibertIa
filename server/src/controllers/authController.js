@@ -1,5 +1,7 @@
+const mongoose = require('mongoose');
 const User = require('../models/User');
 const Voyage = require('../models/Voyage');
+const Dossier = require('../models/Dossier');
 const jwt = require('jsonwebtoken');
 const crypto = require('crypto');
 const nodemailer = require('nodemailer');
@@ -52,14 +54,10 @@ const register = async (req, res) => {
         // SA4
         await auditLog({ userId: user._id, action: 'register', req, success: true });
 
-        res.status(201).json({
-            _id: user._id,
-            nom: user.nom,
-            email: user.email,
-            abonnement: user.abonnement,
-            token: accessToken,
-            refreshToken
-        });
+        // Profil complet (bio/preferences déchiffrés via le transform toJSON du modèle),
+        // pour que le client dispose de tous les champs dès l'inscription, pas juste
+        // d'un sous-ensemble — voir T12/persistance pour le bug que ça évitait pas.
+        res.status(201).json({ ...user.toJSON(), token: accessToken, refreshToken });
 
     } catch (err) {
         res.status(500).json({ message: err.message });
@@ -93,14 +91,7 @@ const login = async (req, res) => {
         // SA4
         await auditLog({ userId: user._id, action: 'login', req, success: true });
 
-        res.json({
-            _id: user._id,
-            nom: user.nom,
-            email: user.email,
-            abonnement: user.abonnement,
-            token: accessToken,
-            refreshToken
-        });
+        res.json({ ...user.toJSON(), token: accessToken, refreshToken });
 
     } catch (err) {
         res.status(500).json({ message: err.message });
@@ -153,14 +144,7 @@ const googleAuth = async (req, res) => {
 
         await auditLog({ userId: user._id, action: 'login_google', req, success: true });
 
-        res.json({
-            _id: user._id,
-            nom: user.nom,
-            email: user.email,
-            abonnement: user.abonnement,
-            token: accessToken,
-            refreshToken
-        });
+        res.json({ ...user.toJSON(), token: accessToken, refreshToken });
     } catch (err) {
         res.status(500).json({ message: err.message });
     }
@@ -217,14 +201,7 @@ const facebookAuth = async (req, res) => {
 
         await auditLog({ userId: user._id, action: 'login_facebook', req, success: true });
 
-        res.json({
-            _id: user._id,
-            nom: user.nom,
-            email: user.email,
-            abonnement: user.abonnement,
-            token: accessTokenJwt,
-            refreshToken
-        });
+        res.json({ ...user.toJSON(), token: accessTokenJwt, refreshToken });
     } catch (err) {
         res.status(500).json({ message: err.message });
     }
@@ -354,6 +331,69 @@ const updateProfile = async (req, res) => {
 
     } catch (err) {
         res.status(500).json({ message: err.message });
+    }
+};
+
+// ─────────────────────────────────────────────
+//  @GET /api/auth/users/:userId/public
+//  Route PUBLIQUE (pas de middleware `proteger`) — un profil public doit
+//  rester consultable par n'importe qui, y compris un visiteur déconnecté.
+//  Ne renvoie que des champs sûrs + les voyages dont visibilite="public"
+//  (et non simplement partage=true, qui inclut aussi les voyages "amis",
+//  réservés aux abonnés — les exposer ici à n'importe quel visiteur
+//  serait une fuite de confidentialité).
+// ─────────────────────────────────────────────
+const getPublicProfile = async (req, res) => {
+    try {
+        const { userId } = req.params;
+        if (!mongoose.Types.ObjectId.isValid(userId)) {
+            return res.status(400).json({ success: false, message: 'Identifiant invalide' });
+        }
+
+        const user = await User.findById(userId)
+            .select('nom bio profilePhoto followers following createdAt isActive');
+        if (!user || !user.isActive) {
+            return res.status(404).json({ success: false, message: 'Utilisateur non trouvé' });
+        }
+        // toJSON() déchiffre bio/preferences et retire les champs sensibles (SA2)
+        const userPublic = user.toJSON();
+
+        const voyagesPublics = await Voyage.find({ user: userId, visibilite: 'public' })
+            .select('titre destination dates budget itineraire.duree_jours likeCount commentCount createdAt')
+            .sort({ createdAt: -1 })
+            .limit(50);
+
+        const dossiers = await Dossier.find({ voyage: { $in: voyagesPublics.map(v => v._id) } }).select('photos');
+        const photosCount = dossiers.reduce((total, d) => total + d.photos.length, 0);
+        const paysVisitesCount = new Set(voyagesPublics.map(v => v.destination).filter(Boolean)).size;
+        const followersCount = userPublic.followers?.length || 0;
+
+        // Badges dérivés des statistiques — aucun champ "badges" n'existe sur le
+        // modèle User, ce sont de simples seuils calculés à la volée.
+        const badges = [];
+        if (voyagesPublics.length >= 3) badges.push('Globe-trotter');
+        if (photosCount >= 10) badges.push('Photographe');
+        if (followersCount >= 50) badges.push('Influenceur voyage');
+
+        res.json({
+            success: true,
+            data: {
+                _id: userPublic._id,
+                nom: userPublic.nom,
+                bio: userPublic.bio,
+                profilePhoto: userPublic.profilePhoto,
+                createdAt: userPublic.createdAt,
+                followersCount,
+                followingCount: userPublic.following?.length || 0,
+                voyagesCount: voyagesPublics.length,
+                paysVisitesCount,
+                photosCount,
+                badges,
+                voyages: voyagesPublics
+            }
+        });
+    } catch (err) {
+        res.status(500).json({ success: false, message: err.message });
     }
 };
 
@@ -546,6 +586,7 @@ module.exports = {
     forgotPassword,
     resetPassword,
     updateProfile,
+    getPublicProfile,
     supprimerCompte,   // T16
     refreshTokenHandler, // SA1
     logout             // SA1 + SA5
