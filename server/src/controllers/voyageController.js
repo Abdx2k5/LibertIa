@@ -16,6 +16,7 @@ const { creerNotification } = require('./notificationController');
 // ─────────────────────────────────────────────
 const DS_API_URL = 'https://api.groq.com/openai/v1/chat/completions';
 const DS_MODEL = 'llama-3.3-70b-versatile';
+const IS_PROD = process.env.NODE_ENV === 'production';
 
 // ─────────────────────────────────────────────
 //  LIENS DE REDIRECTION
@@ -181,6 +182,7 @@ async function appelIA(systemPrompt, userPrompt, opts = {}) {
 //  HELPER — Python (scraping + RAG)
 // ─────────────────────────────────────────────
 function scraperDestination(destination, checkin, checkout, origine) {
+    scraperDestination
     return new Promise((resolve) => {
         const python = spawn('python', ['-c', `
 import sys
@@ -218,6 +220,7 @@ print(json.dumps(clean(result)))
 }
 
 function getRAGContexte(query, destination) {
+    if (IS_PROD) return Promise.resolve('');
     return new Promise((resolve) => {
         const python = spawn('python', ['-c', `
 import sys
