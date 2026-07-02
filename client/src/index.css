@@ -1,0 +1,175 @@
+*, *::before, *::after {
+  box-sizing: border-box;
+}
+
+html {
+  margin: 0;
+  padding: 0;
+  width: 100%;
+  overflow-x: clip;
+}
+
+body {
+  margin: 0;
+  padding: 0;
+  width: 100%;
+  overflow-x: clip;
+  background: var(--bg);
+}
+
+#root {
+  margin: 0;
+  padding: 0;
+  width: 100%;
+  overflow-x: clip;
+}
+/* ─────────────────────────────────────────────────────────────
+   T130 — Variables de thème (clair / sombre)
+   Pilotées par l'attribut [data-theme] posé sur <html>
+   (voir main.jsx + store/uiStore.js).
+
+   IMPORTANT — ordre des règles : :root doit être déclaré AVANT
+   [data-theme="dark"/"light"]. :root et [data-theme=...] ont la
+   même spécificité CSS (0,1,0) ; en cas d'égalité, c'est l'ordre
+   dans le fichier qui tranche. Si :root passait après (comme
+   c'était le cas avant ce correctif), ses valeurs gagnaient
+   TOUJOURS et le thème clair ne s'appliquait jamais.
+   ───────────────────────────────────────────────────────────── */
+:root {
+  /* fallback avant que React/useEffect pose [data-theme] = dark,
+     mêmes valeurs que [data-theme="dark"] ci-dessous */
+  --bg: #16171d;
+  --bg-secondary: #1e1f27;
+  --bg-tertiary: #2a2b35;
+  --bg-input: #0f1724;
+  --border: rgba(255,255,255,0.08);
+  --text: #f3f4f6;
+  --text-muted: #6b7280;
+  --text-inverse: #16171d;
+  --accent: #aa3bff;
+  --accent-secondary: #A78BFA;
+  --accent-green: #4ade80;
+  --accent-bg: rgba(170,59,255,0.15);
+  --accent-border: rgba(170,59,255,0.4);
+  --success: #4ade80;
+  --error: #f87171;
+  --warning: #fbbf24;
+  --warning-bg: rgba(251,191,36,0.15);
+  --shadow: 0 4px 24px rgba(0,0,0,0.3);
+  --card-shadow: 0 4px 24px rgba(0,0,0,0.3);
+
+  /* anciennes variables conservées pour la typographie globale
+     (h1, h2, code, .counter ci-dessous) — non pilotées par [data-theme] */
+  --text-h: #f3f4f6;
+  --code-bg: #1f2028;
+  --social-bg: rgba(47, 48, 58, 0.5);
+
+  --sans: system-ui, 'Segoe UI', Roboto, sans-serif;
+  --heading: system-ui, 'Segoe UI', Roboto, sans-serif;
+  --mono: ui-monospace, Consolas, monospace;
+
+  font: 18px/145% var(--sans);
+  letter-spacing: 0.18px;
+  color-scheme: light dark;
+  color: var(--text);
+  background: var(--bg);
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+
+  @media (max-width: 1024px) {
+    font-size: 16px;
+  }
+}
+[data-theme="dark"] {
+  --bg: #16171d;
+  --bg-secondary: #1e1f27;
+  --bg-tertiary: #2a2b35;
+  --bg-input: #0f1724;
+  --border: rgba(255,255,255,0.08);
+  --text: #f3f4f6;
+  --text-muted: #6b7280;
+  --text-inverse: #16171d;
+  --accent: #aa3bff;
+  --accent-secondary: #A78BFA;
+  --accent-green: #4ade80;
+  --accent-bg: rgba(170,59,255,0.15);
+  --accent-border: rgba(170,59,255,0.4);
+  --success: #4ade80;
+  --error: #f87171;
+  --warning: #fbbf24;
+  --warning-bg: rgba(251,191,36,0.15);
+  --shadow: 0 4px 24px rgba(0,0,0,0.3);
+  --card-shadow: 0 4px 24px rgba(0,0,0,0.3);
+}
+[data-theme="light"] {
+  --bg: #F7F6FB;
+  --bg-secondary: #FFFFFF;
+  --bg-tertiary: #EDEDF5;
+  --bg-input: #FFFFFF;
+  --border: rgba(23,23,29,0.08);
+  --text: #16171D;
+  --text-muted: #6B7280;
+  --text-inverse: #f3f4f6;
+  --accent: #9333EA;
+  --accent-secondary: #7C3AED;
+  --accent-green: #16A34A;
+  --accent-bg: rgba(147,51,234,0.1);
+  --accent-border: rgba(147,51,234,0.4);
+  --success: #16A34A;
+  --error: #DC2626;
+  --warning: #D97706;
+  --warning-bg: rgba(217,119,6,0.1);
+  --shadow: 0 4px 24px rgba(23,23,29,0.06);
+  --card-shadow: 0 4px 24px rgba(23,23,29,0.08);
+}
+
+#social .button-icon {
+  filter: invert(1) brightness(2);
+}
+
+
+h1,
+h2 {
+  font-family: var(--heading);
+  font-weight: 500;
+  color: var(--text-h);
+}
+
+h1 {
+  font-size: 56px;
+  letter-spacing: -1.68px;
+  margin: 32px 0;
+  @media (max-width: 1024px) {
+    font-size: 36px;
+    margin: 20px 0;
+  }
+}
+h2 {
+  font-size: 24px;
+  line-height: 118%;
+  letter-spacing: -0.24px;
+  margin: 0 0 8px;
+  @media (max-width: 1024px) {
+    font-size: 20px;
+  }
+}
+p {
+  margin: 0;
+}
+
+code,
+.counter {
+  font-family: var(--mono);
+  display: inline-flex;
+  border-radius: 4px;
+  color: var(--text-h);
+}
+
+code {
+  font-size: 15px;
+  line-height: 135%;
+  padding: 4px 8px;
+  background: var(--code-bg);
+}

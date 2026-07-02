@@ -1,0 +1,45 @@
+// =============================================================
+// FICHIER  : src/components/ui/index.js
+// TÂCHE    : T129 — point d'entrée centralisé
+//
+// Import depuis n'importe quelle page :
+//   import { Button, Input, Card, Modal, Badge, Spinner, Pill }
+//     from "../../components/ui";
+// =============================================================
+
+export { default as Button         } from "./Button";
+export { default as Input          } from "./Input";
+export { default as Card           } from "./Card";
+export { default as Modal          } from "./Modal";
+export { default as Badge          } from "./Badge";
+export { default as Spinner        } from "./Spinner";
+export { default as Pill           } from "./Pill";
+export { default as LogoutButton   } from "./LogoutButton";
+export { default as ProgressBar    } from "./ProgressBar";
+export { default as ShareButton    } from "./ShareButton";
+export { default as DeleteButton   } from "./DeleteButton";
+export { default as ExportPdfButton } from "./ExportPdfButton";
+export { default as ItineraireJourJour } from "./ItineraireJourJour";
+export { default as VolCard } from "./VolCard";
+export { default as HotelCard } from "./HotelCard";
+export { default as ActiviteCard } from "./ActiviteCard";
+export { default as PostCard } from "./PostCard";
+export { default as GaleriePhoto } from "./GaleriePhoto";
+export { default as StreamingOutput } from "./StreamingOutput";
+export { default as MicroAnimated } from "./MicroAnimated";
+export { default as UploadPhoto } from "./UploadPhoto";
+export { default as BudgetChart } from "./BudgetChart";
+export { default as ChatMessagerie } from "./ChatMessagerie";
+export { default as RechercheVoyages } from "./RechercheVoyages";
+export { default as LikeButton } from "./LikeButton";
+export { default as CommentSection } from "./CommentSection";
+export { default as FollowButton } from "./FollowButton";
+export { default as VisibilityToggle } from "./VisibilityToggle";
+export { default as DuplicateButton } from "./DuplicateButton";
+export { default as VoyageActionsMenu } from "./VoyageActionsMenu";
+export { default as CarteMapbox } from "./CarteMapbox";
+export { default as UploadMultiplePhotos } from "./UploadMultiplePhotos";
+export { default as NotificationBell } from "./NotificationBell";
+export { default as PaymentForm } from "./PaymentForm";
+export { default as PaymentModal } from "./PaymentModal";
+export { default as AvisSection } from "./AvisSection";

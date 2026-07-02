@@ -1,0 +1,67 @@
+import { Link, useNavigate, useLocation } from "react-router-dom";
+import styles from "./Navbar.module.css";
+import { useAuthStore } from "../../store/authStore";
+import { LogoutButton } from "../../components/ui";
+import imgLogo from "../../assets/logos/logo.png";
+import imgGlobe from "../../assets/icons/icon-globe-light.png";
+import imgAvatar from "../../assets/images/community/avatar.png";
+
+const NAV_LINKS = [
+  { label: "Accueil",       to: "/" },
+  { label: "Vols",          to: "/vols" },
+  { label: "Hébergements",  to: "/hebergements" },
+  { label: "Activités",     to: "/activites" },
+  { label: "Communauté",    to: "/communaute" },
+];
+
+export default function Navbar() {
+  const navigate  = useNavigate();
+  const location  = useLocation();
+  const { isAuthenticated } = useAuthStore();
+
+  return (
+    <nav className={styles.navbar}>
+      <Link to="/" className={styles.logo}>
+        <img src={imgLogo} alt="Libertia" className={styles.logoImg} />
+        <span className={styles.logoText}>Libertia</span>
+      </Link>
+
+      <div className={styles.links}>
+        {NAV_LINKS.map((l) => (
+          <Link
+            key={l.to}
+            to={l.to}
+            className={`${styles.link} ${location.pathname === l.to ? styles.linkActive : ""}`}
+          >
+            {l.label}
+          </Link>
+        ))}
+      </div>
+
+      <div className={styles.actions}>
+        <button className={styles.iconBtn}>
+          <img src={imgGlobe} alt="" className={styles.iconBtnImg} />
+          FR
+        </button>
+
+        {isAuthenticated ? (
+          <>
+            <div className={styles.avatar} onClick={() => navigate("/profile")}>
+              <img src={imgAvatar} alt="Profil" className={styles.avatarImg} />
+            </div>
+            <LogoutButton variant="outline" size="md" />
+          </>
+        ) : (
+          <>
+            <Link to="/login">
+              <button className={styles.btnOutline}>Se connecter</button>
+            </Link>
+            <Link to="/register">
+              <button className={styles.btnPrimary}>S'inscrire</button>
+            </Link>
+          </>
+        )}
+      </div>
+    </nav>
+  );
+}

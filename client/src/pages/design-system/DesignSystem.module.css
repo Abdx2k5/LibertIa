@@ -1,0 +1,252 @@
+/* =============================================================
+   FICHIER  : src/pages/design-system/DesignSystem.module.css
+   TÂCHE    : T129 — Bibliothèque composants UI (page catalogue)
+   ============================================================= */
+
+.page {
+  display: flex;
+  min-height: 100vh;
+  background: var(--bg);
+  color: var(--text);
+}
+
+/* ── Sidebar ─────────────────────────────────────────────── */
+.sidebar {
+  flex-shrink: 0;
+  width: 240px;
+  height: 100vh;
+  position: sticky;
+  top: 0;
+  align-self: flex-start;
+  overflow-y: auto;
+  padding: 32px 16px;
+  border-right: 1px solid var(--border);
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.sidebarTitle {
+  margin: 0 0 16px;
+  padding: 0 12px;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+}
+
+.nav {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.navLink {
+  display: block;
+  padding: 10px 12px;
+  border-radius: 8px;
+  font-size: 14px;
+  color: #9ca3af;
+  text-decoration: none;
+  transition: background-color 0.15s ease, color 0.15s ease;
+}
+
+.navLink:hover,
+.navLink:focus-visible {
+  background: rgba(170, 59, 255, 0.12);
+  color: var(--text);
+}
+
+/* ── Contenu principal ───────────────────────────────────── */
+.main {
+  flex: 1;
+  min-width: 0;
+  padding: 48px 56px 96px;
+}
+
+.header {
+  margin-bottom: 48px;
+}
+
+.title {
+  margin: 0 0 8px;
+  font-size: 32px;
+  font-weight: 700;
+  color: var(--text);
+}
+
+.subtitle {
+  margin: 0;
+  font-size: 16px;
+  color: var(--text-muted);
+}
+
+.section {
+  margin-bottom: 64px;
+  scroll-margin-top: 24px;
+}
+
+.sectionTitle {
+  margin: 0 0 20px;
+  padding-bottom: 12px;
+  font-size: 22px;
+  font-weight: 600;
+  color: var(--text);
+  border-bottom: 1px solid var(--border);
+}
+
+/* ── Grille de cartes ────────────────────────────────────── */
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 20px;
+}
+
+.card {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  padding: 20px;
+  background: var(--bg-secondary);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  box-shadow: var(--card-shadow);
+  overflow: hidden;
+}
+
+.cardWide {
+  grid-column: 1 / -1;
+}
+
+.cardLabel {
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+}
+
+.cardBody {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  min-width: 0;
+}
+
+.rowGroup {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 12px;
+}
+
+.stackGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+/* ── Contenu de démonstration générique (ex: Card) ───────── */
+.demoTitle {
+  margin: 0 0 8px;
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--text);
+}
+
+.demoText {
+  margin: 0;
+  font-size: 14px;
+  line-height: 1.5;
+  color: #9ca3af;
+}
+
+/* ── Aperçu statique : Modal / PaymentModal ──────────────── */
+.modalPreview {
+  display: flex;
+  width: 100%;
+  padding: 16px;
+  background: rgba(0, 0, 0, 0.35);
+  border-radius: 8px;
+}
+
+.modalPreviewBox {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 20px;
+  background: #0b1220;
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.7);
+}
+
+.modalPreviewHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.modalPreviewTitle {
+  margin: 0;
+  font-size: 18px;
+  font-weight: 700;
+  color: #e7f0ff;
+}
+
+.modalPreviewClose {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 4px;
+  border-radius: 6px;
+  color: #94a3b8;
+}
+
+.modalPreviewBody {
+  margin: 0;
+  font-size: 14px;
+  line-height: 1.6;
+  color: #94a3b8;
+}
+
+.modalPreviewFooter {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  padding-top: 12px;
+  border-top: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+/* ── Responsive ──────────────────────────────────────────── */
+@media (max-width: 900px) {
+  .page {
+    flex-direction: column;
+  }
+
+  .sidebar {
+    position: static;
+    width: 100%;
+    height: auto;
+    flex-direction: row;
+    flex-wrap: wrap;
+    overflow-y: visible;
+    border-right: none;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .sidebarTitle {
+    width: 100%;
+  }
+
+  .nav {
+    flex-direction: row;
+    flex-wrap: wrap;
+  }
+
+  .main {
+    padding: 32px 20px 64px;
+  }
+}

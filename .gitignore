@@ -1,0 +1,13 @@
+node_modules/
+reset_kanban.js
+.envnode_modules/
+reset_kanban.js
+.env
+server/.env
+server/.env
+ai/chroma_db/
+.claude
+.github
+ai/colibri_lora/
+ai/colibri_merged/
+colibri_output/

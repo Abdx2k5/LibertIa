@@ -1,0 +1,245 @@
+/* =============================================================
+   FICHIER  : src/components/ui/AvisSection.module.css
+   TÂCHE    : T95 — Avis sur les agences / hôtels / vols
+============================================================= */
+
+.wrap {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  background: var(--bg-secondary);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 20px;
+  box-sizing: border-box;
+}
+
+/* ── en-tête ── */
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding-bottom: 16px;
+  border-bottom: 1px solid var(--border);
+}
+
+.moyenneBlock {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.moyenneValue {
+  font-size: 32px;
+  font-weight: 700;
+  color: var(--text);
+  line-height: 1;
+}
+
+.totalLabel {
+  font-size: 13px;
+  color: var(--text-muted);
+}
+
+/* ── étoiles d'affichage ── */
+.starsRow {
+  display: flex;
+  gap: 2px;
+}
+
+.starWrap {
+  position: relative;
+  display: inline-flex;
+  flex-shrink: 0;
+}
+
+.starFillClip {
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 100%;
+  overflow: hidden;
+  display: flex;
+}
+
+/* ── formulaire ── */
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.starPicker {
+  display: flex;
+  gap: 4px;
+}
+
+.starPickerBtn {
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  padding: 2px;
+  display: flex;
+  transition: transform 0.15s ease;
+}
+
+.starPickerBtn:hover {
+  transform: scale(1.1);
+}
+
+.textarea {
+  width: 100%;
+  resize: vertical;
+  min-height: 70px;
+  max-height: 160px;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 10px 14px;
+  font-size: 14px;
+  font-family: inherit;
+  color: var(--text);
+  outline: none;
+  box-sizing: border-box;
+  transition: border-color 0.2s ease;
+}
+
+.textarea::placeholder {
+  color: var(--text-muted);
+}
+
+.textarea:focus {
+  border-color: rgba(170, 59, 255, 0.45);
+}
+
+.formFooter {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.charCount {
+  font-size: 12px;
+  color: var(--text-muted);
+}
+
+.submitBtn {
+  border: none;
+  border-radius: 8px;
+  padding: 10px 22px;
+  font-size: 13px;
+  font-weight: 700;
+  color: #ffffff;
+  background: linear-gradient(135deg, var(--accent), #7c3aed);
+  cursor: pointer;
+  transition: opacity 0.2s ease, transform 0.2s ease;
+}
+
+.submitBtn:hover:not(:disabled) {
+  transform: translateY(-1px);
+}
+
+.submitBtn:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.error {
+  font-size: 13px;
+  color: var(--error);
+}
+
+/* ── liste des avis ── */
+.empty {
+  margin: 0;
+  text-align: center;
+  font-size: 13px;
+  color: var(--text-muted);
+  padding: 16px 0;
+}
+
+.list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.item {
+  display: flex;
+  gap: 12px;
+}
+
+.avatar {
+  width: 36px;
+  height: 36px;
+  border-radius: 999px;
+  flex-shrink: 0;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, var(--accent), #7c3aed);
+  color: #ffffff;
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.avatar img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.itemBody {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.itemHead {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.itemAuteur {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--text);
+}
+
+.deleteBtn {
+  margin-left: auto;
+  border: none;
+  background: transparent;
+  color: var(--text-muted);
+  cursor: pointer;
+  padding: 2px;
+  display: flex;
+  transition: color 0.2s ease;
+}
+
+.deleteBtn:hover {
+  color: var(--error);
+}
+
+.itemText {
+  margin: 0;
+  font-size: 14px;
+  line-height: 1.55;
+  color: #e5e7eb;
+  word-break: break-word;
+}
+
+.itemDate {
+  font-size: 12px;
+  color: var(--text-muted);
+}

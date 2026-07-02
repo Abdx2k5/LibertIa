@@ -1,0 +1,186 @@
+/* ============================================================
+   PublicProfile.module.css — Profil public (lecture seule)
+   ============================================================ */
+
+.page {
+  min-height: 100vh;
+  background: var(--bg);
+  font-family: 'Inter', sans-serif;
+  color: var(--text);
+}
+
+.main { max-width: 900px; margin: 0 auto; padding: 40px 24px; }
+
+.centered {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  min-height: 60vh;
+  text-align: center;
+}
+
+.notFoundText { font-size: 15px; color: var(--text-muted); }
+
+.btnBack {
+  background: none;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 10px 20px;
+  font-size: 14px;
+  color: var(--text);
+  cursor: pointer;
+  font-family: inherit;
+}
+.btnBack:hover { background: var(--accent-bg); }
+
+/* ── Barre publique (visiteur déconnecté) ── */
+.publicNav {
+  position: sticky; top: 0; z-index: 100;
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 16px 32px;
+  background: var(--bg-secondary);
+  border-bottom: 1px solid var(--border);
+}
+.publicNavLogo { display: flex; align-items: center; gap: 10px; text-decoration: none; color: var(--text); font-weight: 700; font-size: 18px; }
+.publicNavLogoImg { width: 32px; height: 32px; border-radius: 8px; object-fit: cover; }
+.publicNavActions { display: flex; align-items: center; gap: 10px; }
+
+.btnOutlineLink,
+.btnPrimaryLink {
+  display: inline-flex; align-items: center; justify-content: center;
+  padding: 9px 18px; border-radius: 8px; font-size: 14px; font-weight: 600;
+  text-decoration: none; cursor: pointer; font-family: inherit;
+}
+.btnOutlineLink { background: none; border: 1px solid var(--border); color: var(--text); }
+.btnOutlineLink:hover { background: var(--accent-bg); }
+.btnPrimaryLink { background: linear-gradient(135deg, var(--accent), #7c3aed); border: none; color: #fff; }
+
+/* ── Cover + identité ── */
+.coverCard {
+  background: var(--bg-secondary);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  overflow: hidden;
+  margin-bottom: 24px;
+}
+
+.cover {
+  height: 140px;
+  background: linear-gradient(135deg, var(--accent), #2a1f3d 70%);
+}
+
+.heroRow {
+  display: flex;
+  align-items: flex-end;
+  gap: 20px;
+  padding: 0 28px;
+  margin-top: -48px;
+  flex-wrap: wrap;
+}
+
+.avatarWrap { flex-shrink: 0; }
+.avatarImg {
+  width: 100px; height: 100px; border-radius: 50%;
+  border: 4px solid var(--bg-secondary);
+  object-fit: cover; display: block;
+  background: var(--bg-tertiary);
+}
+
+.heroInfo { flex: 1; min-width: 0; padding-bottom: 8px; }
+.heroName { font-size: 22px; font-weight: 700; color: var(--text); margin: 0; }
+.heroJoined { font-size: 13px; color: var(--text-muted); margin: 4px 0 0; }
+
+.badgeRow { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 10px; }
+.badge {
+  display: inline-flex; align-items: center; gap: 6px;
+  background: var(--accent-bg);
+  border: 1px solid var(--accent-border);
+  border-radius: 20px; padding: 5px 12px;
+  font-size: 12px; font-weight: 600; color: var(--accent-secondary);
+}
+
+.heroAction { flex-shrink: 0; padding-bottom: 8px; }
+
+.btnOwnProfile {
+  display: inline-flex; align-items: center; justify-content: center;
+  background: var(--bg-tertiary);
+  border: 1px solid var(--border);
+  border-radius: 8px; padding: 10px 18px;
+  font-size: 14px; font-weight: 600; color: var(--text);
+  text-decoration: none; cursor: pointer; font-family: inherit;
+}
+.btnOwnProfile:hover { background: var(--accent-bg); }
+
+.bioText {
+  font-size: 14px; color: var(--text); line-height: 1.55;
+  padding: 20px 28px 28px; margin: 0;
+}
+.bioPlaceholder {
+  font-size: 14px; color: var(--text-muted); font-style: italic;
+  padding: 20px 28px 28px; margin: 0;
+}
+
+/* ── Stats ── */
+.statsBar {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 14px;
+  margin-bottom: 24px;
+}
+.statCard {
+  background: var(--bg-secondary);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 18px 8px;
+  display: flex; flex-direction: column; align-items: center; gap: 4px;
+}
+.statNum { font-size: 24px; font-weight: 700; color: var(--accent-secondary); }
+.statLabel { font-size: 12px; color: var(--text-muted); text-align: center; }
+
+@media (max-width: 640px) {
+  .statsBar { grid-template-columns: repeat(2, 1fr); }
+  .heroRow { margin-top: -36px; }
+  .avatarImg { width: 76px; height: 76px; }
+}
+
+/* ── Sections ── */
+.section {
+  background: var(--bg-secondary);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 28px;
+  margin-bottom: 24px;
+}
+.sectionTitle { font-size: 18px; font-weight: 600; color: var(--text); margin: 0 0 20px; }
+.emptyText { font-size: 14px; color: var(--text-muted); font-style: italic; margin: 0; }
+
+.postsList { display: flex; flex-direction: column; gap: 16px; }
+
+/* ── Voyages (lecture seule) ── */
+.voyagesGrid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 16px;
+}
+@media (max-width: 640px) {
+  .voyagesGrid { grid-template-columns: 1fr; }
+}
+
+.voyageCard {
+  background: var(--bg-tertiary);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 18px;
+}
+.voyageTitle { font-size: 15px; font-weight: 700; color: var(--text); margin: 0 0 6px; }
+.voyageDestination {
+  display: flex; align-items: center; gap: 6px;
+  font-size: 13px; color: var(--text-muted); margin: 0 0 10px;
+}
+.voyageMeta {
+  display: flex; flex-wrap: wrap; gap: 14px;
+  font-size: 12px; color: var(--text-muted);
+}
+.voyageMeta span { display: inline-flex; align-items: center; gap: 5px; }

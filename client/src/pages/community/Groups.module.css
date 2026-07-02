@@ -1,0 +1,221 @@
+/* ============================================================
+   Groups.module.css — Page Groupes de voyage (T62)
+   ============================================================ */
+
+.page {
+  min-height: 100vh;
+  background: var(--bg);
+  color: var(--text);
+  padding: 32px 24px 56px;
+  font-family: 'Inter', sans-serif;
+}
+
+.container {
+  max-width: 1100px;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+/* ── Hero ── */
+.heroCard {
+  padding: 28px;
+  background: linear-gradient(135deg, var(--bg-secondary), #2a1f3d);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  box-shadow: var(--card-shadow);
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.backLink {
+  align-self: flex-start;
+  background: none; border: none; padding: 0;
+  font-size: 13px; font-weight: 500; color: var(--accent);
+  cursor: pointer; font-family: 'Inter', sans-serif;
+}
+.backLink:hover { text-decoration: underline; }
+
+.heroKicker {
+  display: inline-flex;
+  width: fit-content;
+  align-items: center;
+  border-radius: 999px;
+  padding: 6px 10px;
+  background: rgba(170, 59, 255, 0.12);
+  border: 1px solid rgba(170, 59, 255, 0.28);
+  color: #d8b4fe;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.heroTitle {
+  margin: 0;
+  font-size: clamp(28px, 4vw, 42px);
+  line-height: 1.1;
+  font-weight: 800;
+  color: var(--text);
+}
+.heroTitle span { color: var(--accent); }
+
+.heroSubtitle {
+  margin: 0;
+  max-width: 640px;
+  color: #9ca3af;
+  font-size: 15px;
+  line-height: 1.6;
+}
+
+.searchInput {
+  width: 100%; max-width: 480px;
+  margin-top: 8px;
+  background: rgba(255,255,255,0.04);
+  border: 1px solid rgba(255,255,255,0.1);
+  border-radius: 10px;
+  padding: 12px 16px;
+  font-size: 14px; color: var(--text);
+  font-family: 'Inter', sans-serif;
+  outline: none;
+  box-sizing: border-box;
+  transition: border-color 0.2s;
+}
+.searchInput::placeholder { color: var(--text-muted); }
+.searchInput:focus { border-color: rgba(170,59,255,0.5); }
+
+/* ── Filtres ── */
+.filterTabs {
+  display: flex; flex-wrap: wrap; gap: 8px;
+}
+
+.filterTab {
+  padding: 9px 16px; border-radius: 999px;
+  background: var(--bg-secondary);
+  border: 1px solid var(--border);
+  color: #9ca3af; font-size: 13px; font-weight: 500;
+  cursor: pointer; font-family: 'Inter', sans-serif;
+  transition: all 0.15s;
+}
+.filterTab:hover { color: var(--text); border-color: rgba(255,255,255,0.2); }
+
+.filterTabActive {
+  background: linear-gradient(135deg, var(--accent), #7c3aed);
+  border-color: transparent;
+  color: #ffffff;
+}
+
+/* ── Empty state ── */
+.emptyState {
+  text-align: center; padding: 48px 20px;
+  color: var(--text-muted); font-size: 14px;
+  background: var(--bg-secondary);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+}
+
+/* ── Grille de groupes ── */
+.groupsGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  gap: 18px;
+}
+
+.groupCard {
+  background: var(--bg-secondary);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  overflow: hidden;
+  display: flex; flex-direction: column;
+  box-shadow: var(--card-shadow);
+}
+
+.groupCover {
+  height: 88px;
+  background: linear-gradient(135deg, rgba(170,59,255,0.35), rgba(167,139,250,0.15));
+  display: flex; align-items: center; justify-content: center;
+}
+
+.groupCoverInitial {
+  font-size: 32px; font-weight: 800; color: #ffffff;
+}
+
+.groupBody {
+  display: flex; flex-direction: column; gap: 10px;
+  padding: 18px;
+}
+
+.groupHeaderRow {
+  display: flex; align-items: flex-start; justify-content: space-between; gap: 8px;
+}
+
+.groupName {
+  margin: 0; font-size: 16px; font-weight: 700; color: var(--text);
+  display: flex; align-items: center; gap: 6px;
+}
+
+.verifiedBadge {
+  display: inline-flex; align-items: center; justify-content: center;
+  width: 18px; height: 18px; border-radius: 50%;
+  background: rgba(167,139,250,0.15); color: var(--accent-secondary);
+  font-size: 11px; font-weight: 700;
+}
+
+.typeBadge {
+  flex-shrink: 0;
+  font-size: 11px; font-weight: 600; color: #9ca3af;
+  background: rgba(255,255,255,0.05);
+  border: 1px solid rgba(255,255,255,0.1);
+  border-radius: 8px; padding: 4px 8px;
+}
+
+.groupLocation { margin: 0; font-size: 12px; color: var(--text-muted); }
+
+.groupDescription {
+  margin: 0; font-size: 13px; color: #d1d5db; line-height: 1.5;
+}
+
+.tagRow { display: flex; flex-wrap: wrap; gap: 6px; }
+
+.tag {
+  font-size: 11px; font-weight: 500; color: #d8b4fe;
+  background: rgba(170,59,255,0.1);
+  border: 1px solid rgba(170,59,255,0.2);
+  border-radius: 8px; padding: 3px 8px;
+}
+
+.groupFooter {
+  display: flex; align-items: flex-end; justify-content: space-between; gap: 12px;
+  margin-top: 4px; padding-top: 12px;
+  border-top: 1px solid rgba(255,255,255,0.06);
+}
+
+.groupStats { display: flex; flex-direction: column; gap: 2px; }
+.membersCount { font-size: 12px; font-weight: 600; color: var(--text); }
+.nextActivity { font-size: 11px; color: var(--text-muted); }
+
+.joinButton, .joinedButton {
+  display: inline-flex; align-items: center; gap: 6px;
+  flex-shrink: 0;
+  border: none; border-radius: 999px;
+  padding: 9px 18px; font-size: 13px; font-weight: 700;
+  cursor: pointer; font-family: 'Inter', sans-serif;
+  transition: all 0.15s;
+}
+
+.joinButton {
+  background: linear-gradient(135deg, var(--accent), #7c3aed);
+  color: #ffffff;
+}
+.joinButton:hover { opacity: 0.9; }
+
+.joinedButton {
+  background: rgba(34,197,94,0.12);
+  border: 1px solid rgba(34,197,94,0.3);
+  color: var(--accent-green);
+}
+
+/* ── Responsive ── */
+@media (max-width: 700px) {
+  .groupsGrid { grid-template-columns: 1fr; }
+}
