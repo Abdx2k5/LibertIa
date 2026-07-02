@@ -28,9 +28,14 @@ const app = express();
 connectDB();
 
 app.use(cors({
-    origin: "http://localhost:5173",
+    origin: [
+        "http://localhost:5173",
+        "https://libertia-production.up.railway.app",
+        /\.vercel\.app$/
+    ],
     credentials: true
 }));
+
 // limite augmentée pour l'upload de photos en base64 (T79)
 app.use(express.json({ limit: '5mb' }));
 
