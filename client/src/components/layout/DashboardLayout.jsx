@@ -14,6 +14,7 @@ const IconStar     = () => <svg {...sv} fill="currentColor" stroke="none"><polyg
 const IconLogOut   = () => <svg {...sv}><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>;
 const IconMenu     = () => <svg {...sv}><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>;
 const IconX        = () => <svg {...sv}><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>;
+const IconShield   = () => <svg {...sv}><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>;
 
 const NAV = [
   { label:"Accueil",     to:"/dashboard",   icon:IconHome },
@@ -29,10 +30,11 @@ const SIDEBAR_W = 220;
 export default function DashboardLayout() {
   const navigate = useNavigate();
   const location = useLocation();
-  const { user, logout } = useAuthStore();
+  const { user, logout, role } = useAuthStore();
   const [open, setOpen] = useState(false);
 
   const handleLogout = () => { logout(); navigate("/"); };
+  const isAdmin = role === 'admin';
 
   const navItem = (active) => ({
     display:"flex", alignItems:"center", gap:10,
@@ -114,6 +116,24 @@ export default function DashboardLayout() {
               {item.label}
             </button>
           ))}
+
+          {/* Admin — visible uniquement pour les admins */}
+          {isAdmin && (
+            <>
+              <div style={{ height:1, background:"var(--border)", margin:"8px 0" }}/>
+              <button
+                style={{
+                  ...navItem(location.pathname === '/admin'),
+                  color: location.pathname === '/admin' ? "#f97316" : "#f97316bb",
+                  background: location.pathname === '/admin' ? "rgba(249,115,22,0.1)" : "none",
+                }}
+                onClick={() => { navigate('/admin'); setOpen(false); }}>
+                <IconShield />
+                Administration
+              </button>
+            </>
+          )}
+
           <div style={{ height:1, background:"var(--border)", margin:"8px 0" }}/>
           <button style={navItem(false)} onClick={handleLogout}>
             <IconLogOut />

@@ -91,7 +91,9 @@ const login = async (req, res) => {
         // SA4
         await auditLog({ userId: user._id, action: 'login', req, success: true });
 
-        res.json({ ...user.toJSON(), token: accessToken, refreshToken });
+        const adminEmails = (process.env.ADMIN_EMAILS || '').split(',').map(e => e.trim());
+const role = adminEmails.includes(user.email) ? 'admin' : 'user';
+res.json({ ...user.toJSON(), token: accessToken, refreshToken, role });
 
     } catch (err) {
         res.status(500).json({ message: err.message });
@@ -144,7 +146,9 @@ const googleAuth = async (req, res) => {
 
         await auditLog({ userId: user._id, action: 'login_google', req, success: true });
 
-        res.json({ ...user.toJSON(), token: accessToken, refreshToken });
+        const adminEmails = (process.env.ADMIN_EMAILS || '').split(',').map(e => e.trim());
+        const role = adminEmails.includes(user.email) ? 'admin' : 'user';
+        res.json({ ...user.toJSON(), token: accessToken, refreshToken, role });
     } catch (err) {
         res.status(500).json({ message: err.message });
     }

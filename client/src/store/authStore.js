@@ -35,6 +35,7 @@ export function AuthProvider({ children }) {
   const login = (userData, userToken) => {
     localStorage.setItem("libertia_token", userToken);
     localStorage.setItem("libertia_user", JSON.stringify(userData));
+localStorage.setItem("libertia_token", userToken);
     setToken(userToken);
     setUser(userData);
   };
