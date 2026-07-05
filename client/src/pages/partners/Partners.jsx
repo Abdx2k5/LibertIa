@@ -1,5 +1,6 @@
 import { useNavigate } from "react-router-dom";
-
+import logoVisitMorocco from "../../assets/logos/logo-w.png";
+import logoMonvoyage from "../../assets/logos/fr_logo.png";
 export default function Partners() {
   const navigate = useNavigate();
 
@@ -7,7 +8,7 @@ export default function Partners() {
     {
       name: "Visit Morocco",
       url: "https://www.visitmorocco.com",
-      logo: "src/assets/logos/logo-w.png",
+      logo: logoVisitMorocco,
       color: "#C8102E",
       letter: "VM",
       desc: "Office National Marocain du Tourisme — partenaire officiel pour les destinations marocaines.",
@@ -16,7 +17,7 @@ export default function Partners() {
     {
       name: "monvoyage.ma",
       url: "https://www.monvoyage.ma",
-      logo: "src/assets/logos/fr_logo.png",
+      logo: logoMonvoyage,
       color: "#0066CC",
       letter: "MV",
       desc: "Plateforme marocaine de réservation de voyages — vols, hôtels et packages.",
