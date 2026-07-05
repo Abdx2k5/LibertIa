@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import styles from "./Landing.module.css";
+import imgLogo from "../../assets/logos/logo.png";
 
 // ── Icônes SVG inline ──────────────────────────────────────────
 const IconPlane = () => <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M17.8 19.2 16 11l3.5-3.5C21 6 21.5 4 21 3c-1-.5-3 0-4.5 1.5L13 8 4.8 6.2c-.5-.1-1 .1-1.3.5l-.7.8c-.4.5-.2 1.2.3 1.5L9 12l-2 3H4l-1 1 3 2 2 3 1-1v-3l3-2 3.5 5.3c.3.5 1 .7 1.5.3l.8-.7c.4-.3.6-.8.5-1.3Z"/></svg>;
@@ -110,7 +111,7 @@ export default function Landing() {
       <nav className={`${styles.nav} ${scrolled ? styles.navScrolled : ""}`}>
         <div className={styles.navInner}>
           <Link to="/" className={styles.logo}>
-            <div className={styles.logoIcon}>L</div>
+            <img src={imgLogo} alt="LibertIa" style={{ height:32, objectFit:"contain" }}/>
             <span className={styles.logoText}>LibertIa</span>
           </Link>
 
@@ -365,7 +366,7 @@ export default function Landing() {
         <div className={styles.footerInner}>
           <div className={styles.footerBrand}>
             <div className={styles.logo}>
-              <div className={styles.logoIcon}>L</div>
+              <img src={imgLogo} alt="LibertIa" style={{ height:32, objectFit:"contain" }}/>
               <span className={styles.logoText}>LibertIa</span>
             </div>
             <p className={styles.footerTagline}>

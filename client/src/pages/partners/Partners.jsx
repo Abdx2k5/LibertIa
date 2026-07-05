@@ -7,7 +7,7 @@ export default function Partners() {
     {
       name: "Visit Morocco",
       url: "https://www.visitmorocco.com",
-      logo: null,
+      logo: "src/assets/logos/logo-w.png",
       color: "#C8102E",
       letter: "VM",
       desc: "Office National Marocain du Tourisme — partenaire officiel pour les destinations marocaines.",
@@ -16,7 +16,7 @@ export default function Partners() {
     {
       name: "monvoyage.ma",
       url: "https://www.monvoyage.ma",
-      logo: null,
+      logo: "src/assets/logos/fr_logo.png",
       color: "#0066CC",
       letter: "MV",
       desc: "Plateforme marocaine de réservation de voyages — vols, hôtels et packages.",
@@ -74,7 +74,10 @@ export default function Partners() {
         {partners.map((p, i) => (
           <div key={i} style={sty.card}>
             <div style={sty.cardHead}>
-              <div style={sty.logoBox(p.color)}>{p.letter}</div>
+              {p.logo
+                ? <img src={p.logo} alt={p.name} style={{ width:56, height:56, borderRadius:14, objectFit:"contain", background:"#1a1a2e", padding:6, flexShrink:0 }}/>
+                : <div style={sty.logoBox(p.color)}>{p.letter}</div>
+              }
               <div>
                 <div style={sty.cardName}>{p.name}</div>
                 <div style={{ fontSize:13, color:"var(--accent)", fontWeight:500 }}>Partenaire officiel</div>

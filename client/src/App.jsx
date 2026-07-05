@@ -27,6 +27,7 @@ import Settings     from "./pages/settings/Settings";
 import Subscription from "./pages/subscription/Subscription";
 import AgencyDetail from "./pages/agency/AgencyDetail";
 import MesVoyages   from "./pages/voyages/MesVoyages";
+import Partners     from "./pages/partners/Partners";
 import AdminPanel   from "./pages/admin/AdminPanel";
 import NotFound     from "./pages/NotFound";
 
@@ -71,6 +72,7 @@ export default function App() {
                 <Route path={ROUTES.MY_TRIPS} element={<MesVoyages />} />
                 <Route path={ROUTES.COMMUNITY} element={<Community />} />
                 <Route path={ROUTES.GROUPS}    element={<Groups />} />
+                <Route path="/partners"        element={<Partners />} />
               </Route>
             </Route>
 
@@ -89,4 +91,4 @@ export default function App() {
       </AuthProvider>
     </BrowserRouter>
   );
-}
+} 
